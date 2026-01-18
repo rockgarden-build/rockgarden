@@ -57,3 +57,7 @@ rockgarden/
 - **Templating:** Jinja2
 - **CLI framework:** typer (rich integration later)
 - **Markdown parser:** markdown-it-py (CommonMark, extensible)
+- **Formatting/Linting:** ruff
+- **Testing:** pytest
+- **Version bumping:** commitizen
+- **Commit style:** conventional commits
