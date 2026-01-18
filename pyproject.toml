@@ -1,0 +1,34 @@
+[project]
+name = "rockgarden"
+version = "0.1.0"
+description = "Obsidian-compatible static site generator"
+readme = "README.md"
+authors = [
+    { name = "Dave Forgac", email = "tylerdave@tylerdave.com" }
+]
+requires-python = ">=3.13"
+license = "MIT"
+keywords = ["obsidian", "static-site-generator", "markdown"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Text Processing :: Markup :: Markdown",
+]
+dependencies = [
+    "typer>=0.9.0",
+]
+
+[project.scripts]
+rockgarden = "rockgarden.cli:main"
+rgdn = "rockgarden.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/rockgarden"]
