@@ -8,3 +8,6 @@ Noted but not currently planned:
 - Graph visualization
 - Dark mode toggle
 - RSS feed
+- Content from other data sources during collection (other files, APIs, databases, etc.)
+- Installable templates
+- Plugins
