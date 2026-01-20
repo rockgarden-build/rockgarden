@@ -1,4 +1,4 @@
-# Milestone 1: Render Home Page
+# Milestone 1: Render Home Page ✅
 
 Render `index.md` from an Obsidian vault to `_site/index.html` with basic styling. Wiki-links rendered as plain text (no resolution).
 

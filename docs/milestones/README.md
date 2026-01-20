@@ -12,13 +12,13 @@ Both use Quartz-style `content/` folder structure.
 
 ## Roadmap
 
-### Milestone 1: Home Page
+### Milestone 1: Home Page ✅
 Render single `index.md` to HTML. Basic markdown, no link resolution.
 
-### Milestone 2: All Pages
+### Milestone 2: All Pages ✅
 Render all markdown files. Folder structure preserved in output.
 
-### Milestone 3: Wiki-Links
+### Milestone 3: Wiki-Links ✅
 Resolve `[[Name]]` and `[[Name|Alias]]` to actual page URLs.
 
 ### Milestone 4: Embeds
@@ -42,8 +42,14 @@ User-defined Jinja2 macros in `_macros/` directory.
 ### Milestone 10: Themes
 Full theme support - override single templates or replace entire template set.
 
-### Milestone 11: Polish
-Dark mode, responsive design, RSS, sitemap.
+### Milestone 11: RSS Feed
+Generate RSS/Atom feed for content updates.
+
+### Milestone 12: Base Path Prefix
+Support deploying to subdirectories (e.g., `example.com/docs/`) via `base_url` config.
+
+### Milestone 13: Polish
+Dark mode, responsive design, sitemap.
 
 ## Quartz Features to Support
 
@@ -51,7 +57,7 @@ From the test vaults' Quartz configs:
 
 **Core:**
 - [x] Frontmatter parsing
-- [ ] Wiki-links with shortest-path resolution
+- [x] Wiki-links with name-based resolution
 - [ ] Image/audio embeds
 - [ ] Callouts
 - [ ] Table of contents
@@ -60,7 +66,7 @@ From the test vaults' Quartz configs:
 - [ ] Search
 
 **Output:**
-- [ ] Content pages
+- [x] Content pages
 - [ ] Folder pages
 - [ ] Tag pages
 - [ ] Sitemap
@@ -69,4 +75,4 @@ From the test vaults' Quartz configs:
 **Customizations found:**
 - [ ] `BeyondLink` component (frontmatter-driven D&D Beyond links)
 - [ ] Build info in footer (timestamp, git commit)
-- [ ] Ignore patterns (private, templates, .obsidian)
+- [x] Ignore patterns (private, templates, .obsidian)
