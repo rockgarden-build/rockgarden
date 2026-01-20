@@ -3,7 +3,8 @@
 from pathlib import Path
 
 from rockgarden.config import Config
-from rockgarden.content import load_content
+from rockgarden.content import ContentStore, load_content
+from rockgarden.obsidian import process_wikilinks
 from rockgarden.render import create_engine, render_markdown, render_page
 
 
@@ -21,6 +22,7 @@ def build_site(config: Config, source: Path, output: Path) -> int:
     output.mkdir(parents=True, exist_ok=True)
 
     pages = load_content(source, config.build.ignore_patterns)
+    store = ContentStore(pages)
 
     env = create_engine(config, site_root=source.parent)
 
@@ -28,7 +30,8 @@ def build_site(config: Config, source: Path, output: Path) -> int:
 
     count = 0
     for page in pages:
-        page.html = render_markdown(page.content)
+        content = process_wikilinks(page.content, store.resolve_link)
+        page.html = render_markdown(content)
 
         html = render_page(env, page, site_config)
 
