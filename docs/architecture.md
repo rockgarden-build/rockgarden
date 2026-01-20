@@ -7,6 +7,10 @@
 └─────────────────┘     └─────────────────┘     └─────────────────┘
 ```
 
+## Design Goals
+
+- **Build speed:** Prioritize efficient builds without sacrificing core concepts. The build step should be as fast as practical.
+
 ## Project Structure
 
 ```
