@@ -1,6 +1,7 @@
 """Command-line interface for rockgarden."""
 
 import http.server
+import shutil
 import socketserver
 from functools import partial
 from pathlib import Path
@@ -12,6 +13,13 @@ from rockgarden.config import Config
 from rockgarden.output import build_site
 
 app = typer.Typer(no_args_is_help=True)
+
+
+def _output_dir_has_contents(output_dir: Path) -> bool:
+    """Check if output directory exists and has contents."""
+    if not output_dir.exists():
+        return False
+    return any(output_dir.iterdir())
 
 
 @app.command()
@@ -28,6 +36,10 @@ def build(
         Path | None,
         typer.Option("--config", "-c", help="Path to config file"),
     ] = None,
+    clean: Annotated[
+        bool,
+        typer.Option("--clean", help="Clean output directory without prompting"),
+    ] = False,
 ) -> None:
     """Build the static site from an Obsidian vault."""
     # If source specified but no config, look for config in source directory
@@ -47,6 +59,19 @@ def build(
     if not source_dir.exists():
         typer.echo(f"Error: Source directory not found: {source_dir}", err=True)
         raise typer.Exit(1)
+
+    # Handle cleaning output directory
+    if _output_dir_has_contents(output_dir):
+        if clean:
+            shutil.rmtree(output_dir)
+        else:
+            confirm = typer.confirm(
+                f"Output directory {output_dir} exists. Delete contents?"
+            )
+            if confirm:
+                shutil.rmtree(output_dir)
+            else:
+                raise typer.Exit(0)
 
     typer.echo(f"Building site from {source_dir}")
 
