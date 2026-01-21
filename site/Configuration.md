@@ -56,8 +56,11 @@ Page-level options in YAML frontmatter:
 title: Page Title     # Used in nav and <title>
 nav_order: 1          # Pin position in nav (lower = first)
 tags: [doc, guide]    # Shown in folder listings
+auto_index: false     # For index.md: disable folder listing
 ---
 ```
+
+The `auto_index` option only applies to `index.md` files. When `true` (default), the page shows both its content and an auto-generated listing of the folder's contents.
 
 ## CLI Overrides
 

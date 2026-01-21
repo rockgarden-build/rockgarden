@@ -40,14 +40,22 @@ def build_site(config: Config, source: Path, output: Path) -> int:
         "nav_default_state": config.nav.default_state,
     }
 
-    existing_indexes = {
-        "/".join(p.slug.split("/")[:-1])
-        for p in pages
-        if p.slug.split("/")[-1].lower() == "index"
-    }
+    indexes_with_auto = {}
+    for p in pages:
+        parts = p.slug.split("/")
+        if parts[-1].lower() == "index":
+            folder_path = "/".join(parts[:-1])
+            auto_index = p.frontmatter.get("auto_index", True)
+            indexes_with_auto[folder_path] = auto_index
 
     count = 0
     for page in pages:
+        parts = page.slug.split("/")
+        if parts[-1].lower() == "index":
+            folder_path = "/".join(parts[:-1])
+            if indexes_with_auto.get(folder_path, True):
+                continue
+
         content = page.content
 
         if page.frontmatter.get("title"):
@@ -71,7 +79,7 @@ def build_site(config: Config, source: Path, output: Path) -> int:
 
     for folder in folder_indexes:
         folder_path = folder.slug.rsplit("/", 1)[0] if "/" in folder.slug else ""
-        if folder_path in existing_indexes:
+        if folder_path in indexes_with_auto and not indexes_with_auto[folder_path]:
             continue
 
         if folder.custom_content:

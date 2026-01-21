@@ -63,4 +63,27 @@ Each page shows a breadcrumb trail from root to current location.
 
 ## Folder Index Pages
 
-Folders automatically get index pages listing their contents. To customize a folder's index, create `folder/index.md` with your own content.
+Folders automatically get index pages listing their contents.
+
+To add custom content above the listing, create `folder/index.md`:
+
+```yaml
+---
+title: My Folder
+---
+
+Custom intro text here.
+```
+
+See [Examples](/examples/index.html) for a live example—it has custom content with the auto-generated listing below.
+
+To disable the listing entirely and render as a normal page:
+
+```yaml
+---
+title: My Folder
+auto_index: false
+---
+```
+
+This site's [homepage](/index.html) uses `auto_index: false`.

@@ -9,6 +9,12 @@
 <article>
   <h1>{{ folder.title }}</h1>
 
+  {% if folder.custom_content %}
+  <div class="folder-custom-content">
+    {{ folder.custom_content | safe }}
+  </div>
+  {% endif %}
+
   {% if folder.children %}
   <table class="folder-listing">
     <thead>
@@ -30,15 +36,6 @@
       {% endfor %}
     </tbody>
   </table>
-  {% else %}
-  <p><em>No pages in this folder.</em></p>
-  {% endif %}
-
-  {% if folder.custom_content %}
-  <hr>
-  <div class="folder-custom-content">
-    {{ folder.custom_content | safe }}
-  </div>
   {% endif %}
 </article>
 {% endblock %}
