@@ -3,7 +3,7 @@
 <li>
   {% if node.is_folder and node.children %}
   <details {{ 'open' if default_state == 'expanded' else '' }}>
-    <summary><a href="{{ node.path }}">{{ node.label }}</a></summary>
+    <summary><a href="{{ node.path }}" class="hover:text-primary">{{ node.label }}</a></summary>
     <ul>
       {% for child in node.children %}
         {{ render_node(child, default_state) }}
@@ -11,16 +11,15 @@
     </ul>
   </details>
   {% elif node.is_folder %}
-  <a href="{{ node.path }}">{{ node.label }}</a>
+  <a href="{{ node.path }}" class="hover:text-primary">{{ node.label }}</a>
   {% else %}
-  <a href="{{ node.path }}">{{ node.label }}</a>
+  <a href="{{ node.path }}" class="hover:text-primary">{{ node.label }}</a>
   {% endif %}
 </li>
 {% endmacro %}
 
-<nav class="site-nav" aria-label="Site navigation">
-  <ul>
-    <li class="nav-home"><a href="{{ site.nav.path }}">{{ site.nav.label }}</a></li>
+<nav class="nav-tree text-sm" aria-label="Site navigation">
+  <ul class="space-y-1">
     {% for node in site.nav.children %}
       {{ render_node(node, site.nav_default_state) }}
     {% endfor %}

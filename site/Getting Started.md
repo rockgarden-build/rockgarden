@@ -63,4 +63,14 @@ my-site/
     └── subpage.md
 ```
 
+## Output Structure
+
+Rockgarden generates clean URLs by default. Filenames are converted to URL-safe slugs:
+
+| Source | Output | URL |
+|--------|--------|-----|
+| `Getting Started.md` | `getting-started/index.html` | `/getting-started/` |
+| `folder/index.md` | `folder/index.html` | `/folder/` |
+| `My Page.md` | `my-page/index.html` | `/my-page/` |
+
 See [[Configuration]] for all options.

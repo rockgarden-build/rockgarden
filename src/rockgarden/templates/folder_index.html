@@ -7,35 +7,54 @@
 {% include "components/breadcrumbs.html" %}
 {% endif %}
 <article>
-  <h1>{{ folder.title }}</h1>
+  <h1 class="text-3xl font-bold mb-6">{{ folder.title }}</h1>
 
   {% if folder.custom_content %}
-  <div class="folder-custom-content">
+  <div class="prose prose-base max-w-none mb-8 prose-a:text-primary">
     {{ folder.custom_content | safe }}
   </div>
   {% endif %}
 
   {% if folder.children %}
-  <table class="folder-listing">
-    <thead>
-      <tr>
-        <th>Title</th>
-        <th>Modified</th>
-        <th>Tags</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for child in folder.children %}
-      <tr>
-        <td>
-          {% if child.is_folder %}📁 {% endif %}<a href="{{ child.path }}">{{ child.title }}</a>
-        </td>
-        <td>{{ child.modified.strftime('%Y-%m-%d') if child.modified else '' }}</td>
-        <td>{{ child.tags | join(', ') if child.tags else '' }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <div class="overflow-x-auto">
+    <table class="table table-zebra">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Modified</th>
+          <th>Tags</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for child in folder.children %}
+        <tr class="hover">
+          <td>
+            {% if child.is_folder %}
+            <span class="inline-flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-base-content/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+              </svg>
+              <a href="{{ child.path }}" class="link link-hover link-primary">{{ child.title }}</a>
+            </span>
+            {% else %}
+            <a href="{{ child.path }}" class="link link-hover link-primary">{{ child.title }}</a>
+            {% endif %}
+          </td>
+          <td class="text-base-content/60 text-sm">{{ child.modified.strftime('%Y-%m-%d') if child.modified else '' }}</td>
+          <td>
+            {% if child.tags %}
+            <div class="flex flex-wrap gap-1">
+              {% for tag in child.tags %}
+              <span class="badge badge-sm badge-ghost">{{ tag }}</span>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
   {% endif %}
 </article>
 {% endblock %}

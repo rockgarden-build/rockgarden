@@ -12,8 +12,22 @@ Configuration is optional. Create `rockgarden.toml` in your project root to cust
 title = "My Site"     # Page title suffix
 source = "."          # Source directory
 output = "_site"      # Output directory
-clean_urls = true     # Use /path/ instead of /path/index.html
+clean_urls = true     # Use /path/ instead of /path.html (default: true)
 ```
+
+### Clean URLs
+
+When `clean_urls = true` (the default):
+- Pages output to directories: `about.md` → `about/index.html`
+- URLs use trailing slashes: `/about/`
+- Links in content transform: `[text](page.md)` → `[text](page/)`
+
+When `clean_urls = false`:
+- Pages output as files: `about.md` → `about.html`
+- URLs use `.html` extension: `/about.html`
+- Links in content transform: `[text](page.md)` → `[text](page.html)`
+
+Index pages (`index.md`) always output as `index.html` in their folder.
 
 ## Build
 
@@ -55,6 +69,7 @@ Page-level options in YAML frontmatter:
 ```yaml
 ---
 title: Page Title     # Used in nav and <title>
+slug: custom-slug     # Override generated URL slug
 nav_order: 1          # Pin position in nav (lower = first)
 tags: [doc, guide]    # Shown in folder listings
 auto_index: false     # For index.md: disable folder listing
@@ -62,6 +77,32 @@ auto_index: false     # For index.md: disable folder listing
 ```
 
 The `auto_index` option only applies to `index.md` files. When `true` (default), the page shows both its content and an auto-generated listing of the folder's contents.
+
+## URL Slugs
+
+Rockgarden generates URL-safe slugs from filenames:
+
+| Filename | Generated Slug |
+|----------|----------------|
+| `Getting Started.md` | `getting-started` |
+| `NPCs/Olvir the Wise.md` | `npcs/olvir-the-wise` |
+| `my_page.md` | `my-page` |
+
+Slug rules:
+- Lowercase the entire path
+- Replace spaces and underscores with dashes
+- Preserve directory structure
+
+Override the generated slug with frontmatter:
+
+```yaml
+---
+title: Getting Started
+slug: quickstart
+---
+```
+
+This produces `/quickstart/` instead of `/getting-started/`.
 
 ## CLI Overrides
 

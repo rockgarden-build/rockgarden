@@ -23,11 +23,18 @@ rockgarden/
 │       ├── __init__.py
 │       ├── cli.py              # typer CLI
 │       ├── config.py           # TOML config loading
+│       ├── urls.py             # URL/path generation utilities
+│       ├── links.py            # Markdown link transformation
 │       ├── content/
 │       │   ├── __init__.py
 │       │   ├── store.py        # Content store & API
 │       │   ├── loader.py       # File discovery & parsing
 │       │   └── models.py       # Content/model classes
+│       ├── nav/
+│       │   ├── __init__.py
+│       │   ├── tree.py         # Navigation tree builder
+│       │   ├── breadcrumbs.py  # Breadcrumb generation
+│       │   └── folder_index.py # Folder index generation
 │       ├── obsidian/
 │       │   ├── __init__.py
 │       │   ├── wikilinks.py    # [[link]] processing
