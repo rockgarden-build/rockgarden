@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}{{ folder.title }}{% if site.title %} - {{ site.title }}{% endif %}{% endblock %}
+
+{% block content %}
+{% if breadcrumbs and breadcrumbs|length > 1 %}
+{% include "components/breadcrumbs.html" %}
+{% endif %}
+<article>
+  <h1>{{ folder.title }}</h1>
+
+  {% if folder.children %}
+  <table class="folder-listing">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Modified</th>
+        <th>Tags</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for child in folder.children %}
+      <tr>
+        <td>
+          {% if child.is_folder %}📁 {% endif %}<a href="{{ child.path }}">{{ child.title }}</a>
+        </td>
+        <td>{{ child.modified.strftime('%Y-%m-%d') if child.modified else '' }}</td>
+        <td>{{ child.tags | join(', ') if child.tags else '' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p><em>No pages in this folder.</em></p>
+  {% endif %}
+
+  {% if folder.custom_content %}
+  <hr>
+  <div class="folder-custom-content">
+    {{ folder.custom_content | safe }}
+  </div>
+  {% endif %}
+</article>
+{% endblock %}

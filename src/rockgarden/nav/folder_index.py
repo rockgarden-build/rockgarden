@@ -1,0 +1,191 @@
+"""Folder index page generation."""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from datetime import datetime
+
+from rockgarden.config import NavConfig
+from rockgarden.content import Page
+
+
+@dataclass
+class FolderChild:
+    """A child item in a folder listing."""
+
+    title: str
+    path: str
+    is_folder: bool
+    modified: datetime | None = None
+    tags: list[str] = field(default_factory=list)
+
+
+@dataclass
+class FolderIndex:
+    """Data for rendering a folder index page."""
+
+    slug: str
+    title: str
+    children: list[FolderChild]
+    custom_content: str | None = None
+    frontmatter: dict = field(default_factory=dict)
+
+
+def find_folders(pages: list[Page]) -> set[str]:
+    """Find all folder paths that need index pages."""
+    folders: set[str] = set()
+
+    for page in pages:
+        parts = page.slug.split("/")
+        if len(parts) > 1:
+            for i in range(1, len(parts)):
+                folder_path = "/".join(parts[:i])
+                folders.add(folder_path)
+
+    return folders
+
+
+def generate_folder_indexes(
+    pages: list[Page],
+    config: NavConfig | None = None,
+) -> list[FolderIndex]:
+    """Generate folder index data for all folders.
+
+    Args:
+        pages: All pages from the content store
+        config: Navigation config for hide patterns and labels
+
+    Returns:
+        List of FolderIndex objects for folders that need generated indexes
+    """
+    if config is None:
+        config = NavConfig()
+
+    folders = find_folders(pages)
+
+    existing_indexes: dict[str, Page] = {}
+    for page in pages:
+        parts = page.slug.split("/")
+        if parts[-1].lower() == "index":
+            folder_path = "/".join(parts[:-1])
+            existing_indexes[folder_path] = page
+
+    folder_indexes: list[FolderIndex] = []
+
+    for folder_path in sorted(folders):
+        if _should_hide(folder_path, config.hide):
+            continue
+
+        children = _get_folder_children(folder_path, pages, config)
+
+        if folder_path in existing_indexes:
+            index_page = existing_indexes[folder_path]
+            title = index_page.title
+            custom_content = index_page.content
+            frontmatter = index_page.frontmatter
+        else:
+            folder_name = folder_path.split("/")[-1]
+            title = _resolve_label(folder_path, folder_name, config.labels)
+            custom_content = None
+            frontmatter = {}
+
+        folder_indexes.append(
+            FolderIndex(
+                slug=f"{folder_path}/index" if folder_path else "index",
+                title=title,
+                children=children,
+                custom_content=custom_content,
+                frontmatter=frontmatter,
+            )
+        )
+
+    return folder_indexes
+
+
+def _should_hide(path: str, hide_patterns: list[str]) -> bool:
+    """Check if a path should be hidden."""
+    from fnmatch import fnmatch
+
+    for pattern in hide_patterns:
+        normalized_pattern = pattern.strip("/")
+        normalized_path = path.strip("/")
+        if fnmatch(normalized_path, normalized_pattern):
+            return True
+        if normalized_path.startswith(f"{normalized_pattern}/"):
+            return True
+    return False
+
+
+def _get_folder_children(
+    folder_path: str,
+    pages: list[Page],
+    config: NavConfig,
+) -> list[FolderChild]:
+    """Get direct children of a folder."""
+    children: list[FolderChild] = []
+    seen_subfolders: set[str] = set()
+
+    prefix = f"{folder_path}/" if folder_path else ""
+
+    for page in pages:
+        if not page.slug.startswith(prefix):
+            continue
+
+        relative = page.slug[len(prefix) :]
+        if not relative:
+            continue
+
+        parts = relative.split("/")
+
+        if len(parts) == 1:
+            if parts[0].lower() == "index":
+                continue
+            if _should_hide(page.slug, config.hide):
+                continue
+
+            modified = None
+            if page.source_path.exists():
+                modified = datetime.fromtimestamp(page.source_path.stat().st_mtime)
+
+            children.append(
+                FolderChild(
+                    title=page.title,
+                    path=f"/{page.slug}.html",
+                    is_folder=False,
+                    modified=modified,
+                    tags=page.frontmatter.get("tags", []),
+                )
+            )
+        else:
+            subfolder = parts[0]
+            subfolder_path = f"{prefix}{subfolder}" if prefix else subfolder
+
+            if subfolder_path not in seen_subfolders:
+                if _should_hide(subfolder_path, config.hide):
+                    continue
+
+                seen_subfolders.add(subfolder_path)
+                label = _resolve_label(subfolder_path, subfolder, config.labels)
+
+                children.append(
+                    FolderChild(
+                        title=label,
+                        path=f"/{subfolder_path}/index.html",
+                        is_folder=True,
+                    )
+                )
+
+    folders = sorted([c for c in children if c.is_folder], key=lambda x: x.title)
+    files = sorted([c for c in children if not c.is_folder], key=lambda x: x.title)
+
+    return folders + files
+
+
+def _resolve_label(path: str, name: str, labels: dict[str, str]) -> str:
+    """Resolve display label for a folder."""
+    normalized_path = f"/{path.strip('/')}" if path else "/"
+
+    if normalized_path in labels:
+        return labels[normalized_path]
+
+    return name.replace("-", " ").replace("_", " ").title()

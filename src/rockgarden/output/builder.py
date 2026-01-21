@@ -4,7 +4,11 @@ from pathlib import Path
 
 from rockgarden.config import Config
 from rockgarden.content import ContentStore, load_content
-from rockgarden.nav import build_breadcrumbs, build_nav_tree
+from rockgarden.nav import (
+    build_breadcrumbs,
+    build_nav_tree,
+    generate_folder_indexes,
+)
 from rockgarden.obsidian import process_wikilinks
 from rockgarden.render import create_engine, render_markdown, render_page
 
@@ -35,6 +39,12 @@ def build_site(config: Config, source: Path, output: Path) -> int:
         "nav_default_state": config.nav.default_state,
     }
 
+    existing_indexes = {
+        "/".join(p.slug.split("/")[:-1])
+        for p in pages
+        if p.slug.split("/")[-1].lower() == "index"
+    }
+
     count = 0
     for page in pages:
         content = process_wikilinks(page.content, store.resolve_link)
@@ -49,4 +59,70 @@ def build_site(config: Config, source: Path, output: Path) -> int:
 
         count += 1
 
+    folder_indexes = generate_folder_indexes(pages, config.nav)
+    folder_template = env.get_template("folder_index.html")
+
+    for folder in folder_indexes:
+        folder_path = folder.slug.rsplit("/", 1)[0] if "/" in folder.slug else ""
+        if folder_path in existing_indexes:
+            continue
+
+        if folder.custom_content:
+            processed = process_wikilinks(folder.custom_content, store.resolve_link)
+            folder.custom_content = render_markdown(processed)
+
+        breadcrumbs = _build_folder_breadcrumbs(folder, pages, config.nav)
+
+        html = folder_template.render(
+            folder=folder,
+            site=site_config,
+            breadcrumbs=breadcrumbs,
+        )
+
+        output_file = output / f"{folder.slug}.html"
+        output_file.parent.mkdir(parents=True, exist_ok=True)
+        output_file.write_text(html)
+
+        count += 1
+
     return count
+
+
+def _build_folder_breadcrumbs(folder, pages, nav_config):
+    """Build breadcrumbs for a folder index page."""
+    from rockgarden.nav import Breadcrumb
+
+    folder_pages: dict[str, any] = {}
+    for p in pages:
+        parts = p.slug.split("/")
+        if parts[-1].lower() == "index":
+            folder_path = "/".join(parts[:-1])
+            folder_pages[folder_path] = p
+
+    breadcrumbs = []
+
+    root_label = nav_config.labels.get("/", "Home")
+    if "" in folder_pages and folder_pages[""].frontmatter.get("title"):
+        root_label = folder_pages[""].frontmatter["title"]
+    breadcrumbs.append(Breadcrumb(label=root_label, path="/index.html"))
+
+    folder_path = folder.slug.rsplit("/", 1)[0] if "/" in folder.slug else ""
+    if not folder_path:
+        return breadcrumbs
+
+    parts = folder_path.split("/")
+    current_parts = []
+
+    for part in parts:
+        current_parts.append(part)
+        path = "/".join(current_parts)
+
+        label = nav_config.labels.get(f"/{path}", None)
+        if not label and path in folder_pages:
+            label = folder_pages[path].frontmatter.get("title")
+        if not label:
+            label = part.replace("-", " ").replace("_", " ").title()
+
+        breadcrumbs.append(Breadcrumb(label=label, path=f"/{path}/index.html"))
+
+    return breadcrumbs

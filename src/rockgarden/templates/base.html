@@ -114,6 +114,32 @@
             content: "▾ ";
         }
 
+        /* Folder listing */
+        .folder-listing {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        .folder-listing th,
+        .folder-listing td {
+            padding: 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--color-border);
+        }
+        .folder-listing th {
+            font-weight: 600;
+            color: var(--color-muted);
+            font-size: 0.875rem;
+        }
+        .folder-listing td:nth-child(2),
+        .folder-listing td:nth-child(3) {
+            color: var(--color-muted);
+            font-size: 0.875rem;
+        }
+        .folder-custom-content {
+            margin-top: 2rem;
+        }
+
         /* Breadcrumbs */
         .breadcrumbs {
             margin-bottom: 1rem;
