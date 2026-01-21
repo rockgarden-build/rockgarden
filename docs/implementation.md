@@ -14,10 +14,11 @@
 - Track file metadata (path, modified date, etc.)
 
 ### 1.3 Obsidian Compatibility
-- **Wiki-links:** Convert `[[Page Name]]` and `[[Page Name|Display Text]]` to HTML links
-- **Embeds:** Handle `![[image.png]]` and `![[note]]` transclusions
+- **Wiki-links:** Convert `[[Page Name]]` and `[[Page Name|Display Text]]` to HTML links ✅
+- **Image embeds:** Handle `![[image.png]]` with alt text and sizing ✅
+- **Note transclusions:** Handle `![[note]]` embeds
 - **Callouts:** Convert Obsidian callout syntax to styled HTML
-- **Assets:** Copy images/files, update references
+- **Assets:** Copy images/files, update references ✅
 
 ### 1.4 Data Store & API
 - In-memory store during build
@@ -82,9 +83,10 @@ fields = ["location", "faction"]
 
 ### Step 3: Obsidian Processing
 - [x] Wiki-link parser/converter
-- [ ] Embed handling
+- [x] Image embed handling (alt text, sizing)
+- [ ] Note transclusion embeds
 - [ ] Callout conversion
-- [ ] Asset copying
+- [x] Asset copying
 
 ### Step 4: HTML Output
 - [x] Jinja2 environment setup

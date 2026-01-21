@@ -21,8 +21,10 @@ Render all markdown files. Folder structure preserved in output.
 ### Milestone 3: Wiki-Links ✅
 Resolve `[[Name]]` and `[[Name|Alias]]` to actual page URLs.
 
-### Milestone 4: Embeds
+### Milestone 4: Embeds (partial)
 Support `![[image.jpg]]` and `![[file.md]]` embeds.
+- [x] Image embeds with alt text and sizing
+- [ ] Note transclusions
 
 ### Milestone 5: Callouts
 Convert Obsidian callout syntax to styled HTML.
@@ -58,7 +60,9 @@ From the test vaults' Quartz configs:
 **Core:**
 - [x] Frontmatter parsing
 - [x] Wiki-links with name-based resolution
-- [ ] Image/audio embeds
+- [x] Image embeds (with alt text, sizing)
+- [ ] Audio embeds
+- [ ] Note transclusions
 - [ ] Callouts
 - [ ] Table of contents
 - [ ] Backlinks
