@@ -46,16 +46,22 @@ def create_engine(
     )
 
 
-def render_page(env: Environment, page: Page, site_config: dict) -> str:
+def render_page(
+    env: Environment,
+    page: Page,
+    site_config: dict,
+    breadcrumbs: list | None = None,
+) -> str:
     """Render a page using the page template.
 
     Args:
         env: The Jinja2 environment.
         page: The page to render.
         site_config: Site configuration to pass to template.
+        breadcrumbs: Optional list of Breadcrumb objects for navigation.
 
     Returns:
         Rendered HTML string.
     """
     template = env.get_template("page.html")
-    return template.render(page=page, site=site_config)
+    return template.render(page=page, site=site_config, breadcrumbs=breadcrumbs or [])

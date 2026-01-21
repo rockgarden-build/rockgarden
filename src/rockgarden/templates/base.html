@@ -114,6 +114,38 @@
             content: "▾ ";
         }
 
+        /* Breadcrumbs */
+        .breadcrumbs {
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+        .breadcrumbs ol {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+        }
+        .breadcrumbs li {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .breadcrumbs a {
+            color: var(--color-muted);
+            text-decoration: none;
+        }
+        .breadcrumbs a:hover {
+            color: var(--color-link);
+        }
+        .breadcrumbs .separator {
+            color: var(--color-muted);
+        }
+        .breadcrumbs [aria-current="page"] {
+            color: var(--color-text);
+        }
+
         /* Responsive: hide nav on small screens */
         @media (max-width: 768px) {
             .site-layout {

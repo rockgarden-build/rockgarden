@@ -4,7 +4,7 @@ from pathlib import Path
 
 from rockgarden.config import Config
 from rockgarden.content import ContentStore, load_content
-from rockgarden.nav import build_nav_tree
+from rockgarden.nav import build_breadcrumbs, build_nav_tree
 from rockgarden.obsidian import process_wikilinks
 from rockgarden.render import create_engine, render_markdown, render_page
 
@@ -40,7 +40,8 @@ def build_site(config: Config, source: Path, output: Path) -> int:
         content = process_wikilinks(page.content, store.resolve_link)
         page.html = render_markdown(content)
 
-        html = render_page(env, page, site_config)
+        breadcrumbs = build_breadcrumbs(page, pages, config.nav)
+        html = render_page(env, page, site_config, breadcrumbs)
 
         output_file = output / page.output_path
         output_file.parent.mkdir(parents=True, exist_ok=True)

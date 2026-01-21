@@ -20,6 +20,7 @@
 
 <nav class="site-nav" aria-label="Site navigation">
   <ul>
+    <li class="nav-home"><a href="{{ site.nav.path }}">{{ site.nav.label }}</a></li>
     {% for node in site.nav.children %}
       {{ render_node(node, site.nav_default_state) }}
     {% endfor %}

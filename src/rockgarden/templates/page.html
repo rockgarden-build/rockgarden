@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
+{% if breadcrumbs and breadcrumbs|length > 1 %}
+{% include "components/breadcrumbs.html" %}
+{% endif %}
 <article>
     <h1>{{ page.title }}</h1>
     {{ page.html | safe }}
