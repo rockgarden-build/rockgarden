@@ -10,3 +10,4 @@ This folder demonstrates Obsidian-specific syntax that rockgarden supports.
 
 - [[formatting]] - Text formatting examples
 - [[linking]] - Wiki-link examples
+- [[embeds]] - Image embed examples

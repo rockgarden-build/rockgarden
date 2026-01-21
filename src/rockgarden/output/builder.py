@@ -66,10 +66,11 @@ def build_site(config: Config, source: Path, output: Path) -> int:
         if page.frontmatter.get("title"):
             content = strip_content_title(content)
 
-        content = process_wikilinks(content, store.resolve_link)
-        image_resolver = create_image_resolver(source, page.path)
+        page_rel_path = str(page.source_path.relative_to(source))
+        image_resolver = create_image_resolver(source, page_rel_path)
         content, images = process_image_embeds(content, image_resolver)
         all_images.update(images)
+        content = process_wikilinks(content, store.resolve_link)
         content = transform_md_links(content, clean_urls)
         page.html = render_markdown(content)
 
@@ -94,11 +95,11 @@ def build_site(config: Config, source: Path, output: Path) -> int:
             processed = folder.custom_content
             if folder.frontmatter.get("title"):
                 processed = strip_content_title(processed)
-            processed = process_wikilinks(processed, store.resolve_link)
             folder_src = folder_path + "/index.md" if folder_path else "index.md"
             image_resolver = create_image_resolver(source, folder_src)
             processed, images = process_image_embeds(processed, image_resolver)
             all_images.update(images)
+            processed = process_wikilinks(processed, store.resolve_link)
             processed = transform_md_links(processed, clean_urls)
             folder.custom_content = render_markdown(processed)
 
