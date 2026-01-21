@@ -18,6 +18,7 @@ class FolderChild:
     is_folder: bool
     modified: datetime | None = None
     tags: list[str] = field(default_factory=list)
+    nav_order: int | None = None
 
 
 @dataclass
@@ -116,6 +117,37 @@ def _should_hide(path: str, hide_patterns: list[str]) -> bool:
     return False
 
 
+def _sort_folder_children(
+    children: list[FolderChild], sort_strategy: str
+) -> list[FolderChild]:
+    """Sort folder children by nav_order (pinned first) then by strategy."""
+    pinned = [c for c in children if c.nav_order is not None]
+    unpinned = [c for c in children if c.nav_order is None]
+
+    pinned.sort(key=lambda c: (c.nav_order, c.title.lower()))
+
+    if sort_strategy == "folders-first":
+        folders = sorted(
+            [c for c in unpinned if c.is_folder], key=lambda c: c.title.lower()
+        )
+        files = sorted(
+            [c for c in unpinned if not c.is_folder], key=lambda c: c.title.lower()
+        )
+        unpinned = folders + files
+    elif sort_strategy == "alphabetical":
+        unpinned = sorted(unpinned, key=lambda c: c.title.lower())
+    else:  # files-first (default)
+        files = sorted(
+            [c for c in unpinned if not c.is_folder], key=lambda c: c.title.lower()
+        )
+        folders = sorted(
+            [c for c in unpinned if c.is_folder], key=lambda c: c.title.lower()
+        )
+        unpinned = files + folders
+
+    return pinned + unpinned
+
+
 def _get_folder_children(
     folder_path: str,
     pages: list[Page],
@@ -124,6 +156,13 @@ def _get_folder_children(
     """Get direct children of a folder."""
     children: list[FolderChild] = []
     seen_subfolders: set[str] = set()
+
+    folder_index_pages: dict[str, Page] = {}
+    for page in pages:
+        parts = page.slug.split("/")
+        if parts[-1].lower() == "index":
+            idx_folder_path = "/".join(parts[:-1])
+            folder_index_pages[idx_folder_path] = page
 
     prefix = f"{folder_path}/" if folder_path else ""
 
@@ -154,6 +193,7 @@ def _get_folder_children(
                     is_folder=False,
                     modified=modified,
                     tags=page.frontmatter.get("tags", []),
+                    nav_order=page.frontmatter.get("nav_order"),
                 )
             )
         else:
@@ -167,18 +207,22 @@ def _get_folder_children(
                 seen_subfolders.add(subfolder_path)
                 label = _resolve_label(subfolder_path, subfolder, config.labels)
 
+                nav_order = None
+                if subfolder_path in folder_index_pages:
+                    nav_order = folder_index_pages[subfolder_path].frontmatter.get(
+                        "nav_order"
+                    )
+
                 children.append(
                     FolderChild(
                         title=label,
                         path=f"/{subfolder_path}/index.html",
                         is_folder=True,
+                        nav_order=nav_order,
                     )
                 )
 
-    folders = sorted([c for c in children if c.is_folder], key=lambda x: x.title)
-    files = sorted([c for c in children if not c.is_folder], key=lambda x: x.title)
-
-    return folders + files
+    return _sort_folder_children(children, config.sort)
 
 
 def _resolve_label(path: str, name: str, labels: dict[str, str]) -> str:

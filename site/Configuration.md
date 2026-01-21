@@ -1,5 +1,6 @@
 ---
 title: Configuration
+nav_order: 2
 ---
 
 Rockgarden is configured via `rockgarden.toml`.

@@ -7,9 +7,15 @@ from rockgarden.content import Page
 from rockgarden.nav import build_nav_tree
 
 
-def make_page(slug: str, title: str | None = None) -> Page:
+def make_page(
+    slug: str, title: str | None = None, nav_order: int | None = None
+) -> Page:
     """Helper to create a Page with minimal required fields."""
-    frontmatter = {"title": title} if title else {}
+    frontmatter = {}
+    if title:
+        frontmatter["title"] = title
+    if nav_order is not None:
+        frontmatter["nav_order"] = nav_order
     return Page(
         source_path=Path(f"/vault/{slug}.md"),
         slug=slug,
@@ -78,8 +84,8 @@ class TestBuildNavTree:
         assert page.label == "Deep Page"
         assert page.is_folder is False
 
-    def test_folders_sorted_before_files(self):
-        """Folders appear before files at each level."""
+    def test_files_sorted_before_folders(self):
+        """Files appear before folders, both alphabetically."""
         pages = [
             make_page("zebra", "Zebra"),
             make_page("folder/page", "Page"),
@@ -87,10 +93,13 @@ class TestBuildNavTree:
         ]
         tree = build_nav_tree(pages)
 
-        assert tree.children[0].is_folder is True
-        assert tree.children[0].name == "folder"
+        # Files first (alphabetically), then folders
+        assert tree.children[0].is_folder is False
+        assert tree.children[0].name == "alpha"
         assert tree.children[1].is_folder is False
-        assert tree.children[2].is_folder is False
+        assert tree.children[1].name == "zebra"
+        assert tree.children[2].is_folder is True
+        assert tree.children[2].name == "folder"
 
 
 class TestNavConfigHide:
@@ -164,3 +173,123 @@ class TestNavConfigLabels:
 
         folder = tree.children[0]
         assert folder.label == "My Folder"
+
+
+class TestNavOrder:
+    def test_nav_order_pins_first(self):
+        """Pages with nav_order appear before unpinned pages."""
+        pages = [
+            make_page("zebra", "Zebra"),
+            make_page("getting-started", "Getting Started", nav_order=1),
+            make_page("alpha", "Alpha"),
+        ]
+        tree = build_nav_tree(pages)
+
+        assert tree.children[0].label == "Getting Started"
+        assert tree.children[0].nav_order == 1
+        assert tree.children[1].label == "Alpha"
+        assert tree.children[2].label == "Zebra"
+
+    def test_nav_order_sorting(self):
+        """Multiple pinned pages sort by nav_order."""
+        pages = [
+            make_page("config", "Configuration", nav_order=2),
+            make_page("getting-started", "Getting Started", nav_order=1),
+            make_page("about", "About"),
+        ]
+        tree = build_nav_tree(pages)
+
+        assert tree.children[0].label == "Getting Started"
+        assert tree.children[1].label == "Configuration"
+        assert tree.children[2].label == "About"
+
+    def test_nav_order_negative(self):
+        """Negative nav_order values work."""
+        pages = [
+            make_page("home", "Home", nav_order=-1),
+            make_page("getting-started", "Getting Started", nav_order=1),
+            make_page("about", "About"),
+        ]
+        tree = build_nav_tree(pages)
+
+        assert tree.children[0].label == "Home"
+        assert tree.children[1].label == "Getting Started"
+        assert tree.children[2].label == "About"
+
+    def test_nav_order_folder_from_index(self):
+        """Folder nav_order comes from its index.md frontmatter."""
+        pages = [
+            make_page("guides/index", "Guides", nav_order=1),
+            make_page("guides/quick-start", "Quick Start"),
+            make_page("reference/index", "Reference"),
+            make_page("reference/api", "API"),
+        ]
+        tree = build_nav_tree(pages)
+
+        assert tree.children[0].label == "Guides"
+        assert tree.children[0].nav_order == 1
+        assert tree.children[1].label == "Reference"
+
+    def test_nav_order_same_value_alphabetical(self):
+        """Same nav_order values sort alphabetically."""
+        pages = [
+            make_page("zebra", "Zebra", nav_order=1),
+            make_page("alpha", "Alpha", nav_order=1),
+        ]
+        tree = build_nav_tree(pages)
+
+        assert tree.children[0].label == "Alpha"
+        assert tree.children[1].label == "Zebra"
+
+
+class TestSortConfig:
+    def test_sort_files_first_default(self):
+        """Default sort is files-first."""
+        pages = [
+            make_page("folder/page", "Page"),
+            make_page("file", "File"),
+        ]
+        tree = build_nav_tree(pages)
+
+        assert tree.children[0].is_folder is False
+        assert tree.children[1].is_folder is True
+
+    def test_sort_folders_first(self):
+        """folders-first sort puts folders before files."""
+        pages = [
+            make_page("folder/page", "Page"),
+            make_page("file", "File"),
+        ]
+        config = NavConfig(sort="folders-first")
+        tree = build_nav_tree(pages, config)
+
+        assert tree.children[0].is_folder is True
+        assert tree.children[1].is_folder is False
+
+    def test_sort_alphabetical(self):
+        """alphabetical sort mixes files and folders."""
+        pages = [
+            make_page("bbb-folder/page", "Page"),
+            make_page("aaa-file", "AAA File"),
+            make_page("ccc-file", "CCC File"),
+        ]
+        config = NavConfig(sort="alphabetical")
+        tree = build_nav_tree(pages, config)
+
+        assert tree.children[0].label == "AAA File"
+        assert tree.children[1].label == "Bbb Folder"
+        assert tree.children[2].label == "CCC File"
+
+    def test_sort_with_nav_order(self):
+        """Pinned items come before sort strategy."""
+        pages = [
+            make_page("folder/page", "Page"),
+            make_page("zebra", "Zebra"),
+            make_page("alpha", "Alpha", nav_order=1),
+        ]
+        config = NavConfig(sort="folders-first")
+        tree = build_nav_tree(pages, config)
+
+        assert tree.children[0].label == "Alpha"
+        assert tree.children[1].is_folder is True
+        assert tree.children[2].label == "Zebra"

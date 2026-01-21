@@ -18,6 +18,7 @@ class NavNode:
     label: str
     is_folder: bool
     children: list[NavNode] = field(default_factory=list)
+    nav_order: int | None = None
 
 
 def _should_hide(path: str, hide_patterns: list[str]) -> bool:
@@ -58,6 +59,38 @@ def _resolve_label(
             return title
 
     return name.replace("-", " ").replace("_", " ").title()
+
+
+def _sort_nav_nodes(nodes: list[NavNode], sort_strategy: str) -> list[NavNode]:
+    """Sort nav nodes by nav_order (pinned first) then by strategy.
+
+    Args:
+        nodes: List of NavNode objects to sort
+        sort_strategy: One of "files-first", "folders-first", "alphabetical"
+
+    Returns:
+        Sorted list of NavNode objects
+    """
+    pinned = [n for n in nodes if n.nav_order is not None]
+    unpinned = [n for n in nodes if n.nav_order is None]
+
+    pinned.sort(key=lambda n: (n.nav_order, n.label.lower()))
+
+    def by_label(n: NavNode) -> str:
+        return n.label.lower()
+
+    if sort_strategy == "folders-first":
+        folders = sorted([n for n in unpinned if n.is_folder], key=by_label)
+        files = sorted([n for n in unpinned if not n.is_folder], key=by_label)
+        unpinned = folders + files
+    elif sort_strategy == "alphabetical":
+        unpinned = sorted(unpinned, key=by_label)
+    else:  # files-first (default)
+        files = sorted([n for n in unpinned if not n.is_folder], key=by_label)
+        folders = sorted([n for n in unpinned if n.is_folder], key=by_label)
+        unpinned = files + folders
+
+    return pinned + unpinned
 
 
 def build_nav_tree(pages: list[Page], config: NavConfig | None = None) -> NavNode:
@@ -118,22 +151,28 @@ def build_nav_tree(pages: list[Page], config: NavConfig | None = None) -> NavNod
 
     def dict_to_nodes(d: dict, parent_path: str = "") -> list[NavNode]:
         nodes = []
-        for name, data in sorted(d.items()):
+        for name, data in d.items():
             if name.startswith("_"):
                 continue
 
             path = data.get("_path", "")
             is_folder = data.get("_is_folder", False)
+            nav_order = None
 
             if is_folder:
                 label = _resolve_label(path, name, config.labels, folder_pages)
                 url_path = f"/{path}/index.html" if path else "/index.html"
+                if path in folder_pages:
+                    nav_order = folder_pages[path].frontmatter.get("nav_order")
             else:
                 page = data.get("_page")
                 label = page.title if page else name
                 url_path = f"/{path}.html"
+                if page:
+                    nav_order = page.frontmatter.get("nav_order")
 
             children = dict_to_nodes(data.get("_children", {}), path)
+            children = _sort_nav_nodes(children, config.sort)
 
             nodes.append(
                 NavNode(
@@ -142,12 +181,11 @@ def build_nav_tree(pages: list[Page], config: NavConfig | None = None) -> NavNod
                     label=label,
                     is_folder=is_folder,
                     children=children,
+                    nav_order=nav_order,
                 )
             )
 
-        folders = [n for n in nodes if n.is_folder]
-        files = [n for n in nodes if not n.is_folder]
-        return folders + files
+        return _sort_nav_nodes(nodes, config.sort)
 
     root_label = _resolve_label("", "Home", config.labels, folder_pages)
     root_children = dict_to_nodes(tree)

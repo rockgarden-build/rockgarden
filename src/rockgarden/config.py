@@ -37,6 +37,7 @@ class NavConfig:
     default_state: str = "collapsed"
     hide: list[str] = field(default_factory=list)
     labels: dict[str, str] = field(default_factory=dict)
+    sort: str = "files-first"
 
 
 @dataclass
@@ -98,6 +99,7 @@ class Config:
             default_state=nav_data.get("default_state", "collapsed"),
             hide=nav_data.get("hide", []),
             labels=nav_data.get("labels", {}),
+            sort=nav_data.get("sort", "files-first"),
         )
 
         return cls(site=site, build=build, theme=theme, nav=nav)
