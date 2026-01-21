@@ -42,7 +42,7 @@ class TestBuildNavTree:
 
         assert len(tree.children) == 2
         assert tree.children[0].label == "About Us"
-        assert tree.children[0].path == "/about.html"
+        assert tree.children[0].path == "/about/"
         assert tree.children[0].is_folder is False
 
     def test_nested_folders(self):

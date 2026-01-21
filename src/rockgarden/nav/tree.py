@@ -7,6 +7,7 @@ from fnmatch import fnmatch
 
 from rockgarden.config import NavConfig
 from rockgarden.content import Page
+from rockgarden.urls import get_folder_url, get_url
 
 
 @dataclass
@@ -114,7 +115,7 @@ def build_nav_tree(
     folder_pages: dict[str, Page] = {}
     for page in pages:
         parts = page.slug.split("/")
-        if parts[-1].lower() == "index":
+        if parts[-1] == "index":
             folder_path = "/".join(parts[:-1])
             folder_pages[folder_path] = page
 
@@ -146,7 +147,7 @@ def build_nav_tree(
 
         if not _should_hide(page.slug, config.hide):
             page_name = parts[-1]
-            if page_name.lower() != "index":
+            if page_name != "index":
                 current[page_name] = {
                     "_children": {},
                     "_is_folder": False,
@@ -166,16 +167,13 @@ def build_nav_tree(
 
             if is_folder:
                 label = _resolve_label(path, name, config.labels, folder_pages)
-                if clean_urls:
-                    url_path = f"/{path}/" if path else "/"
-                else:
-                    url_path = f"/{path}/index.html" if path else "/index.html"
+                url_path = get_folder_url(path, clean_urls)
                 if path in folder_pages:
                     nav_order = folder_pages[path].frontmatter.get("nav_order")
             else:
                 page = data.get("_page")
                 label = page.title if page else name
-                url_path = f"/{path}.html"
+                url_path = get_url(path, clean_urls)
                 if page:
                     nav_order = page.frontmatter.get("nav_order")
 
@@ -200,7 +198,7 @@ def build_nav_tree(
 
     return NavNode(
         name="",
-        path="/" if clean_urls else "/index.html",
+        path=get_folder_url("", clean_urls),
         label=root_label,
         is_folder=True,
         children=root_children,

@@ -1,7 +1,7 @@
 """Wiki-link processing for Obsidian syntax."""
 
 import re
-from typing import Callable
+from collections.abc import Callable
 from urllib.parse import quote
 
 WIKILINK_PATTERN = re.compile(

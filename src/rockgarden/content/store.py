@@ -1,15 +1,15 @@
 """Content store for page lookups."""
 
-from pathlib import Path
-
 from rockgarden.content.models import Page
+from rockgarden.urls import get_url
 
 
 class ContentStore:
     """Store for looking up pages by name, slug, or alias."""
 
-    def __init__(self, pages: list[Page]) -> None:
+    def __init__(self, pages: list[Page], clean_urls: bool = True) -> None:
         self.pages = pages
+        self.clean_urls = clean_urls
         self._by_slug: dict[str, Page] = {}
         self._by_name: dict[str, Page] = {}
 
@@ -45,9 +45,9 @@ class ContentStore:
             link_target: The target from [[target]] or [[target|text]].
 
         Returns:
-            The URL path (e.g., "/Getting Started.html") or None if not found.
+            The URL path (e.g., "/getting-started/") or None if not found.
         """
         page = self.get_by_name(link_target)
         if page:
-            return "/" + page.output_path
+            return get_url(page.slug, self.clean_urls)
         return None

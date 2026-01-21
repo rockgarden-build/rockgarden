@@ -20,8 +20,3 @@ class Page:
         if title := self.frontmatter.get("title"):
             return title
         return self.source_path.stem.replace("-", " ").replace("_", " ")
-
-    @property
-    def output_path(self) -> str:
-        """Get the output path for this page (e.g., 'index.html', 'NPCs/olvir.html')."""
-        return f"{self.slug}.html"

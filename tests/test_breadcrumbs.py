@@ -37,7 +37,7 @@ class TestBuildBreadcrumbs:
         assert len(breadcrumbs) == 2
         assert breadcrumbs[0].label == "Home"
         assert breadcrumbs[1].label == "About Us"
-        assert breadcrumbs[1].path == "/about.html"
+        assert breadcrumbs[1].path == "/about/"
 
     def test_nested_page(self):
         """Nested page includes folder breadcrumbs."""

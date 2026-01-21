@@ -12,6 +12,7 @@ from rockgarden.nav import (
 )
 from rockgarden.obsidian import process_wikilinks
 from rockgarden.render import create_engine, render_markdown, render_page
+from rockgarden.urls import get_folder_url, get_output_path
 
 
 def build_site(config: Config, source: Path, output: Path) -> int:
@@ -28,9 +29,9 @@ def build_site(config: Config, source: Path, output: Path) -> int:
     output.mkdir(parents=True, exist_ok=True)
 
     pages = load_content(source, config.build.ignore_patterns)
-    store = ContentStore(pages)
-
     clean_urls = config.site.clean_urls
+    store = ContentStore(pages, clean_urls)
+
     nav_tree = build_nav_tree(pages, config.nav, clean_urls)
 
     env = create_engine(config, site_root=source.parent)
@@ -44,7 +45,7 @@ def build_site(config: Config, source: Path, output: Path) -> int:
     indexes_with_auto = {}
     for p in pages:
         parts = p.slug.split("/")
-        if parts[-1].lower() == "index":
+        if parts[-1] == "index":
             folder_path = "/".join(parts[:-1])
             auto_index = p.frontmatter.get("auto_index", True)
             indexes_with_auto[folder_path] = auto_index
@@ -52,7 +53,7 @@ def build_site(config: Config, source: Path, output: Path) -> int:
     count = 0
     for page in pages:
         parts = page.slug.split("/")
-        if parts[-1].lower() == "index":
+        if parts[-1] == "index":
             folder_path = "/".join(parts[:-1])
             if indexes_with_auto.get(folder_path, True):
                 continue
@@ -63,13 +64,13 @@ def build_site(config: Config, source: Path, output: Path) -> int:
             content = strip_content_title(content)
 
         content = process_wikilinks(content, store.resolve_link)
-        content = transform_md_links(content)
+        content = transform_md_links(content, clean_urls)
         page.html = render_markdown(content)
 
         breadcrumbs = build_breadcrumbs(page, pages, config.nav, clean_urls)
         html = render_page(env, page, site_config, breadcrumbs)
 
-        output_file = output / page.output_path
+        output_file = output / get_output_path(page.slug, clean_urls)
         output_file.parent.mkdir(parents=True, exist_ok=True)
         output_file.write_text(html)
 
@@ -88,7 +89,7 @@ def build_site(config: Config, source: Path, output: Path) -> int:
             if folder.frontmatter.get("title"):
                 processed = strip_content_title(processed)
             processed = process_wikilinks(processed, store.resolve_link)
-            processed = transform_md_links(processed)
+            processed = transform_md_links(processed, clean_urls)
             folder.custom_content = render_markdown(processed)
 
         breadcrumbs = _build_folder_breadcrumbs(folder, pages, config.nav, clean_urls)
@@ -99,7 +100,7 @@ def build_site(config: Config, source: Path, output: Path) -> int:
             breadcrumbs=breadcrumbs,
         )
 
-        output_file = output / f"{folder.slug}.html"
+        output_file = output / get_output_path(folder.slug, clean_urls)
         output_file.parent.mkdir(parents=True, exist_ok=True)
         output_file.write_text(html)
 
@@ -115,7 +116,7 @@ def _build_folder_breadcrumbs(folder, pages, nav_config, clean_urls=True):
     folder_pages: dict[str, any] = {}
     for p in pages:
         parts = p.slug.split("/")
-        if parts[-1].lower() == "index":
+        if parts[-1] == "index":
             folder_path = "/".join(parts[:-1])
             folder_pages[folder_path] = p
 
@@ -124,7 +125,7 @@ def _build_folder_breadcrumbs(folder, pages, nav_config, clean_urls=True):
     root_label = nav_config.labels.get("/", "Home")
     if "" in folder_pages and folder_pages[""].frontmatter.get("title"):
         root_label = folder_pages[""].frontmatter["title"]
-    root_path = "/" if clean_urls else "/index.html"
+    root_path = get_folder_url("", clean_urls)
     breadcrumbs.append(Breadcrumb(label=root_label, path=root_path))
 
     folder_path = folder.slug.rsplit("/", 1)[0] if "/" in folder.slug else ""
@@ -144,9 +145,7 @@ def _build_folder_breadcrumbs(folder, pages, nav_config, clean_urls=True):
         if not label:
             label = part.replace("-", " ").replace("_", " ").title()
 
-        if clean_urls:
-            breadcrumbs.append(Breadcrumb(label=label, path=f"/{path}/"))
-        else:
-            breadcrumbs.append(Breadcrumb(label=label, path=f"/{path}/index.html"))
+        folder_url = get_folder_url(path, clean_urls)
+        breadcrumbs.append(Breadcrumb(label=label, path=folder_url))
 
     return breadcrumbs

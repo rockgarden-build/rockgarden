@@ -7,6 +7,7 @@ from datetime import datetime
 
 from rockgarden.config import NavConfig
 from rockgarden.content import Page
+from rockgarden.urls import get_folder_url, get_url
 
 
 @dataclass
@@ -69,7 +70,7 @@ def generate_folder_indexes(
     existing_indexes: dict[str, Page] = {}
     for page in pages:
         parts = page.slug.split("/")
-        if parts[-1].lower() == "index":
+        if parts[-1] == "index":
             folder_path = "/".join(parts[:-1])
             existing_indexes[folder_path] = page
 
@@ -163,7 +164,7 @@ def _get_folder_children(
     folder_index_pages: dict[str, Page] = {}
     for page in pages:
         parts = page.slug.split("/")
-        if parts[-1].lower() == "index":
+        if parts[-1] == "index":
             idx_folder_path = "/".join(parts[:-1])
             folder_index_pages[idx_folder_path] = page
 
@@ -180,7 +181,7 @@ def _get_folder_children(
         parts = relative.split("/")
 
         if len(parts) == 1:
-            if parts[0].lower() == "index":
+            if parts[0] == "index":
                 continue
             if _should_hide(page.slug, config.hide):
                 continue
@@ -192,7 +193,7 @@ def _get_folder_children(
             children.append(
                 FolderChild(
                     title=page.title,
-                    path=f"/{page.slug}.html",
+                    path=get_url(page.slug, clean_urls),
                     is_folder=False,
                     modified=modified,
                     tags=page.frontmatter.get("tags", []),
@@ -216,15 +217,10 @@ def _get_folder_children(
                         "nav_order"
                     )
 
-                if clean_urls:
-                    child_path = f"/{subfolder_path}/"
-                else:
-                    child_path = f"/{subfolder_path}/index.html"
-
                 children.append(
                     FolderChild(
                         title=label,
-                        path=child_path,
+                        path=get_folder_url(subfolder_path, clean_urls),
                         is_folder=True,
                         nav_order=nav_order,
                     )

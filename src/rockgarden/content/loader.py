@@ -6,6 +6,7 @@ from pathlib import Path
 import frontmatter
 
 from rockgarden.content.models import Page
+from rockgarden.urls import generate_slug
 
 
 def should_ignore(path: Path, source: Path, patterns: list[str]) -> bool:
@@ -41,11 +42,10 @@ def path_to_slug(path: Path, source: Path) -> str:
         source: The source root directory.
 
     Returns:
-        The slug (e.g., 'index', 'NPCs/olvir').
+        The slug (e.g., 'index', 'npcs/olvir').
     """
-    rel_path = path.relative_to(source)
-    slug = str(rel_path.with_suffix(""))
-    return slug
+    rel_path = str(path.relative_to(source))
+    return generate_slug(rel_path)
 
 
 def load_page(path: Path, source: Path) -> Page:
@@ -59,11 +59,17 @@ def load_page(path: Path, source: Path) -> Page:
         A Page object with parsed frontmatter and content.
     """
     post = frontmatter.load(path)
+    metadata = dict(post.metadata)
+
+    if custom_slug := metadata.get("slug"):
+        slug = custom_slug
+    else:
+        slug = path_to_slug(path, source)
 
     return Page(
         source_path=path,
-        slug=path_to_slug(path, source),
-        frontmatter=dict(post.metadata),
+        slug=slug,
+        frontmatter=metadata,
         content=post.content,
     )
 

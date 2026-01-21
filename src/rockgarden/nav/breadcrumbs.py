@@ -6,6 +6,7 @@ from dataclasses import dataclass
 
 from rockgarden.config import NavConfig
 from rockgarden.content import Page
+from rockgarden.urls import get_folder_url, get_url
 
 
 @dataclass
@@ -39,19 +40,19 @@ def build_breadcrumbs(
     folder_pages: dict[str, Page] = {}
     for p in pages:
         parts = p.slug.split("/")
-        if parts[-1].lower() == "index":
+        if parts[-1] == "index":
             folder_path = "/".join(parts[:-1])
             folder_pages[folder_path] = p
 
     breadcrumbs: list[Breadcrumb] = []
 
     root_label = _resolve_label("", "Home", config.labels, folder_pages)
-    root_path = "/" if clean_urls else "/index.html"
+    root_path = get_folder_url("", clean_urls)
     breadcrumbs.append(Breadcrumb(label=root_label, path=root_path))
 
     parts = page.slug.split("/")
 
-    if parts[-1].lower() == "index" and len(parts) == 1:
+    if parts[-1] == "index" and len(parts) == 1:
         return breadcrumbs
 
     current_path_parts: list[str] = []
@@ -60,15 +61,12 @@ def build_breadcrumbs(
         folder_path = "/".join(current_path_parts)
 
         label = _resolve_label(folder_path, part, config.labels, folder_pages)
-        if clean_urls:
-            path = f"/{folder_path}/"
-        else:
-            path = f"/{folder_path}/index.html"
+        folder_url = get_folder_url(folder_path, clean_urls)
+        breadcrumbs.append(Breadcrumb(label=label, path=folder_url))
 
-        breadcrumbs.append(Breadcrumb(label=label, path=path))
-
-    if parts[-1].lower() != "index":
-        breadcrumbs.append(Breadcrumb(label=page.title, path=f"/{page.slug}.html"))
+    if parts[-1] != "index":
+        page_url = get_url(page.slug, clean_urls)
+        breadcrumbs.append(Breadcrumb(label=page.title, path=page_url))
 
     return breadcrumbs
 

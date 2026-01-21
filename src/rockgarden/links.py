@@ -10,13 +10,17 @@ LINK_PATTERN = re.compile(
 CODE_BLOCK_PATTERN = re.compile(r"```[\s\S]*?```|`[^`\n]+`")
 
 
-def transform_md_links(content: str) -> str:
-    """Transform .md links to .html in markdown content.
+def transform_md_links(content: str, clean_urls: bool = True) -> str:
+    """Transform .md links in markdown content.
 
-    Converts relative and absolute .md links to .html:
+    With clean_urls=True (directory-based URLs):
+    - [text](./page.md) → [text](./page/)
+    - [text](../folder/page.md) → [text](../folder/page/)
+    - [text](/folder/page.md) → [text](/folder/page/)
+    - [text](page.md#heading) → [text](page/#heading)
+
+    With clean_urls=False:
     - [text](./page.md) → [text](./page.html)
-    - [text](../folder/page.md) → [text](../folder/page.html)
-    - [text](/folder/page.md) → [text](/folder/page.html)
     - [text](page.md#heading) → [text](page.html#heading)
 
     External URLs and non-.md links are preserved.
@@ -24,9 +28,10 @@ def transform_md_links(content: str) -> str:
 
     Args:
         content: Markdown content with links.
+        clean_urls: If True, use trailing slash format; if False, use .html.
 
     Returns:
-        Content with .md links converted to .html.
+        Content with .md links converted.
     """
     code_blocks: list[str] = []
 
@@ -44,7 +49,10 @@ def transform_md_links(content: str) -> str:
             return match.group(0)
 
         if ".md" in url:
-            url = re.sub(r"\.md([#?]|$)", r".html\1", url)
+            if clean_urls:
+                url = re.sub(r"\.md([#?]|$)", r"/\1", url)
+            else:
+                url = re.sub(r"\.md([#?]|$)", r".html\1", url)
 
         return f"[{text}]({url})"
 
