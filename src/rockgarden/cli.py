@@ -110,8 +110,11 @@ def serve(
 
     handler = partial(http.server.SimpleHTTPRequestHandler, directory=str(output_dir))
 
+    class ReuseAddrServer(socketserver.TCPServer):
+        allow_reuse_address = True
+
     try:
-        httpd = socketserver.TCPServer(("", port), handler)
+        httpd = ReuseAddrServer(("", port), handler)
     except OSError as e:
         if e.errno == 48:  # Address already in use
             typer.echo(f"Error: Port {port} is already in use.", err=True)
