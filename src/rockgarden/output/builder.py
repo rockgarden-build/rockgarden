@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+from rockgarden.assets import copy_assets, create_image_resolver
 from rockgarden.config import Config
 from rockgarden.content import ContentStore, load_content, strip_content_title
 from rockgarden.links import transform_md_links
@@ -10,7 +11,7 @@ from rockgarden.nav import (
     build_nav_tree,
     generate_folder_indexes,
 )
-from rockgarden.obsidian import process_wikilinks
+from rockgarden.obsidian import process_image_embeds, process_wikilinks
 from rockgarden.render import create_engine, render_markdown, render_page
 from rockgarden.urls import get_folder_url, get_output_path
 
@@ -50,6 +51,8 @@ def build_site(config: Config, source: Path, output: Path) -> int:
             show_index = p.frontmatter.get("show_index", False)
             show_index_map[folder_path] = show_index
 
+    all_images: set[str] = set()
+
     count = 0
     for page in pages:
         parts = page.slug.split("/")
@@ -64,6 +67,9 @@ def build_site(config: Config, source: Path, output: Path) -> int:
             content = strip_content_title(content)
 
         content = process_wikilinks(content, store.resolve_link)
+        image_resolver = create_image_resolver(source, page.path)
+        content, images = process_image_embeds(content, image_resolver)
+        all_images.update(images)
         content = transform_md_links(content, clean_urls)
         page.html = render_markdown(content)
 
@@ -89,6 +95,10 @@ def build_site(config: Config, source: Path, output: Path) -> int:
             if folder.frontmatter.get("title"):
                 processed = strip_content_title(processed)
             processed = process_wikilinks(processed, store.resolve_link)
+            folder_src = folder_path + "/index.md" if folder_path else "index.md"
+            image_resolver = create_image_resolver(source, folder_src)
+            processed, images = process_image_embeds(processed, image_resolver)
+            all_images.update(images)
             processed = transform_md_links(processed, clean_urls)
             folder.custom_content = render_markdown(processed)
 
@@ -105,6 +115,8 @@ def build_site(config: Config, source: Path, output: Path) -> int:
         output_file.write_text(html)
 
         count += 1
+
+    copy_assets(all_images, source, output)
 
     return count
 
