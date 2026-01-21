@@ -47,7 +47,7 @@ def build_site(config: Config, source: Path, output: Path) -> int:
         parts = p.slug.split("/")
         if parts[-1] == "index":
             folder_path = "/".join(parts[:-1])
-            auto_index = p.frontmatter.get("auto_index", True)
+            auto_index = p.frontmatter.get("auto_index", False)
             indexes_with_auto[folder_path] = auto_index
 
     count = 0
@@ -55,7 +55,7 @@ def build_site(config: Config, source: Path, output: Path) -> int:
         parts = page.slug.split("/")
         if parts[-1] == "index":
             folder_path = "/".join(parts[:-1])
-            if indexes_with_auto.get(folder_path, True):
+            if indexes_with_auto.get(folder_path, False):
                 continue
 
         content = page.content
