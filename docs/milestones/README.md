@@ -27,8 +27,8 @@ Support `![[image.jpg]]` and `![[file.md]]` embeds.
 ### Milestone 5: Callouts
 Convert Obsidian callout syntax to styled HTML.
 
-### Milestone 6: Navigation
-Sidebar explorer, breadcrumbs, folder pages.
+### Milestone 6: Navigation ✅
+Sidebar explorer, breadcrumbs, folder pages. See [06-navigation.md](06-navigation.md).
 
 ### Milestone 7: Backlinks
 Track and display pages that link to each page.
@@ -67,7 +67,7 @@ From the test vaults' Quartz configs:
 
 **Output:**
 - [x] Content pages
-- [ ] Folder pages
+- [x] Folder pages
 - [ ] Tag pages
 - [ ] Sitemap
 - [ ] RSS feed

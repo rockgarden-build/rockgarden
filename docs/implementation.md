@@ -73,28 +73,28 @@ fields = ["location", "faction"]
 - [x] Initialize uv project (`rockgarden`)
 - [x] Set up package structure
 - [x] CLI with `build` and `serve` commands
-- [ ] Config loading from `rockgarden.toml`
+- [x] Config loading from `rockgarden.toml`
 
 ### Step 2: Content Reading
-- [ ] Markdown file discovery
-- [ ] Frontmatter parsing
-- [ ] Content store class
+- [x] Markdown file discovery
+- [x] Frontmatter parsing
+- [x] Content store class
 
 ### Step 3: Obsidian Processing
-- [ ] Wiki-link parser/converter
+- [x] Wiki-link parser/converter
 - [ ] Embed handling
 - [ ] Callout conversion
 - [ ] Asset copying
 
 ### Step 4: HTML Output
-- [ ] Jinja2 environment setup
-- [ ] Base templates
-- [ ] Page rendering
-- [ ] Folder index generation
+- [x] Jinja2 environment setup
+- [x] Base templates
+- [x] Page rendering
+- [x] Folder index generation
 
 ### Step 5: Navigation
-- [ ] Explorer data structure
-- [ ] Breadcrumb generation
+- [x] Explorer data structure
+- [x] Breadcrumb generation
 - [ ] TOC extraction
 - [ ] Backlink tracking
 

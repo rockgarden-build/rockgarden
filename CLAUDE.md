@@ -34,16 +34,27 @@ The project follows a three-stage pipeline:
 2. **Data Store**: In-memory API layer for querying content (`get_content()`, `list_content()`, `get_backlinks()`)
 3. **HTML Output**: Jinja2 templates render the final static site
 
-Planned module structure in `src/rockgarden/`:
+Module structure in `src/rockgarden/`:
 - `cli.py` - Typer CLI with `build` and `serve` commands
 - `config.py` - TOML config loading (`rockgarden.toml`)
 - `content/` - Content store, file loader, data models
+- `nav/` - Navigation tree, breadcrumbs, folder index generation
 - `obsidian/` - Wiki-link, embed, and callout processing
 - `render/` - Jinja2 and markdown-it-py setup
-- `output/` - Site builder and search index generation
+- `output/` - Site builder
 
 ## Conventions
 
 - Uses conventional commits (commitizen configured)
 - Requires Python 3.13+
 - Config file: `rockgarden.toml`
+
+## Planning Docs
+
+Before implementing features, check the planning docs in `docs/`:
+- `docs/milestones/README.md` - Roadmap and feature checklist
+- `docs/milestones/NN-*.md` - Detailed milestone specs
+- `docs/implementation.md` - Step-by-step checklist
+- `docs/future.md` - Ideas not yet planned
+
+After completing features, update these docs to reflect current state.
