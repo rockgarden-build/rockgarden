@@ -5,7 +5,7 @@ nav_order: 1
 
 ## Installation
 
-Rockgarden requires Python 3.13+.
+Requires Python 3.13+.
 
 ```bash
 uv add rockgarden
@@ -17,28 +17,50 @@ Or with pip:
 pip install rockgarden
 ```
 
-## Building Your First Site
+## CLI Commands
 
-Point rockgarden at any Obsidian vault:
+### Build
+
+Generate HTML from your markdown source:
 
 ```bash
 rockgarden build --source ./my-vault --output ./_site
 ```
 
-The generated site will be in `_site/`.
+Short alias: `rgdn build`
 
-## Configuration
+### Serve
 
-Create a `rockgarden.toml` in your project root:
+Preview the built site locally:
 
-```toml
-[site]
-title = "My Site"
-source = "."
-output = "_site"
+```bash
+rockgarden serve --port 8000
+```
 
-[build]
-ignore_patterns = [".obsidian", "private", "templates"]
+## Supported Content
+
+Rockgarden handles both Obsidian-style and plain markdown:
+
+| Feature | Obsidian | Plain Markdown |
+|---------|----------|----------------|
+| Internal links | `[[Page Name]]` | `[text](page.md)` |
+| Images | `![[image.png]]` | `![alt](image.png)` |
+| Callouts | `> [!note]` | - |
+| Tables | GFM | GFM |
+| Task lists | `- [ ]` | `- [ ]` |
+
+## Project Structure
+
+Typical layout:
+
+```
+my-site/
+├── rockgarden.toml    # Optional config
+├── index.md           # Home page
+├── page.md
+└── folder/
+    ├── index.md       # Folder landing page
+    └── subpage.md
 ```
 
 See [[Configuration]] for all options.

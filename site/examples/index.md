@@ -2,18 +2,18 @@
 title: Examples
 ---
 
-# Examples
-
-Rockgarden supports both Obsidian vaults and plain markdown directories.
+Examples showing both supported content styles.
 
 ## Obsidian Style
 
-Uses wiki-links (`[[page]]`) and Obsidian-specific features.
+Uses wiki-links and Obsidian-specific features like callouts.
 
-→ [Obsidian Examples](./obsidian/index.md)
+- [[examples/obsidian/formatting|Formatting]]
+- [[examples/obsidian/linking|Linking]]
 
 ## Plain Markdown
 
-Uses standard GFM links (`[text](url.md)`) without Obsidian syntax.
+Uses standard GFM links without Obsidian syntax.
 
-→ [Markdown Examples](./markdown/index.md)
+- [[examples/markdown/formatting|Formatting]]
+- [[examples/markdown/linking|Linking]]
