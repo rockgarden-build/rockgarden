@@ -3,7 +3,13 @@
 <li>
   {% if node.is_folder and node.children %}
   <details data-nav-path="{{ node.path }}" {{ 'open' if default_state == 'expanded' else '' }}>
-    <summary>{{ node.label }}</summary>
+    <summary>
+      {%- if node.index_path -%}
+      <a href="{{ node.index_path }}" class="nav-folder-link">{{ node.label }}</a>
+      {%- else -%}
+      {{ node.label }}
+      {%- endif -%}
+    </summary>
     <ul>
       {% for child in node.children %}
         {{ render_node(child, default_state) }}

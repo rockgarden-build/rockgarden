@@ -20,6 +20,7 @@ class NavNode:
     is_folder: bool
     children: list[NavNode] = field(default_factory=list)
     nav_order: int | None = None
+    index_path: str | None = None
 
 
 def _should_hide(path: str, hide_patterns: list[str]) -> bool:
@@ -180,19 +181,10 @@ def build_nav_tree(
             children = dict_to_nodes(data.get("_children", {}), path)
             children = _sort_nav_nodes(children, config.sort)
 
+            index_path = None
             if is_folder and path in folder_pages:
                 index_page = folder_pages[path]
-                index_label = index_page.frontmatter.get("title", "Overview")
-                index_url = get_url(index_page.slug, clean_urls)
-                index_node = NavNode(
-                    name="index",
-                    path=index_url,
-                    label=index_label,
-                    is_folder=False,
-                    children=[],
-                    nav_order=None,
-                )
-                children = [index_node] + children
+                index_path = get_url(index_page.slug, clean_urls)
 
             nodes.append(
                 NavNode(
@@ -202,6 +194,7 @@ def build_nav_tree(
                     is_folder=is_folder,
                     children=children,
                     nav_order=nav_order,
+                    index_path=index_path,
                 )
             )
 
