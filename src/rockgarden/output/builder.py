@@ -30,7 +30,8 @@ def build_site(config: Config, source: Path, output: Path) -> int:
     pages = load_content(source, config.build.ignore_patterns)
     store = ContentStore(pages)
 
-    nav_tree = build_nav_tree(pages, config.nav)
+    clean_urls = config.site.clean_urls
+    nav_tree = build_nav_tree(pages, config.nav, clean_urls)
 
     env = create_engine(config, site_root=source.parent)
 
@@ -65,7 +66,7 @@ def build_site(config: Config, source: Path, output: Path) -> int:
         content = transform_md_links(content)
         page.html = render_markdown(content)
 
-        breadcrumbs = build_breadcrumbs(page, pages, config.nav)
+        breadcrumbs = build_breadcrumbs(page, pages, config.nav, clean_urls)
         html = render_page(env, page, site_config, breadcrumbs)
 
         output_file = output / page.output_path
@@ -74,7 +75,7 @@ def build_site(config: Config, source: Path, output: Path) -> int:
 
         count += 1
 
-    folder_indexes = generate_folder_indexes(pages, config.nav)
+    folder_indexes = generate_folder_indexes(pages, config.nav, clean_urls)
     folder_template = env.get_template("folder_index.html")
 
     for folder in folder_indexes:
@@ -90,7 +91,7 @@ def build_site(config: Config, source: Path, output: Path) -> int:
             processed = transform_md_links(processed)
             folder.custom_content = render_markdown(processed)
 
-        breadcrumbs = _build_folder_breadcrumbs(folder, pages, config.nav)
+        breadcrumbs = _build_folder_breadcrumbs(folder, pages, config.nav, clean_urls)
 
         html = folder_template.render(
             folder=folder,
@@ -107,7 +108,7 @@ def build_site(config: Config, source: Path, output: Path) -> int:
     return count
 
 
-def _build_folder_breadcrumbs(folder, pages, nav_config):
+def _build_folder_breadcrumbs(folder, pages, nav_config, clean_urls=True):
     """Build breadcrumbs for a folder index page."""
     from rockgarden.nav import Breadcrumb
 
@@ -123,7 +124,8 @@ def _build_folder_breadcrumbs(folder, pages, nav_config):
     root_label = nav_config.labels.get("/", "Home")
     if "" in folder_pages and folder_pages[""].frontmatter.get("title"):
         root_label = folder_pages[""].frontmatter["title"]
-    breadcrumbs.append(Breadcrumb(label=root_label, path="/index.html"))
+    root_path = "/" if clean_urls else "/index.html"
+    breadcrumbs.append(Breadcrumb(label=root_label, path=root_path))
 
     folder_path = folder.slug.rsplit("/", 1)[0] if "/" in folder.slug else ""
     if not folder_path:
@@ -142,6 +144,9 @@ def _build_folder_breadcrumbs(folder, pages, nav_config):
         if not label:
             label = part.replace("-", " ").replace("_", " ").title()
 
-        breadcrumbs.append(Breadcrumb(label=label, path=f"/{path}/index.html"))
+        if clean_urls:
+            breadcrumbs.append(Breadcrumb(label=label, path=f"/{path}/"))
+        else:
+            breadcrumbs.append(Breadcrumb(label=label, path=f"/{path}/index.html"))
 
     return breadcrumbs

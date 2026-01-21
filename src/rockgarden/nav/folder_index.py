@@ -49,12 +49,14 @@ def find_folders(pages: list[Page]) -> set[str]:
 def generate_folder_indexes(
     pages: list[Page],
     config: NavConfig | None = None,
+    clean_urls: bool = True,
 ) -> list[FolderIndex]:
     """Generate folder index data for all folders.
 
     Args:
         pages: All pages from the content store
         config: Navigation config for hide patterns and labels
+        clean_urls: If True, use /path/ instead of /path/index.html
 
     Returns:
         List of FolderIndex objects for folders that need generated indexes
@@ -77,7 +79,7 @@ def generate_folder_indexes(
         if _should_hide(folder_path, config.hide):
             continue
 
-        children = _get_folder_children(folder_path, pages, config)
+        children = _get_folder_children(folder_path, pages, config, clean_urls)
 
         if folder_path in existing_indexes:
             index_page = existing_indexes[folder_path]
@@ -152,6 +154,7 @@ def _get_folder_children(
     folder_path: str,
     pages: list[Page],
     config: NavConfig,
+    clean_urls: bool = True,
 ) -> list[FolderChild]:
     """Get direct children of a folder."""
     children: list[FolderChild] = []
@@ -213,10 +216,15 @@ def _get_folder_children(
                         "nav_order"
                     )
 
+                if clean_urls:
+                    child_path = f"/{subfolder_path}/"
+                else:
+                    child_path = f"/{subfolder_path}/index.html"
+
                 children.append(
                     FolderChild(
                         title=label,
-                        path=f"/{subfolder_path}/index.html",
+                        path=child_path,
                         is_folder=True,
                         nav_order=nav_order,
                     )

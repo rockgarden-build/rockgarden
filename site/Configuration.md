@@ -12,6 +12,7 @@ Configuration is optional. Create `rockgarden.toml` in your project root to cust
 title = "My Site"     # Page title suffix
 source = "."          # Source directory
 output = "_site"      # Output directory
+clean_urls = true     # Use /path/ instead of /path/index.html
 ```
 
 ## Build

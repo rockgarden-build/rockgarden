@@ -26,7 +26,7 @@ class TestBuildBreadcrumbs:
 
         assert len(breadcrumbs) == 1
         assert breadcrumbs[0].label == "Home"
-        assert breadcrumbs[0].path == "/index.html"
+        assert breadcrumbs[0].path == "/"
 
     def test_top_level_page(self):
         """Top-level page has Home and page breadcrumbs."""
@@ -50,7 +50,7 @@ class TestBuildBreadcrumbs:
         assert len(breadcrumbs) == 3
         assert breadcrumbs[0].label == "Home"
         assert breadcrumbs[1].label == "Characters"
-        assert breadcrumbs[1].path == "/characters/index.html"
+        assert breadcrumbs[1].path == "/characters/"
         assert breadcrumbs[2].label == "Alice"
 
     def test_deeply_nested(self):
@@ -61,7 +61,7 @@ class TestBuildBreadcrumbs:
         assert len(breadcrumbs) == 5
         assert breadcrumbs[0].label == "Home"
         assert breadcrumbs[1].label == "A"
-        assert breadcrumbs[1].path == "/a/index.html"
+        assert breadcrumbs[1].path == "/a/"
         assert breadcrumbs[2].label == "B"
         assert breadcrumbs[3].label == "C"
         assert breadcrumbs[4].label == "Deep Page"
@@ -74,6 +74,14 @@ class TestBuildBreadcrumbs:
         assert len(breadcrumbs) == 2
         assert breadcrumbs[0].label == "Home"
         assert breadcrumbs[1].label == "Characters"
+        assert breadcrumbs[1].path == "/characters/"
+
+    def test_clean_urls_disabled(self):
+        """When clean_urls=False, use index.html paths."""
+        page = make_page("characters/alice", "Alice")
+        breadcrumbs = build_breadcrumbs(page, [page], clean_urls=False)
+
+        assert breadcrumbs[0].path == "/index.html"
         assert breadcrumbs[1].path == "/characters/index.html"
 
 

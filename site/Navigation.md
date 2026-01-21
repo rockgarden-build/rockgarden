@@ -75,7 +75,7 @@ title: My Folder
 Custom intro text here.
 ```
 
-See [Examples](/examples/index.html) for a live example—it has custom content with the auto-generated listing below.
+See [Examples](/examples/) for a live example—it has custom content with the auto-generated listing below.
 
 To disable the listing entirely and render as a normal page:
 
@@ -86,4 +86,4 @@ auto_index: false
 ---
 ```
 
-This site's [homepage](/index.html) uses `auto_index: false`.
+This site's [homepage](/) uses `auto_index: false`.

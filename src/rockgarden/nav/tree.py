@@ -93,12 +93,17 @@ def _sort_nav_nodes(nodes: list[NavNode], sort_strategy: str) -> list[NavNode]:
     return pinned + unpinned
 
 
-def build_nav_tree(pages: list[Page], config: NavConfig | None = None) -> NavNode:
+def build_nav_tree(
+    pages: list[Page],
+    config: NavConfig | None = None,
+    clean_urls: bool = True,
+) -> NavNode:
     """Build navigation tree from a list of pages.
 
     Args:
         pages: List of Page objects from the content store
         config: Navigation configuration (hide patterns, labels, etc.)
+        clean_urls: If True, use /path/ instead of /path/index.html
 
     Returns:
         Root NavNode containing the full navigation tree
@@ -161,7 +166,10 @@ def build_nav_tree(pages: list[Page], config: NavConfig | None = None) -> NavNod
 
             if is_folder:
                 label = _resolve_label(path, name, config.labels, folder_pages)
-                url_path = f"/{path}/index.html" if path else "/index.html"
+                if clean_urls:
+                    url_path = f"/{path}/" if path else "/"
+                else:
+                    url_path = f"/{path}/index.html" if path else "/index.html"
                 if path in folder_pages:
                     nav_order = folder_pages[path].frontmatter.get("nav_order")
             else:
@@ -192,7 +200,7 @@ def build_nav_tree(pages: list[Page], config: NavConfig | None = None) -> NavNod
 
     return NavNode(
         name="",
-        path="/index.html",
+        path="/" if clean_urls else "/index.html",
         label=root_label,
         is_folder=True,
         children=root_children,

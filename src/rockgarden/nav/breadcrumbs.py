@@ -20,6 +20,7 @@ def build_breadcrumbs(
     page: Page,
     pages: list[Page],
     config: NavConfig | None = None,
+    clean_urls: bool = True,
 ) -> list[Breadcrumb]:
     """Build breadcrumb trail for a page.
 
@@ -27,6 +28,7 @@ def build_breadcrumbs(
         page: The current page
         pages: All pages (for looking up folder index titles)
         config: Navigation config (for label overrides)
+        clean_urls: If True, use /path/ instead of /path/index.html
 
     Returns:
         List of Breadcrumb objects from root to current page
@@ -44,7 +46,8 @@ def build_breadcrumbs(
     breadcrumbs: list[Breadcrumb] = []
 
     root_label = _resolve_label("", "Home", config.labels, folder_pages)
-    breadcrumbs.append(Breadcrumb(label=root_label, path="/index.html"))
+    root_path = "/" if clean_urls else "/index.html"
+    breadcrumbs.append(Breadcrumb(label=root_label, path=root_path))
 
     parts = page.slug.split("/")
 
@@ -57,7 +60,10 @@ def build_breadcrumbs(
         folder_path = "/".join(current_path_parts)
 
         label = _resolve_label(folder_path, part, config.labels, folder_pages)
-        path = f"/{folder_path}/index.html"
+        if clean_urls:
+            path = f"/{folder_path}/"
+        else:
+            path = f"/{folder_path}/index.html"
 
         breadcrumbs.append(Breadcrumb(label=label, path=path))
 
