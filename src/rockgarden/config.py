@@ -31,12 +31,22 @@ class ThemeConfig:
 
 
 @dataclass
+class NavConfig:
+    """Navigation configuration."""
+
+    default_state: str = "collapsed"
+    hide: list[str] = field(default_factory=list)
+    labels: dict[str, str] = field(default_factory=dict)
+
+
+@dataclass
 class Config:
     """Root configuration object."""
 
     site: SiteConfig = field(default_factory=SiteConfig)
     build: BuildConfig = field(default_factory=BuildConfig)
     theme: ThemeConfig = field(default_factory=ThemeConfig)
+    nav: NavConfig = field(default_factory=NavConfig)
 
     @classmethod
     def load(cls, config_path: Path | None = None) -> "Config":
@@ -66,6 +76,7 @@ class Config:
         site_data = data.get("site", {})
         build_data = data.get("build", {})
         theme_data = data.get("theme", {})
+        nav_data = data.get("nav", {})
 
         site = SiteConfig(
             title=site_data.get("title", SiteConfig.title),
@@ -83,4 +94,10 @@ class Config:
             name=theme_data.get("name", ""),
         )
 
-        return cls(site=site, build=build, theme=theme)
+        nav = NavConfig(
+            default_state=nav_data.get("default_state", "collapsed"),
+            hide=nav_data.get("hide", []),
+            labels=nav_data.get("labels", {}),
+        )
+
+        return cls(site=site, build=build, theme=theme, nav=nav)

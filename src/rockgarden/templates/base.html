@@ -56,13 +56,90 @@
         }
         hr { border: none; border-top: 1px solid var(--color-border); margin: 2em 0; }
         img { max-width: 100%; height: auto; }
+
+        /* Layout with sidebar */
+        .site-layout {
+            display: flex;
+            gap: 2rem;
+            max-width: 72rem;
+            margin: 0 auto;
+        }
+        .site-nav {
+            flex-shrink: 0;
+            width: 14rem;
+            position: sticky;
+            top: var(--spacing);
+            align-self: flex-start;
+            max-height: calc(100vh - 2 * var(--spacing));
+            overflow-y: auto;
+        }
+        .site-content {
+            flex: 1;
+            min-width: 0;
+            max-width: var(--max-width);
+        }
+
+        /* Nav styling */
+        .site-nav ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+        .site-nav ul ul {
+            padding-left: 1rem;
+        }
+        .site-nav li {
+            margin: 0.25rem 0;
+        }
+        .site-nav a {
+            text-decoration: none;
+            color: var(--color-text);
+        }
+        .site-nav a:hover {
+            color: var(--color-link);
+        }
+        .site-nav details > summary {
+            cursor: pointer;
+            list-style: none;
+        }
+        .site-nav details > summary::-webkit-details-marker {
+            display: none;
+        }
+        .site-nav details > summary::before {
+            content: "▸ ";
+            font-size: 0.75em;
+            color: var(--color-muted);
+        }
+        .site-nav details[open] > summary::before {
+            content: "▾ ";
+        }
+
+        /* Responsive: hide nav on small screens */
+        @media (max-width: 768px) {
+            .site-layout {
+                flex-direction: column;
+            }
+            .site-nav {
+                width: 100%;
+                position: static;
+                max-height: none;
+                border-bottom: 1px solid var(--color-border);
+                padding-bottom: 1rem;
+                margin-bottom: 1rem;
+            }
+        }
     </style>
     {% block head %}{% endblock %}
 </head>
 <body>
-    <main>
-        {% block content %}{% endblock %}
-    </main>
+    <div class="site-layout">
+        {% if site.nav and site.nav.children %}
+        {% include "components/nav.html" %}
+        {% endif %}
+        <main class="site-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
     {% block footer %}{% endblock %}
 </body>
 </html>

@@ -1,5 +1,8 @@
 """Command-line interface for rockgarden."""
 
+import http.server
+import socketserver
+from functools import partial
 from pathlib import Path
 from typing import Annotated
 
@@ -47,9 +50,49 @@ def build(
 
 
 @app.command()
-def serve() -> None:
+def serve(
+    output: Annotated[
+        Path | None,
+        typer.Option("--output", "-o", help="Output directory to serve"),
+    ] = None,
+    port: Annotated[
+        int,
+        typer.Option("--port", "-p", help="Port to serve on"),
+    ] = 8000,
+    config_file: Annotated[
+        Path | None,
+        typer.Option("--config", "-c", help="Path to config file"),
+    ] = None,
+) -> None:
     """Serve the built site locally for preview."""
-    typer.echo("Not implemented yet")
+    config = Config.load(config_file)
+    output_dir = output or config.site.output
+    output_dir = output_dir.resolve()
+
+    if not output_dir.exists():
+        typer.echo(f"Error: Output directory not found: {output_dir}", err=True)
+        typer.echo("Run 'rockgarden build' first.", err=True)
+        raise typer.Exit(1)
+
+    handler = partial(http.server.SimpleHTTPRequestHandler, directory=str(output_dir))
+
+    try:
+        httpd = socketserver.TCPServer(("", port), handler)
+    except OSError as e:
+        if e.errno == 48:  # Address already in use
+            typer.echo(f"Error: Port {port} is already in use.", err=True)
+            typer.echo(f"Try: rockgarden serve -p {port + 1}", err=True)
+            raise typer.Exit(1) from None
+        raise
+
+    typer.echo(f"Serving {output_dir} at http://localhost:{port}")
+    typer.echo("Press Ctrl+C to stop")
+
+    with httpd:
+        try:
+            httpd.serve_forever()
+        except KeyboardInterrupt:
+            typer.echo("\nStopping server")
 
 
 def main() -> None:
