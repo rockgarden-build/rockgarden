@@ -4,6 +4,7 @@ from pathlib import Path
 
 from rockgarden.config import Config
 from rockgarden.content import ContentStore, load_content
+from rockgarden.links import transform_md_links
 from rockgarden.nav import (
     build_breadcrumbs,
     build_nav_tree,
@@ -48,6 +49,7 @@ def build_site(config: Config, source: Path, output: Path) -> int:
     count = 0
     for page in pages:
         content = process_wikilinks(page.content, store.resolve_link)
+        content = transform_md_links(content)
         page.html = render_markdown(content)
 
         breadcrumbs = build_breadcrumbs(page, pages, config.nav)
@@ -69,6 +71,7 @@ def build_site(config: Config, source: Path, output: Path) -> int:
 
         if folder.custom_content:
             processed = process_wikilinks(folder.custom_content, store.resolve_link)
+            processed = transform_md_links(processed)
             folder.custom_content = render_markdown(processed)
 
         breadcrumbs = _build_folder_breadcrumbs(folder, pages, config.nav)
