@@ -44,6 +44,69 @@ def _output_dir_has_contents(output_dir: Path) -> bool:
     return any(output_dir.iterdir())
 
 
+def _is_in_gitignore(gitignore_path: Path, pattern: str) -> bool:
+    """Check if a pattern is already in .gitignore."""
+    if not gitignore_path.exists():
+        return False
+    content = gitignore_path.read_text()
+    lines = [line.strip() for line in content.splitlines()]
+    return pattern in lines or f"{pattern}/" in lines or f"/{pattern}" in lines
+
+
+def _add_to_gitignore(gitignore_path: Path, pattern: str) -> None:
+    """Add a pattern to .gitignore."""
+    if gitignore_path.exists():
+        content = gitignore_path.read_text()
+        if not content.endswith("\n"):
+            content += "\n"
+    else:
+        content = ""
+    content += f"{pattern}/\n"
+    gitignore_path.write_text(content)
+
+
+@app.command()
+def init(
+    directory: Annotated[
+        Path,
+        typer.Argument(help="Directory to initialize (defaults to current directory)"),
+    ] = Path("."),
+) -> None:
+    """Initialize a new rockgarden project."""
+    directory = directory.resolve()
+
+    config_path = directory / "rockgarden.toml"
+    if config_path.exists():
+        typer.echo(f"Error: {config_path} already exists", err=True)
+        raise typer.Exit(1)
+
+    site_name = typer.prompt("Site name", default="My Site")
+    source = typer.prompt("Source directory", default="content")
+    output = typer.prompt("Output directory", default="_site")
+
+    config_content = f'''[site]
+title = "{site_name}"
+clean_urls = true
+
+[build]
+source = "{source}"
+output = "{output}"
+ignore_patterns = [".obsidian", "Templates"]
+'''
+
+    config_path.write_text(config_content)
+    typer.echo(f"Created {config_path}")
+
+    gitignore_path = directory / ".gitignore"
+    if not _is_in_gitignore(gitignore_path, output):
+        add_gitignore = typer.confirm(
+            f"Add '{output}/' to .gitignore?", default=True
+        )
+        if add_gitignore:
+            _add_to_gitignore(gitignore_path, output)
+            typer.echo(f"Added '{output}/' to .gitignore")
+
+
 @app.command()
 def build(
     source: Annotated[
