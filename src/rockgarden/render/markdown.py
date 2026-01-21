@@ -6,10 +6,17 @@ _md: MarkdownIt | None = None
 
 
 def get_markdown_renderer() -> MarkdownIt:
-    """Get or create the markdown renderer instance."""
+    """Get or create the markdown renderer instance.
+
+    Uses gfm-like preset which includes:
+    - Tables
+    - Strikethrough (~~text~~)
+    - Autolinks (bare URLs)
+    - Task lists (- [ ] item)
+    """
     global _md
     if _md is None:
-        _md = MarkdownIt("commonmark", {"html": True})
+        _md = MarkdownIt("gfm-like", {"html": True})
     return _md
 
 

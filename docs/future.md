@@ -10,3 +10,4 @@ Noted but not currently planned:
 - Content from other data sources during collection (other files, APIs, databases, etc.)
 - Installable templates
 - Plugins
+- Configurable markdown preset (commonmark, gfm-like, custom plugins)

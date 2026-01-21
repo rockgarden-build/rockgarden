@@ -3,7 +3,7 @@
 from pathlib import Path
 
 from rockgarden.config import Config
-from rockgarden.content import ContentStore, load_content
+from rockgarden.content import ContentStore, load_content, strip_content_title
 from rockgarden.links import transform_md_links
 from rockgarden.nav import (
     build_breadcrumbs,
@@ -48,7 +48,12 @@ def build_site(config: Config, source: Path, output: Path) -> int:
 
     count = 0
     for page in pages:
-        content = process_wikilinks(page.content, store.resolve_link)
+        content = page.content
+
+        if page.frontmatter.get("title"):
+            content = strip_content_title(content)
+
+        content = process_wikilinks(content, store.resolve_link)
         content = transform_md_links(content)
         page.html = render_markdown(content)
 
@@ -70,7 +75,10 @@ def build_site(config: Config, source: Path, output: Path) -> int:
             continue
 
         if folder.custom_content:
-            processed = process_wikilinks(folder.custom_content, store.resolve_link)
+            processed = folder.custom_content
+            if folder.frontmatter.get("title"):
+                processed = strip_content_title(processed)
+            processed = process_wikilinks(processed, store.resolve_link)
             processed = transform_md_links(processed)
             folder.custom_content = render_markdown(processed)
 
