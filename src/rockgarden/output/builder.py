@@ -2,7 +2,11 @@
 
 from pathlib import Path
 
-from rockgarden.assets import copy_assets, create_image_resolver
+from rockgarden.assets import (
+    collect_markdown_images,
+    copy_assets,
+    create_image_resolver,
+)
 from rockgarden.config import Config
 from rockgarden.content import ContentStore, load_content, strip_content_title
 from rockgarden.links import transform_md_links
@@ -70,6 +74,7 @@ def build_site(config: Config, source: Path, output: Path) -> int:
         image_resolver = create_image_resolver(source, page_rel_path)
         content, images = process_image_embeds(content, image_resolver)
         all_images.update(images)
+        all_images.update(collect_markdown_images(content, image_resolver))
         content = process_wikilinks(content, store.resolve_link)
         content = transform_md_links(content, clean_urls)
         page.html = render_markdown(content)
@@ -99,6 +104,7 @@ def build_site(config: Config, source: Path, output: Path) -> int:
             image_resolver = create_image_resolver(source, folder_src)
             processed, images = process_image_embeds(processed, image_resolver)
             all_images.update(images)
+            all_images.update(collect_markdown_images(processed, image_resolver))
             processed = process_wikilinks(processed, store.resolve_link)
             processed = transform_md_links(processed, clean_urls)
             folder.custom_content = render_markdown(processed)

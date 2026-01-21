@@ -23,14 +23,21 @@ Obsidian uses `![[image.png]]` syntax to embed images.
 
 ![[attachments/icon.svg|48x48]]
 
+## Standard Markdown Images
+
+Standard markdown image syntax also works:
+
+![Pipeline diagram](attachments/diagram.svg)
+
 ## Syntax Reference
 
-| Syntax | Result |
-|--------|--------|
-| `![[image.png]]` | Basic embed, filename as alt |
-| `![[image.png\|description]]` | Custom alt text |
-| `![[image.png\|100]]` | Width of 100px |
-| `![[image.png\|100x200]]` | Width 100px, height 200px |
+| Syntax | Type | Result |
+|--------|------|--------|
+| `![[image.png]]` | Obsidian | Basic embed, filename as alt |
+| `![[image.png\|description]]` | Obsidian | Custom alt text |
+| `![[image.png\|100]]` | Obsidian | Width of 100px |
+| `![[image.png\|100x200]]` | Obsidian | Width 100px, height 200px |
+| `![alt](image.png)` | Markdown | Standard syntax |
 
 ## Back to Index
 

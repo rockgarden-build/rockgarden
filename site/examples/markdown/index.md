@@ -10,3 +10,4 @@ This folder demonstrates standard GitHub Flavored Markdown (GFM) without Obsidia
 
 - [Formatting](./formatting.md) - Text formatting examples
 - [Linking](./linking.md) - Standard link examples
+- [Images](./images.md) - Image embed examples

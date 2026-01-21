@@ -1,9 +1,62 @@
 """Asset collection and copying for static site generation."""
 
+import re
 import shutil
 from pathlib import Path
 
-from rockgarden.obsidian.embeds import IMAGE_EXTENSIONS
+from rockgarden.obsidian.embeds import CODE_BLOCK_PATTERN, IMAGE_EXTENSIONS
+
+MD_IMAGE_PATTERN = re.compile(
+    r"!\[([^\]]*)\]"  # Alt text (can be empty)
+    r"\(([^)\s]+)"  # URL/path (required, no spaces)
+    r"(?:\s+[\"'][^\"']*[\"'])?\)"  # Optional title in quotes
+)
+
+
+def is_external_url(path: str) -> bool:
+    """Check if a path is an external URL."""
+    return path.startswith(("http://", "https://", "//", "data:"))
+
+
+def collect_markdown_images(
+    content: str,
+    image_resolver: callable,
+) -> set[str]:
+    """Collect image paths from standard markdown image syntax.
+
+    Finds ![alt](path) images and resolves their paths.
+    Skips external URLs and images inside code blocks.
+
+    Args:
+        content: Markdown content.
+        image_resolver: Function to resolve image paths.
+
+    Returns:
+        Set of resolved image paths relative to source.
+    """
+    code_blocks: list[str] = []
+
+    def save_code_block(match: re.Match) -> str:
+        code_blocks.append(match.group(0))
+        return f"\x00CODE{len(code_blocks) - 1}\x00"
+
+    content = CODE_BLOCK_PATTERN.sub(save_code_block, content)
+
+    found_images: set[str] = set()
+
+    for match in MD_IMAGE_PATTERN.finditer(content):
+        path = match.group(2)
+
+        if is_external_url(path):
+            continue
+
+        resolved = image_resolver(path)
+        if resolved:
+            _, actual_path = resolved
+            if actual_path:
+                found_images.add(actual_path)
+
+    return found_images
 
 
 def create_image_resolver(source_dir: Path, page_path: str):
