@@ -48,6 +48,7 @@ Module structure in `src/rockgarden/`:
 - Uses conventional commits (commitizen configured)
 - Requires Python 3.13+
 - Config file: `rockgarden.toml`
+- Pre-release project: no need to preserve backwards compatibility
 
 ## Planning Docs
 

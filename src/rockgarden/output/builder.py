@@ -3,9 +3,10 @@
 from pathlib import Path
 
 from rockgarden.assets import (
+    build_media_index,
     collect_markdown_images,
     copy_assets,
-    create_image_resolver,
+    create_media_resolver,
 )
 from rockgarden.config import Config
 from rockgarden.content import ContentStore, load_content, strip_content_title
@@ -15,7 +16,7 @@ from rockgarden.nav import (
     build_nav_tree,
     generate_folder_indexes,
 )
-from rockgarden.obsidian import process_image_embeds, process_wikilinks
+from rockgarden.obsidian import process_media_embeds, process_wikilinks
 from rockgarden.render import create_engine, render_markdown, render_page
 from rockgarden.urls import get_folder_url, get_output_path
 
@@ -55,7 +56,8 @@ def build_site(config: Config, source: Path, output: Path) -> int:
             show_index = p.frontmatter.get("show_index", False)
             show_index_map[folder_path] = show_index
 
-    all_images: set[str] = set()
+    media_index = build_media_index(source)
+    all_media: set[str] = set()
 
     count = 0
     for page in pages:
@@ -71,10 +73,10 @@ def build_site(config: Config, source: Path, output: Path) -> int:
             content = strip_content_title(content)
 
         page_rel_path = str(page.source_path.relative_to(source))
-        image_resolver = create_image_resolver(source, page_rel_path)
-        content, images = process_image_embeds(content, image_resolver)
-        all_images.update(images)
-        all_images.update(collect_markdown_images(content, image_resolver))
+        media_resolver = create_media_resolver(source, page_rel_path, media_index)
+        content, media = process_media_embeds(content, media_resolver)
+        all_media.update(media)
+        all_media.update(collect_markdown_images(content, media_resolver))
         content = process_wikilinks(content, store.resolve_link)
         content = transform_md_links(content, clean_urls)
         page.html = render_markdown(content)
@@ -101,10 +103,10 @@ def build_site(config: Config, source: Path, output: Path) -> int:
             if folder.frontmatter.get("title"):
                 processed = strip_content_title(processed)
             folder_src = folder_path + "/index.md" if folder_path else "index.md"
-            image_resolver = create_image_resolver(source, folder_src)
-            processed, images = process_image_embeds(processed, image_resolver)
-            all_images.update(images)
-            all_images.update(collect_markdown_images(processed, image_resolver))
+            media_resolver = create_media_resolver(source, folder_src, media_index)
+            processed, media = process_media_embeds(processed, media_resolver)
+            all_media.update(media)
+            all_media.update(collect_markdown_images(processed, media_resolver))
             processed = process_wikilinks(processed, store.resolve_link)
             processed = transform_md_links(processed, clean_urls)
             folder.custom_content = render_markdown(processed)
@@ -123,7 +125,7 @@ def build_site(config: Config, source: Path, output: Path) -> int:
 
         count += 1
 
-    copy_assets(all_images, source, output)
+    copy_assets(all_media, source, output)
 
     return count
 
