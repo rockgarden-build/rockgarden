@@ -6,8 +6,16 @@ from rockgarden.cli import app
 runner = CliRunner()
 
 
-def test_version():
-    assert __version__ == "0.2.2"
+def test_version_flag():
+    result = runner.invoke(app, ["--version"])
+    assert result.exit_code == 0
+    assert __version__ in result.output
+
+
+def test_version_flag_short():
+    result = runner.invoke(app, ["-v"])
+    assert result.exit_code == 0
+    assert __version__ in result.output
 
 
 def test_help():

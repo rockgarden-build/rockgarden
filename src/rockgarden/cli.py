@@ -9,10 +9,32 @@ from typing import Annotated
 
 import typer
 
+from rockgarden import __version__
 from rockgarden.config import Config
 from rockgarden.output import build_site
 
+
+def version_callback(value: bool) -> None:
+    if value:
+        typer.echo(f"rockgarden {__version__}")
+        raise typer.Exit()
+
+
 app = typer.Typer(no_args_is_help=True)
+
+
+@app.callback()
+def main_callback(
+    version: Annotated[
+        bool,
+        typer.Option(
+            "--version", "-v", callback=version_callback, is_eager=True,
+            help="Show version and exit"
+        ),
+    ] = False,
+) -> None:
+    """Rockgarden - A static site generator for Obsidian vaults."""
+    pass
 
 
 def _output_dir_has_contents(output_dir: Path) -> bool:
