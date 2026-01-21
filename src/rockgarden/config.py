@@ -39,6 +39,7 @@ class NavConfig:
     hide: list[str] = field(default_factory=list)
     labels: dict[str, str] = field(default_factory=dict)
     sort: str = "files-first"
+    link_auto_index: bool = False
 
 
 @dataclass
@@ -102,6 +103,7 @@ class Config:
             hide=nav_data.get("hide", []),
             labels=nav_data.get("labels", {}),
             sort=nav_data.get("sort", "files-first"),
+            link_auto_index=nav_data.get("link_auto_index", False),
         )
 
         return cls(site=site, build=build, theme=theme, nav=nav)

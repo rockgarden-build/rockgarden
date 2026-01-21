@@ -182,9 +182,12 @@ def build_nav_tree(
             children = _sort_nav_nodes(children, config.sort)
 
             index_path = None
-            if is_folder and path in folder_pages:
-                index_page = folder_pages[path]
-                index_path = get_url(index_page.slug, clean_urls)
+            if is_folder:
+                if path in folder_pages:
+                    index_page = folder_pages[path]
+                    index_path = get_url(index_page.slug, clean_urls)
+                elif config.link_auto_index:
+                    index_path = url_path
 
             nodes.append(
                 NavNode(
