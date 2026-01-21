@@ -21,34 +21,6 @@
             },
         }
     </script>
-    <style>
-        /* Nav tree styling */
-        .nav-tree ul {
-            padding-left: 1rem;
-        }
-        .nav-tree > ul {
-            padding-left: 0;
-        }
-        .nav-tree details > summary {
-            cursor: pointer;
-            list-style: none;
-        }
-        .nav-tree details > summary::-webkit-details-marker {
-            display: none;
-        }
-        .nav-tree details > summary::before {
-            content: "▸ ";
-            font-size: 0.75em;
-            opacity: 0.5;
-            margin-right: 0.25rem;
-        }
-        .nav-tree details[open] > summary::before {
-            content: "▾ ";
-        }
-        .nav-tree li {
-            margin: 0.25rem 0;
-        }
-    </style>
     {% block head %}{% endblock %}
     <script>
         (function() {

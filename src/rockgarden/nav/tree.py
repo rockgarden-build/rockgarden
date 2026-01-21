@@ -180,6 +180,20 @@ def build_nav_tree(
             children = dict_to_nodes(data.get("_children", {}), path)
             children = _sort_nav_nodes(children, config.sort)
 
+            if is_folder and path in folder_pages:
+                index_page = folder_pages[path]
+                index_label = index_page.frontmatter.get("title", "Overview")
+                index_url = get_url(index_page.slug, clean_urls)
+                index_node = NavNode(
+                    name="index",
+                    path=index_url,
+                    label=index_label,
+                    is_folder=False,
+                    children=[],
+                    nav_order=None,
+                )
+                children = [index_node] + children
+
             nodes.append(
                 NavNode(
                     name=name,
