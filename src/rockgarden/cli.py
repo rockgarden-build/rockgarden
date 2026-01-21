@@ -51,10 +51,13 @@ def build(
     config = Config.load(config_file)
 
     source_dir = source or config.site.source
-    output_dir = output or config.site.output
-
     source_dir = source_dir.resolve()
-    output_dir = output_dir.resolve()
+
+    # Resolve output relative to source directory if from config
+    if output:
+        output_dir = output.resolve()
+    else:
+        output_dir = (source_dir / config.site.output).resolve()
 
     if not source_dir.exists():
         typer.echo(f"Error: Source directory not found: {source_dir}", err=True)
