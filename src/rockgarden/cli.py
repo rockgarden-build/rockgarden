@@ -30,6 +30,12 @@ def build(
     ] = None,
 ) -> None:
     """Build the static site from an Obsidian vault."""
+    # If source specified but no config, look for config in source directory
+    if config_file is None and source is not None:
+        source_config = source / "rockgarden.toml"
+        if source_config.exists():
+            config_file = source_config
+
     config = Config.load(config_file)
 
     source_dir = source or config.site.source
