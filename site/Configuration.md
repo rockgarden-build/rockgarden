@@ -72,19 +72,19 @@ title: Page Title     # Used in nav and <title>
 slug: custom-slug     # Override generated URL slug
 nav_order: 1          # Pin position in nav (lower = first)
 tags: [doc, guide]    # Shown in folder listings
-auto_index: true      # For index.md: add folder listing
+show_index: true      # For index.md: add folder listing
 ---
 ```
 
 ### Folder Index Pages
 
-The `auto_index` option controls how `index.md` files are rendered:
+The `show_index` option controls how `index.md` files are rendered:
 
 | Scenario | Result |
 |----------|--------|
 | No `index.md` in folder | Auto-generated folder listing |
 | `index.md` exists (default) | Renders as normal page |
-| `index.md` with `auto_index: true` | Page content + folder listing |
+| `index.md` with `show_index: true` | Page content + folder listing |
 
 This lets you write custom landing pages for folders while still optionally including the file listing.
 

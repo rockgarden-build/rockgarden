@@ -1,6 +1,5 @@
 ---
 title: Rockgarden
-auto_index: false
 ---
 
 A Python static site generator that works with Obsidian vaults and plain markdown directories.
