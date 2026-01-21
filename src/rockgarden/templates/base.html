@@ -125,6 +125,41 @@
                 el.checked = theme === 'dark';
             });
         })();
+
+        // Nav state persistence
+        (function() {
+            const STORAGE_KEY = 'rockgarden-nav-state';
+
+            function getNavState() {
+                try {
+                    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+                } catch {
+                    return {};
+                }
+            }
+
+            function saveNavState(state) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            }
+
+            // Restore state on load
+            const state = getNavState();
+            document.querySelectorAll('.nav-tree details[data-nav-path]').forEach(function(el) {
+                const path = el.dataset.navPath;
+                if (path in state) {
+                    el.open = state[path];
+                }
+            });
+
+            // Save state on toggle
+            document.querySelectorAll('.nav-tree details[data-nav-path]').forEach(function(el) {
+                el.addEventListener('toggle', function() {
+                    const state = getNavState();
+                    state[this.dataset.navPath] = this.open;
+                    saveNavState(state);
+                });
+            });
+        })();
     </script>
 </body>
 </html>
