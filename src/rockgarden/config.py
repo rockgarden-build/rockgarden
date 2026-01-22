@@ -83,8 +83,8 @@ class Config:
 
         site = SiteConfig(
             title=site_data.get("title", SiteConfig.title),
-            source=Path(site_data.get("source", ".")),
-            output=Path(site_data.get("output", "_site")),
+            source=Path(build_data.get("source", ".")),
+            output=Path(build_data.get("output", "_site")),
             clean_urls=site_data.get("clean_urls", True),
         )
 
