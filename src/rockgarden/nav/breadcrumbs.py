@@ -45,6 +45,16 @@ def build_breadcrumbs(
             folder_path = "/".join(parts[:-1])
             folder_pages[folder_path] = p
 
+    # Build mapping from slugified folder paths to original folder names
+    # using the current page's source_path
+    original_folder_names: dict[str, str] = {}
+    slug_parts = page.slug.split("/")
+    num_parts = len(slug_parts)
+    source_parts = page.source_path.parts[-num_parts:]
+    for i in range(len(slug_parts) - 1):
+        folder_slug_path = "/".join(slug_parts[: i + 1])
+        original_folder_names[folder_slug_path] = source_parts[i]
+
     breadcrumbs: list[Breadcrumb] = []
 
     root_label = resolve_label("", "Home", config.labels, folder_pages)
@@ -61,7 +71,8 @@ def build_breadcrumbs(
         current_path_parts.append(part)
         folder_path = "/".join(current_path_parts)
 
-        label = resolve_label(folder_path, part, config.labels, folder_pages)
+        original_name = original_folder_names.get(folder_path, part)
+        label = resolve_label(folder_path, original_name, config.labels, folder_pages)
         folder_url = get_folder_url(folder_path, clean_urls)
         breadcrumbs.append(Breadcrumb(label=label, path=folder_url))
 

@@ -95,6 +95,19 @@ def build_nav_tree(
             folder_path = "/".join(parts[:-1])
             folder_pages[folder_path] = page
 
+    # Build mapping from slugified folder paths to original folder names
+    original_folder_names: dict[str, str] = {}
+    for page in pages:
+        slug_parts = page.slug.split("/")
+        num_parts = len(slug_parts)
+        # Extract original path parts from source_path (last N parts, including filename)
+        source_parts = page.source_path.parts[-num_parts:]
+        # Map each folder's slug path to its original name
+        for i in range(len(slug_parts) - 1):
+            folder_slug_path = "/".join(slug_parts[: i + 1])
+            if folder_slug_path not in original_folder_names:
+                original_folder_names[folder_slug_path] = source_parts[i]
+
     tree: dict[str, dict] = {}
 
     for page in pages:
@@ -114,10 +127,12 @@ def build_nav_tree(
                 break
 
             if part not in current:
+                original_name = original_folder_names.get(folder_path, part)
                 current[part] = {
                     "_children": {},
                     "_is_folder": True,
                     "_path": folder_path,
+                    "_original_name": original_name,
                 }
             current = current[part]["_children"]
 
@@ -142,7 +157,8 @@ def build_nav_tree(
             nav_order = None
 
             if is_folder:
-                label = resolve_label(path, name, config.labels, folder_pages)
+                original_name = data.get("_original_name", name)
+                label = resolve_label(path, original_name, config.labels, folder_pages)
                 url_path = get_folder_url(path, clean_urls)
                 if path in folder_pages:
                     nav_order = folder_pages[path].frontmatter.get("nav_order")
