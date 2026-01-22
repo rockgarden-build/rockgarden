@@ -60,10 +60,10 @@ class TestBuildBreadcrumbs:
 
         assert len(breadcrumbs) == 5
         assert breadcrumbs[0].label == "Home"
-        assert breadcrumbs[1].label == "A"
+        assert breadcrumbs[1].label == "a"
         assert breadcrumbs[1].path == "/a/"
-        assert breadcrumbs[2].label == "B"
-        assert breadcrumbs[3].label == "C"
+        assert breadcrumbs[2].label == "b"
+        assert breadcrumbs[3].label == "c"
         assert breadcrumbs[4].label == "Deep Page"
 
     def test_folder_index_page(self):
@@ -105,9 +105,12 @@ class TestBreadcrumbLabels:
 
         assert breadcrumbs[1].label == "NPCs"
 
-    def test_default_label_titlecase(self):
-        """Default label is titlecased folder name."""
+    def test_default_label_preserves_name(self):
+        """Default label preserves folder name, only replacing underscores."""
         page = make_page("my-folder/page", "Page")
         breadcrumbs = build_breadcrumbs(page, [page])
+        assert breadcrumbs[1].label == "my-folder"
 
-        assert breadcrumbs[1].label == "My Folder"
+        page2 = make_page("my_folder/page", "Page")
+        breadcrumbs2 = build_breadcrumbs(page2, [page2])
+        assert breadcrumbs2[1].label == "my folder"

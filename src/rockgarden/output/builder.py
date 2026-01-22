@@ -132,7 +132,7 @@ def build_site(config: Config, source: Path, output: Path) -> int:
 
 def _build_folder_breadcrumbs(folder, pages, nav_config, clean_urls=True):
     """Build breadcrumbs for a folder index page."""
-    from rockgarden.nav import Breadcrumb
+    from rockgarden.nav import Breadcrumb, resolve_label
 
     folder_pages: dict[str, any] = {}
     for p in pages:
@@ -143,9 +143,7 @@ def _build_folder_breadcrumbs(folder, pages, nav_config, clean_urls=True):
 
     breadcrumbs = []
 
-    root_label = nav_config.labels.get("/", "Home")
-    if "" in folder_pages and folder_pages[""].frontmatter.get("title"):
-        root_label = folder_pages[""].frontmatter["title"]
+    root_label = resolve_label("", "Home", nav_config.labels, folder_pages)
     root_path = get_folder_url("", clean_urls)
     breadcrumbs.append(Breadcrumb(label=root_label, path=root_path))
 
@@ -160,12 +158,7 @@ def _build_folder_breadcrumbs(folder, pages, nav_config, clean_urls=True):
         current_parts.append(part)
         path = "/".join(current_parts)
 
-        label = nav_config.labels.get(f"/{path}", None)
-        if not label and path in folder_pages:
-            label = folder_pages[path].frontmatter.get("title")
-        if not label:
-            label = part.replace("-", " ").replace("_", " ").title()
-
+        label = resolve_label(path, part, nav_config.labels, folder_pages)
         folder_url = get_folder_url(path, clean_urls)
         breadcrumbs.append(Breadcrumb(label=label, path=folder_url))
 

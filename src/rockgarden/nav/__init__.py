@@ -2,6 +2,7 @@
 
 from .breadcrumbs import Breadcrumb, build_breadcrumbs
 from .folder_index import FolderChild, FolderIndex, generate_folder_indexes
+from .labels import resolve_label
 from .tree import NavNode, build_nav_tree
 
 __all__ = [
@@ -12,4 +13,5 @@ __all__ = [
     "build_breadcrumbs",
     "build_nav_tree",
     "generate_folder_indexes",
+    "resolve_label",
 ]

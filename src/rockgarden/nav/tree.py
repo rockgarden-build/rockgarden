@@ -7,6 +7,7 @@ from fnmatch import fnmatch
 
 from rockgarden.config import NavConfig
 from rockgarden.content import Page
+from rockgarden.nav.labels import resolve_label
 from rockgarden.urls import get_folder_url, get_url
 
 
@@ -35,32 +36,6 @@ def _should_hide(path: str, hide_patterns: list[str]) -> bool:
         if normalized_path.startswith(f"{normalized_pattern}/"):
             return True
     return False
-
-
-def _resolve_label(
-    path: str,
-    name: str,
-    labels: dict[str, str],
-    folder_pages: dict[str, Page],
-) -> str:
-    """Resolve display label for a nav item.
-
-    Resolution order:
-    1. Config override (labels dict)
-    2. Folder's index.md frontmatter title
-    3. Name (titlecased)
-    """
-    normalized_path = f"/{path.strip('/')}" if path else "/"
-
-    if normalized_path in labels:
-        return labels[normalized_path]
-
-    if path in folder_pages:
-        page = folder_pages[path]
-        if title := page.frontmatter.get("title"):
-            return title
-
-    return name.replace("-", " ").replace("_", " ").title()
 
 
 def _sort_nav_nodes(nodes: list[NavNode], sort_strategy: str) -> list[NavNode]:
@@ -167,7 +142,7 @@ def build_nav_tree(
             nav_order = None
 
             if is_folder:
-                label = _resolve_label(path, name, config.labels, folder_pages)
+                label = resolve_label(path, name, config.labels, folder_pages)
                 url_path = get_folder_url(path, clean_urls)
                 if path in folder_pages:
                     nav_order = folder_pages[path].frontmatter.get("nav_order")
@@ -203,7 +178,7 @@ def build_nav_tree(
 
         return _sort_nav_nodes(nodes, config.sort)
 
-    root_label = _resolve_label("", "Home", config.labels, folder_pages)
+    root_label = resolve_label("", "Home", config.labels, folder_pages)
     root_children = dict_to_nodes(tree)
 
     return NavNode(

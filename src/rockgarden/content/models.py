@@ -19,4 +19,4 @@ class Page:
         """Get page title from frontmatter or derive from filename."""
         if title := self.frontmatter.get("title"):
             return title
-        return self.source_path.stem.replace("-", " ").replace("_", " ")
+        return self.source_path.stem.replace("_", " ")

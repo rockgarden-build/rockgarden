@@ -59,7 +59,7 @@ class TestBuildNavTree:
         assert len(folders) == 2
 
         characters = next(c for c in folders if c.name == "characters")
-        assert characters.label == "Characters"
+        assert characters.label == "characters"
         assert len(characters.children) == 2
 
     def test_deeply_nested(self):
@@ -164,15 +164,21 @@ class TestNavConfigLabels:
         characters = tree.children[0]
         assert characters.label == "Cast"
 
-    def test_default_label_titlecase(self):
-        """Default label is titlecased folder name."""
+    def test_default_label_preserves_name(self):
+        """Default label preserves folder name, only replacing underscores."""
         pages = [
             make_page("my-folder/page", "Page"),
         ]
         tree = build_nav_tree(pages)
-
         folder = tree.children[0]
-        assert folder.label == "My Folder"
+        assert folder.label == "my-folder"
+
+        pages2 = [
+            make_page("my_folder/page", "Page"),
+        ]
+        tree2 = build_nav_tree(pages2)
+        folder2 = tree2.children[0]
+        assert folder2.label == "my folder"
 
 
 class TestNavOrder:
@@ -277,7 +283,7 @@ class TestSortConfig:
         tree = build_nav_tree(pages, config)
 
         assert tree.children[0].label == "AAA File"
-        assert tree.children[1].label == "Bbb Folder"
+        assert tree.children[1].label == "bbb-folder"
         assert tree.children[2].label == "CCC File"
 
     def test_sort_with_nav_order(self):

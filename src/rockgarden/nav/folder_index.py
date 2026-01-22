@@ -7,6 +7,7 @@ from datetime import datetime
 
 from rockgarden.config import NavConfig
 from rockgarden.content import Page
+from rockgarden.nav.labels import resolve_label
 from rockgarden.urls import get_folder_url, get_url
 
 
@@ -89,7 +90,7 @@ def generate_folder_indexes(
             frontmatter = index_page.frontmatter
         else:
             folder_name = folder_path.split("/")[-1]
-            title = _resolve_label(folder_path, folder_name, config.labels)
+            title = resolve_label(folder_path, folder_name, config.labels)
             custom_content = None
             frontmatter = {}
 
@@ -209,7 +210,7 @@ def _get_folder_children(
                     continue
 
                 seen_subfolders.add(subfolder_path)
-                label = _resolve_label(subfolder_path, subfolder, config.labels)
+                label = resolve_label(subfolder_path, subfolder, config.labels)
 
                 nav_order = None
                 if subfolder_path in folder_index_pages:
@@ -227,13 +228,3 @@ def _get_folder_children(
                 )
 
     return _sort_folder_children(children, config.sort)
-
-
-def _resolve_label(path: str, name: str, labels: dict[str, str]) -> str:
-    """Resolve display label for a folder."""
-    normalized_path = f"/{path.strip('/')}" if path else "/"
-
-    if normalized_path in labels:
-        return labels[normalized_path]
-
-    return name.replace("-", " ").replace("_", " ").title()

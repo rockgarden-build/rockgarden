@@ -6,6 +6,7 @@ from dataclasses import dataclass
 
 from rockgarden.config import NavConfig
 from rockgarden.content import Page
+from rockgarden.nav.labels import resolve_label
 from rockgarden.urls import get_folder_url, get_url
 
 
@@ -46,7 +47,7 @@ def build_breadcrumbs(
 
     breadcrumbs: list[Breadcrumb] = []
 
-    root_label = _resolve_label("", "Home", config.labels, folder_pages)
+    root_label = resolve_label("", "Home", config.labels, folder_pages)
     root_path = get_folder_url("", clean_urls)
     breadcrumbs.append(Breadcrumb(label=root_label, path=root_path))
 
@@ -60,7 +61,7 @@ def build_breadcrumbs(
         current_path_parts.append(part)
         folder_path = "/".join(current_path_parts)
 
-        label = _resolve_label(folder_path, part, config.labels, folder_pages)
+        label = resolve_label(folder_path, part, config.labels, folder_pages)
         folder_url = get_folder_url(folder_path, clean_urls)
         breadcrumbs.append(Breadcrumb(label=label, path=folder_url))
 
@@ -69,29 +70,3 @@ def build_breadcrumbs(
         breadcrumbs.append(Breadcrumb(label=page.title, path=page_url))
 
     return breadcrumbs
-
-
-def _resolve_label(
-    path: str,
-    name: str,
-    labels: dict[str, str],
-    folder_pages: dict[str, Page],
-) -> str:
-    """Resolve display label for a breadcrumb.
-
-    Resolution order:
-    1. Config override (labels dict)
-    2. Folder's index.md frontmatter title
-    3. Name (titlecased)
-    """
-    normalized_path = f"/{path.strip('/')}" if path else "/"
-
-    if normalized_path in labels:
-        return labels[normalized_path]
-
-    if path in folder_pages:
-        page = folder_pages[path]
-        if title := page.frontmatter.get("title"):
-            return title
-
-    return name.replace("-", " ").replace("_", " ").title()
