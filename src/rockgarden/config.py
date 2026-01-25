@@ -29,6 +29,7 @@ class ThemeConfig:
     """Theme configuration."""
 
     name: str = ""
+    daisyui: str = "light"
 
 
 @dataclass
@@ -96,6 +97,7 @@ class Config:
 
         theme = ThemeConfig(
             name=theme_data.get("name", ""),
+            daisyui=theme_data.get("daisyui", "light"),
         )
 
         nav = NavConfig(
