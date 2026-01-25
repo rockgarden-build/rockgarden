@@ -50,12 +50,10 @@ Module structure in `src/rockgarden/`:
 - Config file: `rockgarden.toml`
 - Pre-release project: no need to preserve backwards compatibility
 
-## Planning Docs
+## Feature Docs
 
-Before implementing features, check the planning docs in `docs/`:
-- `docs/milestones/README.md` - Roadmap and feature checklist
-- `docs/milestones/NN-*.md` - Detailed milestone specs
-- `docs/implementation.md` - Step-by-step checklist
-- `docs/future.md` - Ideas not yet planned
+Before implementing features, check the docs in `docs/features/`:
+- `docs/features/README.md` - Feature list and status
+- `docs/features/NN-*.md` - Detailed feature specs
 
 After completing features, update these docs to reflect current state.

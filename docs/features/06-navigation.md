@@ -1,4 +1,4 @@
-# Milestone 6: Navigation
+# Feature 06: Navigation ✅
 
 Breadcrumbs, sidebar navigation with collapsible folder tree, and auto-generated folder index pages.
 
