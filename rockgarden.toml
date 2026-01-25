@@ -1,0 +1,4 @@
+[site]
+title = "Rockgarden"
+source = "./site"
+output = "./_site"

@@ -1,4 +1,0 @@
-[site]
-title = "Rockgarden"
-source = "."
-output = "../_site"

@@ -49,11 +49,11 @@ Configuration is stored in `rockgarden.toml`:
 ```toml
 [site]
 title = "My Site"
+source = "content"
+output = "_site"
 clean_urls = true
 
 [build]
-source = "content"
-output = "_site"
 ignore_patterns = [".obsidian", "Templates"]
 ```
 

@@ -86,11 +86,11 @@ def init(
 
     config_content = f'''[site]
 title = "{site_name}"
+source = "{source}"
+output = "{output}"
 clean_urls = true
 
 [build]
-source = "{source}"
-output = "{output}"
 ignore_patterns = [".obsidian", "Templates"]
 '''
 
