@@ -46,7 +46,8 @@ def build_site(config: Config, source: Path, output: Path) -> int:
         "title": config.site.title,
         "nav": nav_tree,
         "nav_default_state": config.nav.default_state,
-        "daisyui_theme": config.theme.daisyui,
+        "daisyui_theme": config.theme.daisyui_default,
+        "daisyui_themes": config.theme.daisyui_themes,
     }
 
     show_index_map = {}

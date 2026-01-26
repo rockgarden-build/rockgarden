@@ -29,7 +29,8 @@ class ThemeConfig:
     """Theme configuration."""
 
     name: str = ""
-    daisyui: str = "light"
+    daisyui_default: str = "light"
+    daisyui_themes: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -97,7 +98,8 @@ class Config:
 
         theme = ThemeConfig(
             name=theme_data.get("name", ""),
-            daisyui=theme_data.get("daisyui", "light"),
+            daisyui_default=theme_data.get("daisyui_default", "light"),
+            daisyui_themes=theme_data.get("daisyui_themes", []),
         )
 
         nav = NavConfig(

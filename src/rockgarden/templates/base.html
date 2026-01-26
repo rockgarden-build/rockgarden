@@ -29,8 +29,8 @@
     </style>
     <script>
         (function() {
-            const theme = localStorage.getItem('theme') ||
-                (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            const defaultTheme = '{{ site.daisyui_theme }}';
+            const theme = localStorage.getItem('theme') || defaultTheme;
             document.documentElement.setAttribute('data-theme', theme);
         })();
     </script>
@@ -83,20 +83,32 @@
     </div>
     {% block footer %}{% endblock %}
     <script>
-        // Theme toggle functionality
-        document.querySelectorAll('.theme-controller').forEach(function(el) {
-            el.addEventListener('change', function() {
-                const theme = this.checked ? 'dark' : 'light';
-                document.documentElement.setAttribute('data-theme', theme);
-                localStorage.setItem('theme', theme);
-                // Sync all theme toggles
-                document.querySelectorAll('.theme-controller').forEach(function(toggle) {
-                    toggle.checked = theme === 'dark';
+        // Theme switcher functionality
+        (function() {
+            // Multi-theme dropdown
+            document.querySelectorAll('.theme-option').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const theme = this.dataset.theme;
+                    document.documentElement.setAttribute('data-theme', theme);
+                    localStorage.setItem('theme', theme);
+                    // Close dropdown by removing focus
+                    document.activeElement.blur();
                 });
             });
-        });
-        // Sync checkbox state on load
-        (function() {
+
+            // Simple dark/light toggle (fallback when no themes configured)
+            document.querySelectorAll('.theme-controller').forEach(function(el) {
+                el.addEventListener('change', function() {
+                    const theme = this.checked ? 'dark' : 'light';
+                    document.documentElement.setAttribute('data-theme', theme);
+                    localStorage.setItem('theme', theme);
+                    document.querySelectorAll('.theme-controller').forEach(function(toggle) {
+                        toggle.checked = theme === 'dark';
+                    });
+                });
+            });
+
+            // Sync checkbox state on load (for simple toggle)
             const theme = document.documentElement.getAttribute('data-theme');
             document.querySelectorAll('.theme-controller').forEach(function(el) {
                 el.checked = theme === 'dark';

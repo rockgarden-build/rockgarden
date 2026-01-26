@@ -2,3 +2,7 @@
 title = "Rockgarden"
 source = "./site"
 output = "./_site"
+
+[theme]
+daisyui_default = "cyberpunk"
+daisyui_themes = ["light", "dark", "cupcake", "cyberpunk", "forest", "aqua", "lofi", "dracula"]

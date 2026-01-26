@@ -59,8 +59,12 @@ See [[Navigation]] for details.
 
 ```toml
 [theme]
-name = ""             # Theme name (empty = default)
+name = ""                        # Custom theme directory (empty = built-in)
+daisyui_default = "light"        # Default DaisyUI theme
+daisyui_themes = ["light", "dark", "cupcake", "cyberpunk"]  # Theme switcher options
 ```
+
+When `daisyui_themes` is set, a theme switcher dropdown appears. When omitted, a simple dark/light toggle is shown.
 
 ## Frontmatter
 
