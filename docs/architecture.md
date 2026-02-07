@@ -127,6 +127,9 @@ For more complex needs, Python plugins in `_plugins/` could hook into:
 - **Templating:** Jinja2
 - **CLI framework:** typer (rich integration later)
 - **Markdown parser:** markdown-it-py (CommonMark, extensible)
+  - Uses "gfm-like" preset for GFM features (tables, strikethrough, task lists, autolinks)
+  - Obsidian-specific syntax (wiki-links, embeds, callouts) handled via regex preprocessing
+  - Supports the superset: CommonMark + GFM + Obsidian without mode detection
 - **Formatting/Linting:** ruff
 - **Testing:** pytest
 - **Version bumping:** commitizen

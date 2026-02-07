@@ -27,6 +27,7 @@ This model unifies the simple case (a folder of markdown) with the complex case 
 
 ## Design Principles
 
+- **Universal markdown support.** Rockgarden supports the superset of CommonMark, GFM (GitHub Flavored Markdown), and Obsidian markdown without requiring configuration. Use plain markdown, GFM features (tables, task lists, alerts), Obsidian features (wiki-links, callouts with titles), or mix them freely in the same document. No mode detection, no feature flags — rockgarden handles all syntax gracefully.
 - **Works with Obsidian vaults as-is.** No special folder structure or file naming beyond what Obsidian uses.
 - **Works with plain markdown.** Obsidian syntax support is additive — plain markdown renders fine without it.
 - **Custom behavior is additive.** The core handles the common case. Customizations layer on top without modifying source content.
