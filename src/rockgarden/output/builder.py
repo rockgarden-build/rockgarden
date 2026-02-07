@@ -16,7 +16,7 @@ from rockgarden.nav import (
     build_nav_tree,
     generate_folder_indexes,
 )
-from rockgarden.obsidian import process_media_embeds, process_wikilinks
+from rockgarden.obsidian import process_callouts, process_media_embeds, process_wikilinks
 from rockgarden.render import create_engine, render_markdown, render_page
 from rockgarden.urls import get_folder_url, get_output_path
 
@@ -76,6 +76,7 @@ def build_site(config: Config, source: Path, output: Path) -> int:
 
         page_rel_path = str(page.source_path.relative_to(source))
         media_resolver = create_media_resolver(source, page_rel_path, media_index)
+        content = process_callouts(content)
         content, media = process_media_embeds(content, media_resolver)
         all_media.update(media)
         all_media.update(collect_markdown_images(content, media_resolver))
@@ -106,6 +107,7 @@ def build_site(config: Config, source: Path, output: Path) -> int:
                 processed = strip_content_title(processed)
             folder_src = folder_path + "/index.md" if folder_path else "index.md"
             media_resolver = create_media_resolver(source, folder_src, media_index)
+            processed = process_callouts(processed)
             processed, media = process_media_embeds(processed, media_resolver)
             all_media.update(media)
             all_media.update(collect_markdown_images(processed, media_resolver))
