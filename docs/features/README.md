@@ -22,7 +22,7 @@ The [PyOhio static website](https://github.com/pyohio/static-website) (Astro + P
 | 02 | [All Pages](02-all-pages.md) | ✅ | — | Render all markdown files |
 | 03 | [Wiki-Links](03-wiki-links.md) | ✅ | — | Resolve `[[Name]]` to URLs |
 | 04 | [Embeds](04-embeds.md) | Partial | — | Image embeds ✅, transclusions ❌ |
-| 05 | [Callouts](05-callouts.md) | ❌ | A | Obsidian callout syntax |
+| 05 | [Callouts](05-callouts.md) | Ready | A | GFM alerts + Obsidian callouts |
 | 06 | [Navigation](06-navigation.md) | ✅ | — | Sidebar, breadcrumbs, folder pages |
 | 07 | [Backlinks](07-backlinks.md) | ❌ | A | Pages that link to current page |
 | 08 | [Search](08-search.md) | ❌ | A | Client-side search |
