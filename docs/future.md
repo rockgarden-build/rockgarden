@@ -2,12 +2,16 @@
 
 Noted but not currently planned:
 
+- Incremental builds / watch-mode selective rebuild (file-mtime dirty checking, partial rebuilds)
+
 - Hover previews (popover preview of linked page on hover)
 - CLI model discovery wizard
 - Config drift detection
-- MCP server for vault data
+- MCP server for vault data (JSON content export makes this feasible)
 - Graph visualization
-- Content from other data sources during collection (other files, APIs, databases, etc.)
 - Installable templates
-- Plugins
+- Python plugins (tighter integration than shell hooks)
 - Configurable markdown preset (commonmark, gfm-like, custom plugins)
+
+Moved to roadmap:
+- ~~Content from other data sources~~ → Feature 14 (Collections) + Feature 15 (Build Hooks)
