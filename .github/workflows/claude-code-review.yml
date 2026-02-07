@@ -2,43 +2,227 @@ name: Claude Code Review
 
 on:
   pull_request:
-    types: [opened, synchronize, ready_for_review, reopened]
-    # Optional: Only run on specific file changes
-    # paths:
-    #   - "src/**/*.ts"
-    #   - "src/**/*.tsx"
-    #   - "src/**/*.js"
-    #   - "src/**/*.jsx"
+    types: [opened, synchronize, reopened, ready_for_review, labeled]
 
 jobs:
   claude-review:
-    # Optional: Filter by PR author
-    # if: |
-    #   github.event.pull_request.user.login == 'external-contributor' ||
-    #   github.event.pull_request.user.login == 'new-developer' ||
-    #   github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR'
-
+    if: |
+      contains(github.event.pull_request.labels.*.name, 'claude-review') ||
+      (
+        github.actor != 'dependabot[bot]' &&
+        (github.event.pull_request.draft == false || github.event.action == 'ready_for_review')
+      )
+    concurrency:
+      group: claude-review-${{ github.repository }}-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: read
+      pull-requests: write
       issues: read
       id-token: write
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0
+
+      - name: Collect previous Claude reviews
+        id: previous-reviews
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          # Query for previous reviews
+          REVIEWS_JSON=$(gh api graphql -f query='
+            query($owner: String!, $repo: String!, $prNumber: Int!) {
+              repository(owner: $owner, name: $repo) {
+                pullRequest(number: $prNumber) {
+                  reviews(first: 100) {
+                    nodes {
+                      id
+                      author { login }
+                      body
+                      isMinimized
+                      comments(first: 100) {
+                        nodes {
+                          id
+                          body
+                          path
+                          line
+                          isMinimized
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ' -f owner="$OWNER" -f repo="$REPO" -F prNumber="$PR_NUMBER")
+
+          # Extract Claude review IDs (the parent review bodies)
+          CLAUDE_REVIEWS=$(echo "$REVIEWS_JSON" | jq -c '
+            [.data.repository.pullRequest.reviews.nodes[]
+             | select(.author.login == "claude")
+             | select(.isMinimized == false)
+             | .id]
+          ')
+
+          # Extract ALL Claude inline comments (for minimizing - no marker requirement)
+          ALL_CLAUDE_COMMENTS=$(echo "$REVIEWS_JSON" | jq -c '
+            [.data.repository.pullRequest.reviews.nodes[]
+             | select(.author.login == "claude")
+             | .comments.nodes[]
+             | select(.isMinimized == false)
+             | .id]
+          ')
+
+          REVIEW_COUNT=$(echo "$CLAUDE_REVIEWS" | jq 'length')
+          COMMENT_COUNT=$(echo "$ALL_CLAUDE_COMMENTS" | jq 'length')
+          echo "Found $REVIEW_COUNT previous Claude reviews and $COMMENT_COUNT inline comments to minimize after review"
+
+          # Extract previous issues WITH marker for context (remove marker from body)
+          PREVIOUS_ISSUES=$(echo "$REVIEWS_JSON" | jq '
+            [.data.repository.pullRequest.reviews.nodes[]
+             | select(.author.login == "claude")
+             | .comments.nodes[]
+             | select(.body | contains("<!-- claude-review -->"))
+             | {
+                 path: .path,
+                 line: .line,
+                 body: (.body | gsub("<!-- claude-review -->[\n]*"; ""))
+               }]
+          ')
+
+          # Combine review IDs and comment IDs for minimizing later
+          ALL_IDS=$(echo "$CLAUDE_REVIEWS $ALL_CLAUDE_COMMENTS" | jq -s 'add | unique')
+
+          # Output for subsequent steps
+          {
+            echo "previous_issues<<EOF"
+            echo "$PREVIOUS_ISSUES"
+            echo "EOF"
+            echo "ids_to_minimize<<EOF"
+            echo "$ALL_IDS"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Run Claude Code Review
         id: claude-review
         uses: anthropics/claude-code-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          plugin_marketplaces: 'https://github.com/anthropics/claude-code.git'
-          plugins: 'code-review@claude-code-plugins'
-          prompt: '/code-review:code-review ${{ github.repository }}/pull/${{ github.event.pull_request.number }}'
-          # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
-          # or https://code.claude.com/docs/en/cli-reference for available options
+          claude_args: '--model ${{ vars.CLAUDE_CODE_DEFAULT_MODEL || ''sonnet'' }} --dangerously-skip-permissions --allowed-tools "Bash(gh *),Bash(cat *),Bash(curl *)"'
+          prompt: |
+            You are reviewing PR #${{ github.event.pull_request.number }} in ${{ github.repository }}.
 
+            **REQUIRED FIRST STEP:**
+            Read and understand the CLAUDE.md file in the repository root. This contains critical context about our architecture, conventions, and intentional design decisions.
+
+            **Previous Review Context:**
+            Previous Claude reviews on this PR will be hidden as outdated after your review completes. If any of these issues are still valid in the current code, re-raise them in your new review. When re-raising a previous issue that is still present, note "Previously flagged and still present."
+
+            Previous issues (may be empty if this is the first review):
+            ${{ steps.previous-reviews.outputs.previous_issues }}
+
+            **Review Process:**
+            1. Use gh pr diff to see the full diff
+            2. Read CLAUDE.md to understand project standards
+            3. Identify files changed and check for existing patterns before flagging issues
+
+            **Review Priorities (in order):**
+            1. Critical Issues - Security vulnerabilities, data loss risks, breaking changes
+            2. Bugs - Logic errors, edge cases, incorrect implementations
+            3. Significant Code Quality - Major performance issues, clear violations of standards
+
+            **What NOT to comment on:**
+            - Patterns that match existing code in the repo (check before commenting!)
+            - Style preferences unless they violate CLAUDE.md standards
+            - Refactoring suggestions without clear bug/security impact
+            - Anything already addressed in CLAUDE.md as intentional
+            - Code that isn't part of this PR's changes
+            - Minor naming or formatting nitpicks
+
+            **How to Submit Your Review:**
+
+            You MUST use the GitHub API to submit your review. Follow these steps EXACTLY:
+
+            1. First, examine the diff:
+               gh pr diff $PR_NUMBER
+
+            2. If you find issues to report, create the JSON file and submit it with curl:
+
+               cat > /tmp/review.json << 'JSONEOF'
+               {
+                 "body": "<!-- claude-review -->\n\nReview Summary here",
+                 "event": "COMMENT",
+                 "comments": [
+                   {
+                     "path": "path/to/file.ts",
+                     "line": 42,
+                     "body": "<!-- claude-review -->\n\nIssue description"
+                   }
+                 ]
+               }
+               JSONEOF
+
+               curl -X POST -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GITHUB_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$REPO/pulls/$PR_NUMBER/reviews" -d @/tmp/review.json
+
+            3. If NO issues found, approve the PR:
+
+               cat > /tmp/review.json << 'JSONEOF'
+               {
+                 "body": "<!-- claude-review -->\n\nLGTM - no significant issues found",
+                 "event": "APPROVE"
+               }
+               JSONEOF
+
+               curl -X POST -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GITHUB_TOKEN" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$REPO/pulls/$PR_NUMBER/reviews" -d @/tmp/review.json
+
+            CRITICAL: You must EXECUTE the curl command. Do not just show the JSON. Do not describe what you would do. Actually run the commands using your Bash tool.
+
+            **Output Requirements:**
+            - Maximum 5 inline comments unless critical security/bugs found
+            - Each comment: 2-3 sentences maximum
+            - Use clear prefixes like Security Issue, Bug, Performance
+            - Only comment on lines you've identified as problematic
+
+            **Before submitting:**
+            - Verify each issue is genuinely problematic (not just different)
+            - Confirm it's not an existing pattern in the codebase
+            - Ensure it's not already addressed in CLAUDE.md
+
+            Remember: Quality over quantity. This team knows their codebase - only flag clear issues. EXECUTE the curl command to submit your review.
+
+      - name: Minimize previous Claude reviews
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          IDS_TO_MINIMIZE='${{ steps.previous-reviews.outputs.ids_to_minimize }}'
+          TOTAL_COUNT=$(echo "$IDS_TO_MINIMIZE" | jq 'length')
+
+          if [ "$TOTAL_COUNT" -gt 0 ]; then
+            echo "Minimizing $TOTAL_COUNT previous reviews/comments as OUTDATED..."
+            echo "$IDS_TO_MINIMIZE" | jq -r '.[]' | while read -r ITEM_ID; do
+              if [ -n "$ITEM_ID" ] && [ "$ITEM_ID" != "null" ]; then
+                echo "  Minimizing: $ITEM_ID"
+                gh api graphql -f query='
+                  mutation($id: ID!) {
+                    minimizeComment(input: {subjectId: $id, classifier: OUTDATED}) {
+                      minimizedComment { isMinimized }
+                    }
+                  }
+                ' -f id="$ITEM_ID" 2>&1 || echo "    Warning: Failed to minimize $ITEM_ID"
+              fi
+            done
+          else
+            echo "No previous reviews to minimize"
+          fi
