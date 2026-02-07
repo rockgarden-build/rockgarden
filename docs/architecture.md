@@ -2,10 +2,19 @@
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│  Obsidian Vault │ ──▶ │   Data Store    │ ──▶ │   HTML Output   │
-│   (Markdown)    │     │   (API Layer)   │     │   (Jinja2)      │
+│ Content Sources │ ──▶ │  Content Store  │ ──▶ │     Output      │
+│ (MD/YAML/JSON)  │     │  (Collections)  │     │  (HTML/Assets)  │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
+         ↑                       ↑                       ↑
+     pre_build              post_collect             post_build
+       hooks                  hooks                    hooks
 ```
+
+Everything is a collection. Zero-config: all markdown files are in an implicit default
+collection. With collections config: named collections carve out directory subsets with
+progressively configurable behavior (schema, templates, page generation, etc.).
+Content is exported to JSON at `.rockgarden/content.json` after collection for hook
+script access.
 
 ## Design Principles
 
@@ -98,9 +107,13 @@ This allows:
 
 Templates can `{% extend %}` from any level. A site's `_templates/page.html` can extend the built-in `base.html`, or a theme's base.
 
+### Build Hooks (planned — Feature 15)
+
+Shell commands run at build lifecycle stages (`pre_build`, `post_collect`, `post_build`). This is the near-term extension mechanism — unopinionated, language-agnostic, and sufficient for data pipelines, asset compilation, and derived asset generation.
+
 ### Python Plugins (future)
 
-For more complex needs, Python plugins in `_plugins/` can hook into:
+For more complex needs, Python plugins in `_plugins/` could hook into:
 - Markdown preprocessing/postprocessing
 - Template context injection
 - Custom build steps

@@ -40,31 +40,44 @@
 - Build search index at build time (JSON)
 - Client-side full-text search
 
-## Phase 2: Content Models
+## Phase 2: Collections
 
-### 2.1 Model Definition
-Config file (`rockgarden.toml`) defining models:
+Supersedes the original "Content Models" design. See [Feature 14](features/14-collections.md) for full spec.
+
+### 2.1 Collection-Aware Content Store
+Extend `ContentStore` to be collection-aware. Without config, all content is in an implicit default collection (current behavior). Named collections carve out directory subsets — content claimed by a named collection is removed from the default.
+
+### 2.2 Collections
+Named subsets of content scoped by directory path. Config-driven, progressively configurable:
 
 ```toml
-[models.Character]
-paths = ["/characters/"]
-fields = ["name", "description"]
+[[collections]]
+name = "characters"
+source = "characters"
 
-[models.NPC]
-extends = "Character"
-paths = ["/characters/npcs/"]
-fields = ["location", "faction"]
+[[collections]]
+name = "pcs"
+source = "characters/pcs"
+model = "pc"
 ```
 
-### 2.2 Model Matching
-- Files match models based on path
-- A file can match multiple models (NPC is also Character)
-- More specific paths take precedence for "primary" type
-- API: `get_content_by_type("NPC")`, `content.types` returns all matching types
+Collections can nest — content in `characters/pcs/` belongs to both `pcs` and `characters`.
 
-### 2.3 Model-Specific Templates
-- Optional templates per model type
-- Falls back to default content template
+At minimum a collection is just a namespace. Optionally add: model (schema), non-markdown formats, custom template, URL pattern, page generation controls, nav integration.
+
+### 2.3 Models
+Optional field schemas attached to collections:
+
+```toml
+[models.pc]
+fields = ["name", "class", "level", "race"]
+```
+
+### 2.4 Non-Markdown Content
+YAML/JSON/TOML files loaded when a collection config enables other formats. Page generation, URL patterns, and templates configurable per collection.
+
+### 2.5 Build Hooks
+See [Feature 15](features/15-build-hooks.md). Shell commands at `pre_build`, `post_collect`, `post_build` stages. Content exported to JSON at `.rockgarden/content.json` after collection for hook script access.
 
 ---
 
