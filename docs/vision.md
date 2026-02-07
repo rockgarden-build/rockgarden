@@ -1,5 +1,34 @@
 # Vision
 
-A Python-based SSG that works with Obsidian vaults directly, without requiring users to change how they organize or manage content. The simple case takes an Obsidian vault and produces a navigable static site. Advanced usage allows defining content models mapped to paths.
+Rockgarden is a Python static site generator built around progressive customization. It works with Obsidian vaults and plain markdown folders out of the box, then scales up to a general-purpose SSG through incremental configuration.
 
-**Key insight:** An intermediate data store with API enables future use cases (MCP server, different output formats, etc.)
+## Core Principle
+
+**You should never need more complexity than your site demands.**
+
+- A personal wiki needs zero config. Point at a folder, get a site.
+- A project docs site might need custom navigation and a theme.
+- A conference website needs collections, data pipelines, and custom templates.
+
+All three should use the same tool. Complexity is additive — you opt into features as you need them, and the defaults stay out of your way.
+
+## Progressive Customization Ladder
+
+1. **Zero config** — Markdown files become pages. Obsidian syntax just works.
+2. **Convention** — Drop files in `_styles/`, `_templates/`, `_macros/` and they're picked up automatically.
+3. **Configuration** — `rockgarden.toml` for collections, navigation, themes, build hooks.
+4. **Full control** — Custom templates, data pipelines, external data sources, build hooks for asset compilation.
+
+## Everything is a Collection
+
+Content is organized into collections. Without config, all content lives in a single implicit default collection. Defining a named collection carves out a directory subset with its own namespace and progressively configurable behavior (schema, templates, page generation, etc.).
+
+This model unifies the simple case (a folder of markdown) with the complex case (typed content from multiple sources generating different page layouts) under one concept.
+
+## Design Principles
+
+- **Works with Obsidian vaults as-is.** No special folder structure or file naming beyond what Obsidian uses.
+- **Works with plain markdown.** Obsidian syntax support is additive — plain markdown renders fine without it.
+- **Custom behavior is additive.** The core handles the common case. Customizations layer on top without modifying source content.
+- **Build stays fast.** External data fetching is separate from the build pipeline. Watch mode rebuilds from local files only.
+- **No lock-in.** Content is plain files on disk. There is no proprietary format or database.

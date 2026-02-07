@@ -1,6 +1,19 @@
 # rockgarden
 
-A static site generator for Obsidian vaults. Converts markdown files with Obsidian-specific syntax (wiki-links, embeds, callouts) into HTML sites.
+A Python static site generator that works with Obsidian vaults and plain markdown folders out of the box. Point it at a directory of markdown files and get a navigable HTML site — no config required.
+
+Rockgarden handles Obsidian-specific syntax (wiki-links, embeds, callouts) so you can publish your vault without changing how you write. For plain markdown, it just works.
+
+## Philosophy
+
+**Progressive customization.** Start with zero config and add complexity only when you need it:
+
+- **Zero config** — Point at a folder, get a site
+- **Convention** — Drop CSS in `_styles/`, templates in `_templates/`
+- **Configuration** — Define collections, navigation, themes in `rockgarden.toml`
+- **Full control** — Custom templates, build hooks, data pipelines
+
+The goal is to scale from a personal wiki to a full-featured site without switching tools.
 
 ## Installation
 
@@ -16,12 +29,6 @@ uv tool install rockgarden
 
 ## Quick Start
 
-Initialize a new project:
-
-```bash
-rockgarden init
-```
-
 Build your site:
 
 ```bash
@@ -36,25 +43,28 @@ rockgarden serve
 
 ## Features
 
-- Wiki-links (`[[page]]` and `[[page|display text]]`)
-- Media embeds (images, audio, video, PDF)
-- Clean URLs
-- Auto-generated navigation
-- Breadcrumbs
+- **Obsidian syntax** — Wiki-links (`[[page]]`, `[[page|text]]`), media embeds, callouts
+- **Auto-generated navigation** — Sidebar, breadcrumbs, folder index pages
+- **Themes** — Built-in theme with dark/light mode, or bring your own
+- **Template overrides** — Override individual templates or swap in a full theme
+- **Clean URLs** — `/getting-started/` instead of `/getting-started.html`
+- **Zero lock-in** — Your content stays as plain markdown files
 
 ## Configuration
 
-Configuration is stored in `rockgarden.toml`:
+Optional. Create `rockgarden.toml` to customize:
 
 ```toml
 [site]
 title = "My Site"
 source = "content"
 output = "_site"
-clean_urls = true
 
 [build]
 ignore_patterns = [".obsidian", "Templates"]
+
+[nav]
+sort = "files-first"
 ```
 
 ## Requirements
