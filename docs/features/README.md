@@ -54,7 +54,7 @@ From test vaults' Quartz configs:
 - [x] Image embeds (with alt text, sizing)
 - [ ] Audio embeds
 - [ ] Note transclusions
-- [ ] Callouts
+- [x] Callouts
 - [ ] Table of contents
 - [ ] Backlinks
 - [ ] Graph visualization
