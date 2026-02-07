@@ -2,7 +2,7 @@
 
 Convert Obsidian callout syntax and GitHub Flavored Markdown (GFM) alerts to styled HTML blocks.
 
-## Status: Ready to Implement
+## Status: ✅ Implemented
 
 ## Syntax Support
 
@@ -240,3 +240,22 @@ Create test cases for:
 3. **Case-insensitive type names**: Accept NOTE/note/Note all as valid
 4. **Collapsible via `<details>`**: Native HTML element, no JavaScript required
 5. **Icons as emoji or SVG**: Start with emoji (simple), can enhance with SVG later
+
+## Implementation Notes
+
+### Files Created
+- `src/rockgarden/obsidian/callouts.py` - Callout parsing and HTML generation
+- `tests/test_callouts.py` - Comprehensive test suite (25 tests)
+
+### Files Modified
+- `src/rockgarden/obsidian/__init__.py` - Export process_callouts function
+- `src/rockgarden/output/builder.py` - Integrate callout processing into build pipeline
+- `src/rockgarden/templates/base.html` - Add callout CSS styling with DaisyUI color scheme
+
+### Key Implementation Details
+- Regex pattern uses `[ \t]*` instead of `\s*` to avoid consuming newlines (critical for proper parsing)
+- CSS uses DaisyUI color variables (--in, --su, --wa, --er, etc.) for theme compatibility
+- Collapsible callouts use native HTML `<details>` and `<summary>` elements
+- All 25 callout types from the spec are supported with appropriate icons
+- Callouts in code blocks are properly preserved
+- Multiline content and nested markdown work correctly
