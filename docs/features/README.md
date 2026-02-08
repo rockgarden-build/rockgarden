@@ -36,7 +36,7 @@ The [PyOhio static website](https://github.com/pyohio/static-website) (Astro + P
 | 16 | [Static Assets](16-static-assets.md) | ❌ | B | Custom CSS & JS inclusion |
 | 17 | [SEO & Meta Tags](17-seo-meta.md) | ❌ | B | Frontmatter-driven meta, OG tags |
 | 18 | [Accessibility](18-accessibility.md) | ❌ | A | Skip links, ARIA, focus styles |
-| N6 | Broken Link Handling | ❌ | A | Visual indication + build warnings |
+| N6 | Broken Link Handling | ✅ | A | Visual indication + build warnings |
 
 ## Roadmap Phases
 

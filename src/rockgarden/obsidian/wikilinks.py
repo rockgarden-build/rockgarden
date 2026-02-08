@@ -17,11 +17,11 @@ CODE_BLOCK_PATTERN = re.compile(r"```[\s\S]*?```|`[^`\n]+`")
 def process_wikilinks(
     content: str,
     resolver: Callable[[str], str | None],
-) -> str:
+) -> tuple[str, list[tuple[str, str]]]:
     """Convert wiki-links to standard markdown links.
 
     Converts [[Target]] and [[Target|Display Text]] to [text](url).
-    Unresolved links are rendered as plain text.
+    Unresolved links are converted to special markdown with __BROKEN__ marker.
     Wiki-links inside code blocks are preserved.
 
     Args:
@@ -29,9 +29,10 @@ def process_wikilinks(
         resolver: Function that takes a link target and returns a URL or None.
 
     Returns:
-        Content with wiki-links converted to standard markdown links.
+        Tuple of (processed content, list of broken links as (target, display) tuples).
     """
     code_blocks: list[str] = []
+    broken_links: list[tuple[str, str]] = []
 
     def save_code_block(match: re.Match) -> str:
         code_blocks.append(match.group(0))
@@ -53,7 +54,9 @@ def process_wikilinks(
             encoded_url = quote(url, safe="/:?#[]@!$&'()*+,;=")
             return f"[{display}]({encoded_url})"
         else:
-            return display
+            broken_links.append((target, display))
+            escaped_target = quote(target, safe="")
+            return f"[{display}](BROKEN::{escaped_target})"
 
     content = WIKILINK_PATTERN.sub(replace_wikilink, content)
 
@@ -63,4 +66,4 @@ def process_wikilinks(
 
     content = re.sub(r"\x00CODE(\d+)\x00", restore_code_block, content)
 
-    return content
+    return content, broken_links

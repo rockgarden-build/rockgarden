@@ -1,5 +1,6 @@
 """Site building orchestration."""
 
+from dataclasses import dataclass
 from pathlib import Path
 
 from rockgarden.assets import (
@@ -26,7 +27,20 @@ from rockgarden.render import create_engine, render_markdown, render_page
 from rockgarden.urls import get_folder_url, get_output_path, get_url
 
 
-def build_site(config: Config, source: Path, output: Path) -> int:
+@dataclass
+class BuildResult:
+    """Result of building the site.
+
+    Attributes:
+        page_count: Number of pages built.
+        broken_links: Mapping of page slugs to lists of broken link targets.
+    """
+
+    page_count: int
+    broken_links: dict[str, list[str]]
+
+
+def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     """Build the static site.
 
     Args:
@@ -35,7 +49,7 @@ def build_site(config: Config, source: Path, output: Path) -> int:
         output: Output directory for generated HTML.
 
     Returns:
-        Number of pages built.
+        BuildResult with page count and broken links information.
     """
     output.mkdir(parents=True, exist_ok=True)
 
@@ -67,6 +81,7 @@ def build_site(config: Config, source: Path, output: Path) -> int:
 
     media_index = build_media_index(source)
     all_media: set[str] = set()
+    broken_links_by_page: dict[str, list[str]] = {}
 
     count = 0
     for page in pages:
@@ -87,7 +102,9 @@ def build_site(config: Config, source: Path, output: Path) -> int:
         content, media = process_media_embeds(content, media_resolver)
         all_media.update(media)
         all_media.update(collect_markdown_images(content, media_resolver))
-        content = process_wikilinks(content, store.resolve_link)
+        content, broken = process_wikilinks(content, store.resolve_link)
+        if broken:
+            broken_links_by_page[page.slug] = [target for target, _ in broken]
         content = transform_md_links(content, clean_urls)
         page.html = render_markdown(content)
 
@@ -131,7 +148,9 @@ def build_site(config: Config, source: Path, output: Path) -> int:
             processed, media = process_media_embeds(processed, media_resolver)
             all_media.update(media)
             all_media.update(collect_markdown_images(processed, media_resolver))
-            processed = process_wikilinks(processed, store.resolve_link)
+            processed, broken = process_wikilinks(processed, store.resolve_link)
+            if broken:
+                broken_links_by_page[folder.slug] = [target for target, _ in broken]
             processed = transform_md_links(processed, clean_urls)
             folder.custom_content = render_markdown(processed)
 
@@ -151,7 +170,7 @@ def build_site(config: Config, source: Path, output: Path) -> int:
 
     copy_assets(all_media, source, output)
 
-    return count
+    return BuildResult(page_count=count, broken_links=broken_links_by_page)
 
 
 def _build_folder_breadcrumbs(folder, pages, nav_config, clean_urls=True):
