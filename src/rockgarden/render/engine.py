@@ -6,6 +6,7 @@ from jinja2 import ChoiceLoader, Environment, FileSystemLoader, PackageLoader
 
 from rockgarden.config import Config
 from rockgarden.content.models import Page
+from rockgarden.nav.tree import NavNode
 
 
 def create_engine(
@@ -51,7 +52,7 @@ def render_page(
     page: Page,
     site_config: dict,
     breadcrumbs: list | None = None,
-    backlinks: list | None = None,
+    backlinks: NavNode | None = None,
 ) -> str:
     """Render a page using the page template.
 
@@ -60,7 +61,7 @@ def render_page(
         page: The page to render.
         site_config: Site configuration to pass to template.
         breadcrumbs: Optional list of Breadcrumb objects for navigation.
-        backlinks: Optional list of Page objects that link to this page.
+        backlinks: Optional NavNode tree of pages that link to this page.
 
     Returns:
         Rendered HTML string.
@@ -70,5 +71,5 @@ def render_page(
         page=page,
         site=site_config,
         breadcrumbs=breadcrumbs or [],
-        backlinks=backlinks or [],
+        backlinks=backlinks,
     )

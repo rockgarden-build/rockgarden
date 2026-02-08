@@ -94,18 +94,18 @@ def build_site(config: Config, source: Path, output: Path) -> int:
         breadcrumbs = build_breadcrumbs(page, pages, config.nav, clean_urls)
 
         # Get backlinks if enabled
-        backlinks = []
+        backlinks_tree = None
         if config.backlinks.enabled:
             backlink_slugs = link_index.get_backlinks(page.slug)
-            for slug in backlink_slugs:
-                backlink_page = store.get_by_slug(slug)
-                if backlink_page:
-                    backlinks.append({
-                        "title": backlink_page.title,
-                        "url": get_url(backlink_page.slug, clean_urls),
-                    })
+            backlink_pages = [
+                store.get_by_slug(slug)
+                for slug in backlink_slugs
+                if store.get_by_slug(slug)
+            ]
+            if backlink_pages:
+                backlinks_tree = build_nav_tree(backlink_pages, config.nav, clean_urls)
 
-        html = render_page(env, page, site_config, breadcrumbs, backlinks)
+        html = render_page(env, page, site_config, breadcrumbs, backlinks_tree)
 
         output_file = output / get_output_path(page.slug, clean_urls)
         output_file.parent.mkdir(parents=True, exist_ok=True)

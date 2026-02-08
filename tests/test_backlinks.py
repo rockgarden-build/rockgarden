@@ -2,9 +2,11 @@
 
 from pathlib import Path
 
+from rockgarden.config import NavConfig
 from rockgarden.content.link_index import LinkIndex, build_link_index, extract_wikilink_targets
 from rockgarden.content.models import Page
 from rockgarden.content.store import ContentStore
+from rockgarden.nav.tree import build_nav_tree
 
 
 class TestExtractWikilinkTargets:
@@ -224,3 +226,175 @@ class TestBuildLinkIndex:
         # Self-links are tracked
         assert index.get_outgoing_links("page-a") == {"page-a"}
         assert index.get_backlinks("page-a") == {"page-a"}
+
+
+class TestBacklinksNavTree:
+    """Tests for building nav tree from backlinks."""
+
+    def test_backlinks_nav_tree_flat(self):
+        """Backlinks from root pages create a flat list."""
+        pages = [
+            Page(
+                source_path=Path("page-a.md"),
+                slug="page-a",
+                content="See [[target]].",
+            ),
+            Page(
+                source_path=Path("page-b.md"),
+                slug="page-b",
+                content="See [[target]].",
+            ),
+            Page(
+                source_path=Path("target.md"),
+                slug="target",
+                content="Target page.",
+            ),
+        ]
+        store = ContentStore(pages)
+        link_index = build_link_index(pages, store)
+
+        # Get backlink pages
+        backlink_slugs = link_index.get_backlinks("target")
+        backlink_pages = [
+            store.get_by_slug(slug) for slug in backlink_slugs if store.get_by_slug(slug)
+        ]
+
+        # Build tree
+        tree = build_nav_tree(backlink_pages, NavConfig(), clean_urls=True)
+
+        # Should have 2 root-level children
+        assert len(tree.children) == 2
+        assert all(not child.is_folder for child in tree.children)
+
+    def test_backlinks_nav_tree_with_folders(self):
+        """Backlinks from different folders create folder structure."""
+        pages = [
+            Page(
+                source_path=Path("page-a.md"),
+                slug="page-a",
+                content="See [[target]].",
+            ),
+            Page(
+                source_path=Path("folder/page-b.md"),
+                slug="folder/page-b",
+                content="See [[target]].",
+            ),
+            Page(
+                source_path=Path("folder/page-c.md"),
+                slug="folder/page-c",
+                content="See [[target]].",
+            ),
+            Page(
+                source_path=Path("target.md"),
+                slug="target",
+                content="Target page.",
+            ),
+        ]
+        store = ContentStore(pages)
+        link_index = build_link_index(pages, store)
+
+        # Get backlink pages
+        backlink_slugs = link_index.get_backlinks("target")
+        backlink_pages = [
+            store.get_by_slug(slug) for slug in backlink_slugs if store.get_by_slug(slug)
+        ]
+
+        # Build tree
+        tree = build_nav_tree(backlink_pages, NavConfig(), clean_urls=True)
+
+        # Should have 2 root children: 1 page + 1 folder
+        assert len(tree.children) == 2
+
+        # Find the folder and page
+        folders = [c for c in tree.children if c.is_folder]
+        pages_root = [c for c in tree.children if not c.is_folder]
+
+        assert len(folders) == 1
+        assert len(pages_root) == 1
+
+        # Folder should have 2 children
+        folder = folders[0]
+        assert folder.label == "folder"
+        assert len(folder.children) == 2
+
+    def test_backlinks_nav_tree_nested(self):
+        """Backlinks from nested folders create nested structure."""
+        pages = [
+            Page(
+                source_path=Path("characters/pcs/alice.md"),
+                slug="characters/pcs/alice",
+                content="See [[target]].",
+            ),
+            Page(
+                source_path=Path("characters/npcs/bob.md"),
+                slug="characters/npcs/bob",
+                content="See [[target]].",
+            ),
+            Page(
+                source_path=Path("target.md"),
+                slug="target",
+                content="Target page.",
+            ),
+        ]
+        store = ContentStore(pages)
+        link_index = build_link_index(pages, store)
+
+        # Get backlink pages
+        backlink_slugs = link_index.get_backlinks("target")
+        backlink_pages = [
+            store.get_by_slug(slug) for slug in backlink_slugs if store.get_by_slug(slug)
+        ]
+
+        # Build tree
+        tree = build_nav_tree(backlink_pages, NavConfig(), clean_urls=True)
+
+        # Should have 1 root folder
+        assert len(tree.children) == 1
+        characters_folder = tree.children[0]
+        assert characters_folder.is_folder
+        assert characters_folder.label == "characters"
+
+        # Characters folder should have 2 subfolders
+        assert len(characters_folder.children) == 2
+        assert all(c.is_folder for c in characters_folder.children)
+
+        # Each subfolder should have 1 page
+        for subfolder in characters_folder.children:
+            assert len(subfolder.children) == 1
+            assert not subfolder.children[0].is_folder
+
+    def test_backlinks_nav_tree_respects_sorting(self):
+        """Backlinks tree respects nav sorting configuration."""
+        pages = [
+            Page(
+                source_path=Path("zebra.md"),
+                slug="zebra",
+                content="See [[target]].",
+            ),
+            Page(
+                source_path=Path("alpha.md"),
+                slug="alpha",
+                content="See [[target]].",
+            ),
+            Page(
+                source_path=Path("target.md"),
+                slug="target",
+                content="Target page.",
+            ),
+        ]
+        store = ContentStore(pages)
+        link_index = build_link_index(pages, store)
+
+        # Get backlink pages
+        backlink_slugs = link_index.get_backlinks("target")
+        backlink_pages = [
+            store.get_by_slug(slug) for slug in backlink_slugs if store.get_by_slug(slug)
+        ]
+
+        # Build tree with alphabetical sorting
+        tree = build_nav_tree(backlink_pages, NavConfig(sort="alphabetical"), clean_urls=True)
+
+        # Should be alphabetically sorted
+        assert len(tree.children) == 2
+        assert tree.children[0].label == "alpha"
+        assert tree.children[1].label == "zebra"

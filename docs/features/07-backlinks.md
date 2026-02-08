@@ -10,11 +10,16 @@ Each page shows a "Backlinks" section listing all pages that reference it via wi
 
 ## Implementation Summary
 
-Backlinks are displayed in a right sidebar (desktop only) on each page. The implementation includes:
+Backlinks are displayed in a categorized tree structure in the right sidebar (desktop only) on each page. The implementation includes:
 
 - **LinkIndex**: Bidirectional index tracking both outgoing and incoming wiki-links
 - **Link extraction**: Re-parses wiki-links from content to build the index
 - **Resolution**: Only successfully resolved links are tracked (broken links are ignored)
+- **Categorization**: Backlinks are organized into a nav tree matching the site's folder structure
+  - Reuses `build_nav_tree()` logic for consistent hierarchy, sorting, and labels
+  - Respects nav configuration (sorting strategy, custom labels, nav_order)
+  - Folders are collapsible, default open
+  - Empty folders are automatically excluded
 - **Configuration**: `backlinks.enabled = true` (default) - can be disabled in `rockgarden.toml`
 - **Display**: Right sidebar on desktop (xl breakpoint), hidden on mobile
 - **Future**: Position customization (bottom vs sidebar) may be added later
