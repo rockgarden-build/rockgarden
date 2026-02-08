@@ -11,7 +11,8 @@ Noted but not currently planned:
 - MCP server for vault data (JSON content export makes this feasible)
 - Graph visualization
 - Installable templates
-- Python plugins (tighter integration than shell hooks)
+- Python plugins (see [concepts.md](concepts.md) for the plugin model)
+- Theme/plugin dependency resolution and installer — `rockgarden theme` and `rockgarden plugin` CLI subcommands that install from git URL or local dir, with themes/plugins declaring dependencies that the installer offers to also install
 - Configurable markdown preset (commonmark, gfm-like, custom plugins)
 
 Moved to roadmap:
