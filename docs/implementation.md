@@ -96,10 +96,13 @@ See [Feature 15](features/15-build-hooks.md). Shell commands at `pre_build`, `po
 
 ### Step 3: Obsidian Processing
 - [x] Wiki-link parser/converter
+- [x] Section links (`[[Page#Section]]`)
+- [x] Media file links (`[[image.png]]`)
 - [x] Image embed handling (alt text, sizing)
 - [ ] Note transclusion embeds
 - [x] Callout conversion
 - [x] Asset copying
+- [x] Broken link handling (warnings + visual indication)
 
 ### Step 4: HTML Output
 - [x] Jinja2 environment setup
@@ -114,8 +117,9 @@ See [Feature 15](features/15-build-hooks.md). Shell commands at `pre_build`, `po
 - [x] Backlink tracking
 
 ### Step 6: Search
-- [ ] Build-time index generation
-- [ ] Client-side search JS
+- [x] Build-time index generation
+- [ ] Client-side search UI
+- [ ] Search integration in template
 
 ---
 
@@ -136,3 +140,54 @@ After each step, verify incrementally:
 **Step 6:** Search index JSON is generated, client search works
 
 **End-to-end:** Run against D&D Obsidian vaults, compare to Quartz output
+
+---
+
+## Current TODOs (Phase A - Zero-Config Release)
+
+### Next Up
+- [ ] **Blockquote Formatting Issue**: Investigate and fix formatting issue with blockquoted text
+  - Details/examples to be provided
+
+### High Priority
+- [ ] **Search UI (Feature 08)**: Wire up the search index to a client-side search interface
+  - JSON index is already generated at build time
+  - Need: search input component, results display, keyboard navigation
+  - Reference: Quartz search implementation
+
+- [ ] **Table of Contents (Feature 13)**: Extract heading structure per-page
+  - Parse rendered HTML to extract h2-h6 headings with IDs
+  - Generate nested TOC structure
+  - Add template support for TOC display
+
+### Medium Priority
+- [ ] **Accessibility (Feature 18)**: Basic a11y improvements
+  - Skip navigation links
+  - ARIA landmarks and labels
+  - Focus styles for keyboard navigation
+  - Alt text validation for images
+
+- [ ] **Polish (Feature 13)**: Production readiness
+  - [ ] Sitemap generation (XML)
+  - [ ] 404 page template
+  - [ ] Improved error messages and validation
+  - [ ] Build performance metrics
+
+### Low Priority
+- [ ] **Audio/Video Embeds (Feature 04)**: Extend media embed support
+  - Currently supports images only
+  - Add `<audio>` and `<video>` tag generation
+  - Test with example media files
+
+### Future (Phase B+)
+- [ ] **Graph View**: Interactive visualization of page connections
+  - Similar to Quartz graph view but with more semantic data
+  - Requirements to be workshopped and defined
+  - Consider: backlinks, forward links, content relationships, collections, etc.
+
+- [ ] Note transclusions (`![[note.md]]`) - requires cycle detection
+- [ ] Collections and content models (Feature 14)
+- [ ] Build hooks (Feature 15)
+- [ ] Base path prefix support (Feature 12)
+- [ ] Static asset inclusion (Feature 16)
+- [ ] SEO & meta tags (Feature 17)

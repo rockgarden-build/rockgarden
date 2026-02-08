@@ -51,14 +51,16 @@ From test vaults' Quartz configs:
 **Core:**
 - [x] Frontmatter parsing
 - [x] Wiki-links with name-based resolution
+- [x] Section links (`[[Page#Section]]`)
+- [x] Media file links (`[[image.png]]`)
 - [x] Image embeds (with alt text, sizing)
-- [ ] Audio embeds
+- [ ] Audio/video embeds
 - [ ] Note transclusions
 - [x] Callouts
 - [ ] Table of contents
 - [x] Backlinks
 - [ ] Graph visualization
-- [ ] Search
+- [x] Search index generation (UI pending)
 
 **Output:**
 - [x] Content pages
