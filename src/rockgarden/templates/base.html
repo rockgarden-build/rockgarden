@@ -473,7 +473,8 @@
                         });
 
                         // Show "X more on this page" if there are more matches
-                        const allMatches = (doc.content.toLowerCase().match(new RegExp(query.toLowerCase(), 'g')) || []).length;
+                        const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                        const allMatches = (doc.content.toLowerCase().match(new RegExp(escapedQuery.toLowerCase(), 'g')) || []).length;
                         if (allMatches > excerpts.length) {
                             const moreLink = document.createElement('a');
                             moreLink.href = doc.url;
