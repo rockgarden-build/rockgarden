@@ -57,7 +57,10 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
 
     pages = load_content(source, config.build.ignore_patterns)
     clean_urls = config.site.clean_urls
-    store = ContentStore(pages, clean_urls)
+
+    # Build media index before creating store so it can resolve media file links
+    media_index = build_media_index(source)
+    store = ContentStore(pages, clean_urls, media_index)
 
     link_index = build_link_index(pages, store)
 
@@ -81,8 +84,6 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
             folder_path = "/".join(parts[:-1])
             show_index = p.frontmatter.get("show_index", False)
             show_index_map[folder_path] = show_index
-
-    media_index = build_media_index(source)
     all_media: set[str] = set()
     broken_links_by_page: dict[str, list[str]] = {}
 
