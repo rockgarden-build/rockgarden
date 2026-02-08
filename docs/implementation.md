@@ -98,7 +98,7 @@ See [Feature 15](features/15-build-hooks.md). Shell commands at `pre_build`, `po
 - [x] Wiki-link parser/converter
 - [x] Image embed handling (alt text, sizing)
 - [ ] Note transclusion embeds
-- [ ] **Callout conversion (NEXT STEP - see docs/features/05-callouts.md)**
+- [x] Callout conversion
 - [x] Asset copying
 
 ### Step 4: HTML Output
@@ -111,7 +111,7 @@ See [Feature 15](features/15-build-hooks.md). Shell commands at `pre_build`, `po
 - [x] Explorer data structure
 - [x] Breadcrumb generation
 - [ ] TOC extraction
-- [ ] Backlink tracking
+- [x] Backlink tracking
 
 ### Step 6: Search
 - [ ] Build-time index generation

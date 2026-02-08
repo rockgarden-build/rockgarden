@@ -45,6 +45,13 @@ class NavConfig:
 
 
 @dataclass
+class BacklinksConfig:
+    """Backlinks configuration."""
+
+    enabled: bool = True
+
+
+@dataclass
 class Config:
     """Root configuration object."""
 
@@ -52,6 +59,7 @@ class Config:
     build: BuildConfig = field(default_factory=BuildConfig)
     theme: ThemeConfig = field(default_factory=ThemeConfig)
     nav: NavConfig = field(default_factory=NavConfig)
+    backlinks: BacklinksConfig = field(default_factory=BacklinksConfig)
 
     @classmethod
     def load(cls, config_path: Path | None = None) -> "Config":
@@ -82,6 +90,7 @@ class Config:
         build_data = data.get("build", {})
         theme_data = data.get("theme", {})
         nav_data = data.get("nav", {})
+        backlinks_data = data.get("backlinks", {})
 
         site = SiteConfig(
             title=site_data.get("title", SiteConfig.title),
@@ -110,4 +119,8 @@ class Config:
             link_auto_index=nav_data.get("link_auto_index", False),
         )
 
-        return cls(site=site, build=build, theme=theme, nav=nav)
+        backlinks = BacklinksConfig(
+            enabled=backlinks_data.get("enabled", True),
+        )
+
+        return cls(site=site, build=build, theme=theme, nav=nav, backlinks=backlinks)

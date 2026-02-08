@@ -3,7 +3,7 @@
 Noted but not currently planned:
 
 - Incremental builds / watch-mode selective rebuild (file-mtime dirty checking, partial rebuilds)
-
+- Backlinks position customization (bottom vs sidebar) - currently right sidebar only, may add config for position later or leave to custom templates
 - Hover previews (popover preview of linked page on hover)
 - CLI model discovery wizard
 - Config drift detection

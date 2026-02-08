@@ -1,0 +1,12 @@
+<div class="backlinks">
+    <h2 class="text-lg font-semibold mb-3">Backlinks</h2>
+    <ul class="space-y-2">
+        {% for link in backlinks %}
+        <li>
+            <a href="{{ link.url }}" class="text-sm hover:underline">
+                {{ link.title }}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>

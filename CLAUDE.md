@@ -50,10 +50,13 @@ Module structure in `src/rockgarden/`:
 - Config file: `rockgarden.toml`
 - Pre-release project: no need to preserve backwards compatibility
 
-## Feature Docs
+## Feature Implementation Workflow
 
-Before implementing features, check the docs in `docs/features/`:
-- `docs/features/README.md` - Feature list and status
-- `docs/features/NN-*.md` - Detailed feature specs
+When implementing features:
 
-After completing features, update these docs to reflect current state.
+1. **Before starting**: Check `docs/features/README.md` and the feature's spec doc (`docs/features/NN-*.md`)
+2. **When starting**: Update `docs/implementation.md` to mark the feature as in progress
+3. **After completing**: Update both:
+   - `docs/implementation.md` - Mark feature checklist items as complete
+   - `docs/features/README.md` - Update feature status and Quartz reference checklist
+   - Feature spec doc - Update status to reflect completion

@@ -2,11 +2,22 @@
 
 Track and display pages that link to the current page.
 
-## Status: Not Started
+## Status: ✅ Complete
 
 ## Goal
 
 Each page shows a "Backlinks" section listing all pages that reference it via wiki-links.
+
+## Implementation Summary
+
+Backlinks are displayed in a right sidebar (desktop only) on each page. The implementation includes:
+
+- **LinkIndex**: Bidirectional index tracking both outgoing and incoming wiki-links
+- **Link extraction**: Re-parses wiki-links from content to build the index
+- **Resolution**: Only successfully resolved links are tracked (broken links are ignored)
+- **Configuration**: `backlinks.enabled = true` (default) - can be disabled in `rockgarden.toml`
+- **Display**: Right sidebar on desktop (xl breakpoint), hidden on mobile
+- **Future**: Position customization (bottom vs sidebar) may be added later
 
 ## Implementation Plan
 
