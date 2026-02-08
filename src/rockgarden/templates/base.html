@@ -359,7 +359,10 @@
             // Highlight search terms in text
             function highlightMatches(text, query) {
                 if (!text || !query) return text;
-                const regex = new RegExp(`(${query})`, 'gi');
+                // Escape special regex characters
+                const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                // Match whole words that start with the query
+                const regex = new RegExp(`(\\b${escapedQuery}\\w*)`, 'gi');
                 return text.replace(regex, '<mark class="bg-primary/20 text-primary">$1</mark>');
             }
 
@@ -500,8 +503,31 @@
                         return;
                     }
 
-                    // Perform search with lunr
-                    const results = searchIndex.search(query + '*').slice(0, 20);
+                    // Perform search with lunr - try multiple search strategies
+                    let results = [];
+                    try {
+                        // Try exact match first, then wildcard, then fuzzy
+                        const exactResults = searchIndex.search(query);
+                        const wildcardResults = searchIndex.search(query + '*');
+                        const fuzzyResults = searchIndex.search(query + '~1');
+
+                        // Combine results, removing duplicates
+                        const seen = new Set();
+                        [exactResults, wildcardResults, fuzzyResults].forEach(resultSet => {
+                            resultSet.forEach(result => {
+                                if (!seen.has(result.ref)) {
+                                    seen.add(result.ref);
+                                    results.push(result);
+                                }
+                            });
+                        });
+
+                        results = results.slice(0, 20);
+                    } catch (e) {
+                        // Fallback to simple wildcard search
+                        results = searchIndex.search(query + '*').slice(0, 20);
+                    }
+
                     renderResults(results, searchResults, searchCount, query);
                 });
 
