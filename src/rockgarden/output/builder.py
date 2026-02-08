@@ -1,5 +1,6 @@
 """Site building orchestration."""
 
+import json
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -23,6 +24,7 @@ from rockgarden.nav import (
     generate_folder_indexes,
 )
 from rockgarden.obsidian import process_callouts, process_media_embeds, process_wikilinks
+from rockgarden.output.search import build_search_index
 from rockgarden.render import create_engine, render_markdown, render_page
 from rockgarden.urls import get_folder_url, get_output_path, get_url
 
@@ -69,6 +71,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         "nav_default_state": config.nav.default_state,
         "daisyui_theme": config.theme.daisyui_default,
         "daisyui_themes": config.theme.daisyui_themes,
+        "search_enabled": config.search.enabled,
     }
 
     show_index_map = {}
@@ -170,6 +173,12 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         count += 1
 
     copy_assets(all_media, source, output)
+
+    # Generate search index if enabled
+    if config.search.enabled:
+        search_index = build_search_index(pages, config.search.include_content, clean_urls)
+        search_index_file = output / "search-index.json"
+        search_index_file.write_text(json.dumps(search_index))
 
     return BuildResult(page_count=count, broken_links=broken_links_by_page)
 

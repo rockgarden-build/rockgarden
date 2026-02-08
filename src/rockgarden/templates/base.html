@@ -6,6 +6,9 @@
     <title>{% block title %}{{ page.title }}{% if site.title %} - {{ site.title }}{% endif %}{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    {% if site.search_enabled %}
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+    {% endif %}
     <script>
         tailwind.config = {
             theme: {
@@ -173,9 +176,15 @@
                         </svg>
                     </label>
                 </div>
+                {% if site.search_enabled %}
+                <div class="flex-1 px-4">
+                    {% include "components/search.html" %}
+                </div>
+                {% else %}
                 <div class="flex-1">
                     <span class="text-lg font-semibold">{{ site.title or 'Documentation' }}</span>
                 </div>
+                {% endif %}
                 <div class="flex-none">
                     {% include "components/theme_toggle.html" %}
                 </div>
@@ -199,6 +208,11 @@
                         {% include "components/theme_toggle.html" %}
                     </div>
                 </div>
+                {% if site.search_enabled %}
+                <div class="mb-4">
+                    {% include "components/search.html" %}
+                </div>
+                {% endif %}
                 {% if site.nav and site.nav.children %}
                 {% include "components/nav.html" %}
                 {% endif %}
@@ -289,6 +303,99 @@
                 });
             });
         })();
+
+        // Search functionality
+        {% if site.search_enabled %}
+        (function() {
+            if (!window.Fuse) return; // Skip if Fuse.js not loaded
+
+            const searchInput = document.getElementById('search-input');
+            const searchResults = document.getElementById('search-results');
+
+            if (!searchInput || !searchResults) return;
+
+            let fuse = null;
+
+            // Load search index
+            fetch('/search-index.json')
+                .then(r => r.json())
+                .then(data => {
+                    fuse = new Fuse(data, {
+                        keys: [
+                            { name: 'title', weight: 2 },
+                            { name: 'content', weight: 1 },
+                            { name: 'tags', weight: 1.5 }
+                        ],
+                        threshold: 0.4,  // Fuzzy matching threshold
+                        includeScore: true,
+                        minMatchCharLength: 2
+                    });
+                })
+                .catch(err => console.error('Failed to load search index:', err));
+
+            // Handle input
+            searchInput.addEventListener('input', function(e) {
+                const query = e.target.value.trim();
+
+                if (!query || query.length < 2 || !fuse) {
+                    searchResults.classList.add('hidden');
+                    return;
+                }
+
+                const results = fuse.search(query).slice(0, 10); // Top 10 results
+
+                // Clear previous results
+                searchResults.textContent = '';
+
+                if (results.length === 0) {
+                    const noResultsDiv = document.createElement('div');
+                    noResultsDiv.className = 'p-4 text-sm text-base-content/60';
+                    noResultsDiv.textContent = 'No results found';
+                    searchResults.appendChild(noResultsDiv);
+                    searchResults.classList.remove('hidden');
+                    return;
+                }
+
+                // Render results safely (avoid XSS)
+                results.forEach(({ item }) => {
+                    const link = document.createElement('a');
+                    link.href = item.url;
+                    link.className = 'block p-3 hover:bg-base-200 border-b border-base-300 last:border-0';
+
+                    const titleDiv = document.createElement('div');
+                    titleDiv.className = 'font-semibold text-sm';
+                    titleDiv.textContent = item.title; // Safe - uses textContent
+                    link.appendChild(titleDiv);
+
+                    if (item.tags && item.tags.length > 0) {
+                        const tagsDiv = document.createElement('div');
+                        tagsDiv.className = 'text-xs text-base-content/60 mt-1';
+                        tagsDiv.textContent = item.tags.join(', '); // Safe - uses textContent
+                        link.appendChild(tagsDiv);
+                    }
+
+                    searchResults.appendChild(link);
+                });
+
+                searchResults.classList.remove('hidden');
+            });
+
+            // Close results when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                    searchResults.classList.add('hidden');
+                }
+            });
+
+            // Navigate results with keyboard
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    searchResults.classList.add('hidden');
+                    searchInput.blur();
+                }
+            });
+        })();
+        {% endif %}
     </script>
 </body>
 </html>
