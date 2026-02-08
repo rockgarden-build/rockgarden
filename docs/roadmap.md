@@ -237,6 +237,7 @@ Nice-to-haves, not required for either release target.
 |---|---|---|---|
 | **09** | Macros | Medium | Already planned. Jinja2 component reuse. |
 | **11** | RSS Feed | Low | Already planned. |
+| **N7** | Config Validator | Low | Validate config file on load, warn about unknown fields, deprecated locations. UX improvement. |
 
 ---
 
