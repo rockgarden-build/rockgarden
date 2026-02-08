@@ -52,6 +52,14 @@ class BacklinksConfig:
 
 
 @dataclass
+class SearchConfig:
+    """Search configuration."""
+
+    enabled: bool = True
+    include_content: bool = True
+
+
+@dataclass
 class Config:
     """Root configuration object."""
 
@@ -60,6 +68,7 @@ class Config:
     theme: ThemeConfig = field(default_factory=ThemeConfig)
     nav: NavConfig = field(default_factory=NavConfig)
     backlinks: BacklinksConfig = field(default_factory=BacklinksConfig)
+    search: SearchConfig = field(default_factory=SearchConfig)
 
     @classmethod
     def load(cls, config_path: Path | None = None) -> "Config":
@@ -91,6 +100,7 @@ class Config:
         theme_data = data.get("theme", {})
         nav_data = data.get("nav", {})
         backlinks_data = data.get("backlinks", {})
+        search_data = data.get("search", {})
 
         site = SiteConfig(
             title=site_data.get("title", SiteConfig.title),
@@ -123,4 +133,16 @@ class Config:
             enabled=backlinks_data.get("enabled", True),
         )
 
-        return cls(site=site, build=build, theme=theme, nav=nav, backlinks=backlinks)
+        search = SearchConfig(
+            enabled=search_data.get("enabled", True),
+            include_content=search_data.get("include_content", True),
+        )
+
+        return cls(
+            site=site,
+            build=build,
+            theme=theme,
+            nav=nav,
+            backlinks=backlinks,
+            search=search,
+        )
