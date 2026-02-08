@@ -1,4 +1,4 @@
-<div class="relative search-container">
+<div class="search-container">
     <div class="form-control">
         <input
             type="search"
@@ -8,8 +8,28 @@
         />
     </div>
 
-    <!-- Search results dropdown (hidden by default) -->
-    <div class="search-results hidden absolute top-full left-0 mt-2 w-80 bg-base-100 shadow-lg rounded-lg border border-base-300 max-h-96 overflow-y-auto z-50">
-        <!-- Results populated by JavaScript -->
+    <!-- Search modal (hidden by default) -->
+    <div class="search-modal hidden fixed inset-0 bg-base-300/95 z-50 overflow-y-auto">
+        <div class="min-h-screen p-4">
+            <div class="max-w-4xl mx-auto bg-base-100 rounded-lg shadow-2xl">
+                <!-- Search input in modal -->
+                <div class="p-6 border-b border-base-300">
+                    <input
+                        type="search"
+                        class="search-input-modal input input-lg w-full"
+                        placeholder="Search..."
+                        autocomplete="off"
+                    />
+                </div>
+
+                <!-- Results count -->
+                <div class="search-count px-6 py-2 text-sm text-base-content/60 border-b border-base-300"></div>
+
+                <!-- Results container -->
+                <div class="search-results p-6 max-h-[70vh] overflow-y-auto">
+                    <!-- Results populated by JavaScript -->
+                </div>
+            </div>
+        </div>
     </div>
 </div>

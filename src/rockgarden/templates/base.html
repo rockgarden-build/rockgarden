@@ -153,6 +153,19 @@
         .internal-link.broken:hover {
             opacity: 0.8;
         }
+
+        /* Search modal styles */
+        .search-modal {
+            backdrop-filter: blur(4px);
+        }
+
+        .search-results mark {
+            background-color: oklch(var(--p) / 0.2);
+            color: oklch(var(--p));
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-weight: 500;
+        }
     </style>
     <script>
         (function() {
@@ -319,22 +332,21 @@
             fetch('/search-index.json')
                 .then(r => r.json())
                 .then(data => {
-                    // Store documents by ref for later retrieval
-                    data.forEach((doc, idx) => {
-                        doc.ref = idx.toString();
-                        documents[doc.ref] = doc;
+                    // Store documents by URL for later retrieval
+                    data.forEach(doc => {
+                        documents[doc.url] = doc;
                     });
 
                     // Build lunr index
                     searchIndex = lunr(function() {
-                        this.ref('ref');
+                        this.ref('url');
                         this.field('title', { boost: 10 });
                         this.field('tags', { boost: 5 });
                         this.field('content');
 
                         data.forEach(doc => {
                             this.add({
-                                ref: doc.ref,
+                                url: doc.url,
                                 title: doc.title,
                                 tags: doc.tags ? doc.tags.join(' ') : '',
                                 content: doc.content || ''
@@ -344,108 +356,167 @@
                 })
                 .catch(err => console.error('Failed to load search index:', err));
 
-            // Extract excerpt around match
-            function getExcerpt(text, query, maxLength = 150) {
-                if (!text) return '';
+            // Highlight search terms in text
+            function highlightMatches(text, query) {
+                if (!text || !query) return text;
+                const regex = new RegExp(`(${query})`, 'gi');
+                return text.replace(regex, '<mark class="bg-primary/20 text-primary">$1</mark>');
+            }
+
+            // Extract multiple excerpts around matches
+            function getExcerpts(text, query, maxExcerpts = 3) {
+                if (!text) return [];
                 const lowerText = text.toLowerCase();
                 const lowerQuery = query.toLowerCase();
-                const index = lowerText.indexOf(lowerQuery);
+                const excerpts = [];
+                let lastIndex = 0;
 
-                if (index === -1) return text.substring(0, maxLength) + '...';
+                while (excerpts.length < maxExcerpts && lastIndex < text.length) {
+                    const index = lowerText.indexOf(lowerQuery, lastIndex);
+                    if (index === -1) break;
 
-                const start = Math.max(0, index - 50);
-                const end = Math.min(text.length, index + query.length + 100);
-                let excerpt = text.substring(start, end);
+                    const start = Math.max(0, index - 60);
+                    const end = Math.min(text.length, index + query.length + 120);
+                    let excerpt = text.substring(start, end);
 
-                if (start > 0) excerpt = '...' + excerpt;
-                if (end < text.length) excerpt = excerpt + '...';
+                    if (start > 0) excerpt = '...' + excerpt;
+                    if (end < text.length) excerpt = excerpt + '...';
 
-                return excerpt;
+                    excerpts.push(excerpt);
+                    lastIndex = end;
+                }
+
+                // If no matches found, return first excerpt
+                if (excerpts.length === 0) {
+                    const excerpt = text.substring(0, 180);
+                    excerpts.push(excerpt + (text.length > 180 ? '...' : ''));
+                }
+
+                return excerpts;
             }
 
             // Render search results
-            function renderResults(results, searchResults, query) {
+            function renderResults(results, searchResults, searchCount, query) {
+                // Update count
+                if (searchCount) {
+                    searchCount.textContent = results.length === 0 ?
+                        'No results found' :
+                        `${results.length} matching ${results.length === 1 ? 'page' : 'pages'}`;
+                }
+
                 // Clear previous results
                 searchResults.textContent = '';
 
                 if (results.length === 0) {
                     const noResultsDiv = document.createElement('div');
-                    noResultsDiv.className = 'p-4 text-sm text-base-content/60';
-                    noResultsDiv.textContent = 'No results found';
+                    noResultsDiv.className = 'text-center py-12 text-base-content/60';
+                    noResultsDiv.textContent = 'No pages found';
                     searchResults.appendChild(noResultsDiv);
                     return;
                 }
 
-                // Render results safely (avoid XSS)
+                // Render results with mkdocs-material style
                 results.forEach(result => {
                     const doc = documents[result.ref];
                     if (!doc) return;
 
-                    const link = document.createElement('a');
-                    link.href = doc.url;
-                    link.className = 'block p-3 hover:bg-base-200 border-b border-base-300 last:border-0';
+                    const resultCard = document.createElement('div');
+                    resultCard.className = 'mb-8 pb-8 border-b border-base-300 last:border-0';
 
-                    const titleDiv = document.createElement('div');
-                    titleDiv.className = 'font-semibold text-sm';
-                    titleDiv.textContent = doc.title;
-                    link.appendChild(titleDiv);
+                    // Title with icon
+                    const titleLink = document.createElement('a');
+                    titleLink.href = doc.url;
+                    titleLink.className = 'flex items-start gap-3 group mb-3';
 
-                    // Show excerpt from content
+                    const icon = document.createElement('div');
+                    icon.innerHTML = '<svg class="w-5 h-5 mt-1 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>';
+                    titleLink.appendChild(icon);
+
+                    const titleText = document.createElement('div');
+                    titleText.className = 'text-lg font-semibold group-hover:text-primary transition-colors';
+                    titleText.textContent = doc.title;
+                    titleLink.appendChild(titleText);
+
+                    resultCard.appendChild(titleLink);
+
+                    // Show excerpts with highlighted matches
                     if (doc.content) {
-                        const excerptDiv = document.createElement('div');
-                        excerptDiv.className = 'text-xs text-base-content/70 mt-1 line-clamp-2';
-                        excerptDiv.textContent = getExcerpt(doc.content, query);
-                        link.appendChild(excerptDiv);
+                        const excerpts = getExcerpts(doc.content, query, 2);
+                        excerpts.forEach((excerpt, idx) => {
+                            const excerptDiv = document.createElement('div');
+                            excerptDiv.className = 'text-sm text-base-content/80 leading-relaxed mb-2 ml-8';
+                            excerptDiv.innerHTML = highlightMatches(excerpt, query);
+                            resultCard.appendChild(excerptDiv);
+                        });
+
+                        // Show "X more on this page" if there are more matches
+                        const allMatches = (doc.content.toLowerCase().match(new RegExp(query.toLowerCase(), 'g')) || []).length;
+                        if (allMatches > excerpts.length) {
+                            const moreLink = document.createElement('a');
+                            moreLink.href = doc.url;
+                            moreLink.className = 'text-sm text-primary hover:underline ml-8';
+                            moreLink.textContent = `${allMatches - excerpts.length} more on this page`;
+                            resultCard.appendChild(moreLink);
+                        }
                     }
 
-                    if (doc.tags && doc.tags.length > 0) {
-                        const tagsDiv = document.createElement('div');
-                        tagsDiv.className = 'text-xs text-base-content/60 mt-1';
-                        tagsDiv.textContent = doc.tags.join(', ');
-                        link.appendChild(tagsDiv);
-                    }
-
-                    searchResults.appendChild(link);
+                    searchResults.appendChild(resultCard);
                 });
             }
 
             // Set up each search container
             searchContainers.forEach(function(container) {
                 const searchInput = container.querySelector('.search-input');
+                const searchModal = container.querySelector('.search-modal');
+                const searchInputModal = container.querySelector('.search-input-modal');
                 const searchResults = container.querySelector('.search-results');
+                const searchCount = container.querySelector('.search-count');
 
-                if (!searchInput || !searchResults) return;
+                if (!searchInput || !searchModal || !searchInputModal || !searchResults) return;
 
-                // Handle input
-                searchInput.addEventListener('input', function(e) {
+                // Open modal when clicking search input
+                searchInput.addEventListener('focus', function() {
+                    searchModal.classList.remove('hidden');
+                    searchInputModal.value = searchInput.value;
+                    searchInputModal.focus();
+                    if (searchInputModal.value.trim().length >= 2) {
+                        searchInputModal.dispatchEvent(new Event('input'));
+                    }
+                });
+
+                searchInput.addEventListener('click', function() {
+                    searchModal.classList.remove('hidden');
+                    searchInputModal.value = searchInput.value;
+                    searchInputModal.focus();
+                });
+
+                // Handle modal input
+                searchInputModal.addEventListener('input', function(e) {
                     const query = e.target.value.trim();
 
                     if (!query || query.length < 2 || !searchIndex) {
-                        searchResults.classList.add('hidden');
+                        searchResults.textContent = '';
+                        if (searchCount) searchCount.textContent = '';
                         return;
                     }
 
                     // Perform search with lunr
-                    const results = searchIndex.search(query + '*').slice(0, 15);
-                    renderResults(results, searchResults, query);
-                    searchResults.classList.remove('hidden');
+                    const results = searchIndex.search(query + '*').slice(0, 20);
+                    renderResults(results, searchResults, searchCount, query);
                 });
 
-                // Navigate results with keyboard
-                searchInput.addEventListener('keydown', function(e) {
+                // Close modal with ESC
+                searchInputModal.addEventListener('keydown', function(e) {
                     if (e.key === 'Escape') {
-                        searchResults.classList.add('hidden');
-                        searchInput.blur();
+                        searchModal.classList.add('hidden');
+                        searchInput.focus();
                     }
                 });
-            });
 
-            // Close results when clicking outside any search container
-            document.addEventListener('click', function(e) {
-                searchContainers.forEach(function(container) {
-                    const searchResults = container.querySelector('.search-results');
-                    if (!container.contains(e.target)) {
-                        searchResults.classList.add('hidden');
+                // Close modal when clicking backdrop
+                searchModal.addEventListener('click', function(e) {
+                    if (e.target === searchModal) {
+                        searchModal.classList.add('hidden');
                     }
                 });
             });
