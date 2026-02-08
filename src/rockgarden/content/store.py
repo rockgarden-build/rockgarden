@@ -1,5 +1,7 @@
 """Content store for page lookups."""
 
+import unicodedata
+
 from rockgarden.content.models import Page
 from rockgarden.urls import get_url
 
@@ -21,22 +23,26 @@ class ContentStore:
         self._by_slug[page.slug] = page
 
         name = page.source_path.stem
-        self._by_name[name.lower()] = page
+        normalized_name = unicodedata.normalize("NFC", name).lower()
+        self._by_name[normalized_name] = page
 
         if aliases := page.frontmatter.get("aliases"):
             if isinstance(aliases, list):
                 for alias in aliases:
-                    self._by_name[alias.lower()] = page
+                    normalized_alias = unicodedata.normalize("NFC", alias).lower()
+                    self._by_name[normalized_alias] = page
             elif isinstance(aliases, str):
-                self._by_name[aliases.lower()] = page
+                normalized_alias = unicodedata.normalize("NFC", aliases).lower()
+                self._by_name[normalized_alias] = page
 
     def get_by_slug(self, slug: str) -> Page | None:
         """Look up a page by its slug."""
         return self._by_slug.get(slug)
 
     def get_by_name(self, name: str) -> Page | None:
-        """Look up a page by its name or alias (case-insensitive)."""
-        return self._by_name.get(name.lower())
+        """Look up a page by its name or alias (case-insensitive, Unicode-normalized)."""
+        normalized_name = unicodedata.normalize("NFC", name).lower()
+        return self._by_name.get(normalized_name)
 
     def resolve_link(self, link_target: str) -> str | None:
         """Resolve a wiki-link target to a URL path.
