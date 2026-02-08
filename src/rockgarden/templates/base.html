@@ -7,7 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     {% if site.search_enabled %}
-    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script>
     {% endif %}
     <script>
         tailwind.config = {
@@ -307,32 +307,64 @@
         // Search functionality
         {% if site.search_enabled %}
         (function() {
-            if (!window.Fuse) return; // Skip if Fuse.js not loaded
+            if (!window.lunr) return; // Skip if lunr.js not loaded
 
             const searchContainers = document.querySelectorAll('.search-container');
             if (searchContainers.length === 0) return;
 
-            let fuse = null;
+            let searchIndex = null;
+            let documents = {};
 
-            // Load search index
+            // Load search index and build lunr index
             fetch('/search-index.json')
                 .then(r => r.json())
                 .then(data => {
-                    fuse = new Fuse(data, {
-                        keys: [
-                            { name: 'title', weight: 2 },
-                            { name: 'content', weight: 1 },
-                            { name: 'tags', weight: 1.5 }
-                        ],
-                        threshold: 0.4,  // Fuzzy matching threshold
-                        includeScore: true,
-                        minMatchCharLength: 2
+                    // Store documents by ref for later retrieval
+                    data.forEach((doc, idx) => {
+                        doc.ref = idx.toString();
+                        documents[doc.ref] = doc;
+                    });
+
+                    // Build lunr index
+                    searchIndex = lunr(function() {
+                        this.ref('ref');
+                        this.field('title', { boost: 10 });
+                        this.field('tags', { boost: 5 });
+                        this.field('content');
+
+                        data.forEach(doc => {
+                            this.add({
+                                ref: doc.ref,
+                                title: doc.title,
+                                tags: doc.tags ? doc.tags.join(' ') : '',
+                                content: doc.content || ''
+                            });
+                        });
                     });
                 })
                 .catch(err => console.error('Failed to load search index:', err));
 
+            // Extract excerpt around match
+            function getExcerpt(text, query, maxLength = 150) {
+                if (!text) return '';
+                const lowerText = text.toLowerCase();
+                const lowerQuery = query.toLowerCase();
+                const index = lowerText.indexOf(lowerQuery);
+
+                if (index === -1) return text.substring(0, maxLength) + '...';
+
+                const start = Math.max(0, index - 50);
+                const end = Math.min(text.length, index + query.length + 100);
+                let excerpt = text.substring(start, end);
+
+                if (start > 0) excerpt = '...' + excerpt;
+                if (end < text.length) excerpt = excerpt + '...';
+
+                return excerpt;
+            }
+
             // Render search results
-            function renderResults(results, searchResults) {
+            function renderResults(results, searchResults, query) {
                 // Clear previous results
                 searchResults.textContent = '';
 
@@ -345,20 +377,31 @@
                 }
 
                 // Render results safely (avoid XSS)
-                results.forEach(({ item }) => {
+                results.forEach(result => {
+                    const doc = documents[result.ref];
+                    if (!doc) return;
+
                     const link = document.createElement('a');
-                    link.href = item.url;
+                    link.href = doc.url;
                     link.className = 'block p-3 hover:bg-base-200 border-b border-base-300 last:border-0';
 
                     const titleDiv = document.createElement('div');
                     titleDiv.className = 'font-semibold text-sm';
-                    titleDiv.textContent = item.title; // Safe - uses textContent
+                    titleDiv.textContent = doc.title;
                     link.appendChild(titleDiv);
 
-                    if (item.tags && item.tags.length > 0) {
+                    // Show excerpt from content
+                    if (doc.content) {
+                        const excerptDiv = document.createElement('div');
+                        excerptDiv.className = 'text-xs text-base-content/70 mt-1 line-clamp-2';
+                        excerptDiv.textContent = getExcerpt(doc.content, query);
+                        link.appendChild(excerptDiv);
+                    }
+
+                    if (doc.tags && doc.tags.length > 0) {
                         const tagsDiv = document.createElement('div');
                         tagsDiv.className = 'text-xs text-base-content/60 mt-1';
-                        tagsDiv.textContent = item.tags.join(', '); // Safe - uses textContent
+                        tagsDiv.textContent = doc.tags.join(', ');
                         link.appendChild(tagsDiv);
                     }
 
@@ -377,13 +420,14 @@
                 searchInput.addEventListener('input', function(e) {
                     const query = e.target.value.trim();
 
-                    if (!query || query.length < 2 || !fuse) {
+                    if (!query || query.length < 2 || !searchIndex) {
                         searchResults.classList.add('hidden');
                         return;
                     }
 
-                    const results = fuse.search(query).slice(0, 10); // Top 10 results
-                    renderResults(results, searchResults);
+                    // Perform search with lunr
+                    const results = searchIndex.search(query + '*').slice(0, 15);
+                    renderResults(results, searchResults, query);
                     searchResults.classList.remove('hidden');
                 });
 
