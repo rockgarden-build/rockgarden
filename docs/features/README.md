@@ -24,7 +24,7 @@ The [PyOhio static website](https://github.com/pyohio/static-website) (Astro + P
 | 04 | [Embeds](04-embeds.md) | Partial | — | Image embeds ✅, transclusions ❌ |
 | 05 | [Callouts](05-callouts.md) | ✅ | A | GFM alerts + Obsidian callouts |
 | 06 | [Navigation](06-navigation.md) | ✅ | — | Sidebar, breadcrumbs, folder pages |
-| 07 | [Backlinks](07-backlinks.md) | ❌ | A | Pages that link to current page |
+| 07 | [Backlinks](07-backlinks.md) | ✅ | A | Pages that link to current page |
 | 08 | [Search](08-search.md) | ❌ | A | Client-side search |
 | 09 | [Macros](09-macros.md) | ❌ | C | User-defined Jinja2 macros |
 | 10 | [Progressive Customization](10-progressive-customization.md) | In Progress | — | Themes and layouts |
@@ -56,7 +56,7 @@ From test vaults' Quartz configs:
 - [ ] Note transclusions
 - [x] Callouts
 - [ ] Table of contents
-- [ ] Backlinks
+- [x] Backlinks
 - [ ] Graph visualization
 - [ ] Search
 

@@ -51,6 +51,7 @@ def render_page(
     page: Page,
     site_config: dict,
     breadcrumbs: list | None = None,
+    backlinks: list | None = None,
 ) -> str:
     """Render a page using the page template.
 
@@ -59,9 +60,15 @@ def render_page(
         page: The page to render.
         site_config: Site configuration to pass to template.
         breadcrumbs: Optional list of Breadcrumb objects for navigation.
+        backlinks: Optional list of Page objects that link to this page.
 
     Returns:
         Rendered HTML string.
     """
     template = env.get_template("page.html")
-    return template.render(page=page, site=site_config, breadcrumbs=breadcrumbs or [])
+    return template.render(
+        page=page,
+        site=site_config,
+        breadcrumbs=breadcrumbs or [],
+        backlinks=backlinks or [],
+    )

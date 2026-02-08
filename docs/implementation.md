@@ -111,7 +111,7 @@ See [Feature 15](features/15-build-hooks.md). Shell commands at `pre_build`, `po
 - [x] Explorer data structure
 - [x] Breadcrumb generation
 - [ ] TOC extraction
-- [ ] Backlink tracking
+- [x] Backlink tracking
 
 ### Step 6: Search
 - [ ] Build-time index generation

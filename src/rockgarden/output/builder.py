@@ -9,7 +9,12 @@ from rockgarden.assets import (
     create_media_resolver,
 )
 from rockgarden.config import Config
-from rockgarden.content import ContentStore, load_content, strip_content_title
+from rockgarden.content import (
+    ContentStore,
+    build_link_index,
+    load_content,
+    strip_content_title,
+)
 from rockgarden.links import transform_md_links
 from rockgarden.nav import (
     build_breadcrumbs,
@@ -18,7 +23,7 @@ from rockgarden.nav import (
 )
 from rockgarden.obsidian import process_callouts, process_media_embeds, process_wikilinks
 from rockgarden.render import create_engine, render_markdown, render_page
-from rockgarden.urls import get_folder_url, get_output_path
+from rockgarden.urls import get_folder_url, get_output_path, get_url
 
 
 def build_site(config: Config, source: Path, output: Path) -> int:
@@ -37,6 +42,8 @@ def build_site(config: Config, source: Path, output: Path) -> int:
     pages = load_content(source, config.build.ignore_patterns)
     clean_urls = config.site.clean_urls
     store = ContentStore(pages, clean_urls)
+
+    link_index = build_link_index(pages, store)
 
     nav_tree = build_nav_tree(pages, config.nav, clean_urls)
 
@@ -85,7 +92,20 @@ def build_site(config: Config, source: Path, output: Path) -> int:
         page.html = render_markdown(content)
 
         breadcrumbs = build_breadcrumbs(page, pages, config.nav, clean_urls)
-        html = render_page(env, page, site_config, breadcrumbs)
+
+        # Get backlinks if enabled
+        backlinks = []
+        if config.backlinks.enabled:
+            backlink_slugs = link_index.get_backlinks(page.slug)
+            for slug in backlink_slugs:
+                backlink_page = store.get_by_slug(slug)
+                if backlink_page:
+                    backlinks.append({
+                        "title": backlink_page.title,
+                        "url": get_url(backlink_page.slug, clean_urls),
+                    })
+
+        html = render_page(env, page, site_config, breadcrumbs, backlinks)
 
         output_file = output / get_output_path(page.slug, clean_urls)
         output_file.parent.mkdir(parents=True, exist_ok=True)
