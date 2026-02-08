@@ -163,9 +163,17 @@ def build(
 
     typer.echo(f"Building site from {source_dir}")
 
-    count = build_site(config, source_dir, output_dir)
+    result = build_site(config, source_dir, output_dir)
 
-    typer.echo(f"Built {count} pages to {output_dir}")
+    typer.echo(f"Built {result.page_count} pages to {output_dir}")
+
+    if result.broken_links:
+        total = sum(len(targets) for targets in result.broken_links.values())
+        typer.echo(f"\nWarnings: {total} broken link(s) found", err=True)
+
+        for page_slug, targets in sorted(result.broken_links.items()):
+            for target in targets:
+                typer.echo(f"  {page_slug}: [[{target}]]", err=True)
 
 
 @app.command()

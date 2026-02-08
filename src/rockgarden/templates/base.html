@@ -134,6 +134,22 @@
         .callout-cite {
             border-color: oklch(var(--bc) / 0.3);
         }
+
+        /* Broken internal links */
+        .internal-link {
+            text-decoration: underline;
+        }
+
+        .internal-link.broken {
+            color: oklch(var(--er) / 0.6);
+            opacity: 0.6;
+            text-decoration: line-through;
+            cursor: not-allowed;
+        }
+
+        .internal-link.broken:hover {
+            opacity: 0.8;
+        }
     </style>
     <script>
         (function() {
