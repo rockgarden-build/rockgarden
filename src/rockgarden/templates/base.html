@@ -232,6 +232,26 @@
             </aside>
         </div>
     </div>
+
+    <!-- Global search results overlay (outside drawer, shared by all search inputs) -->
+    {% if site.search_enabled %}
+    <div id="search-overlay" class="hidden fixed inset-0 z-50 lg:left-64">
+        <!-- Backdrop -->
+        <div class="search-backdrop absolute inset-0 bg-base-300/80 backdrop-blur-sm"></div>
+
+        <!-- Results panel -->
+        <div class="search-results-panel relative max-w-4xl mx-auto mt-4 p-4 bg-base-100 rounded-lg shadow-2xl max-h-[calc(100vh-2rem)] overflow-hidden">
+            <!-- Results count -->
+            <div class="search-count px-6 py-3 text-sm text-base-content/60 border-b border-base-300"></div>
+
+            <!-- Results container -->
+            <div class="search-results p-6 overflow-y-auto max-h-[calc(100vh-8rem)]">
+                <!-- Results populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     {% block footer %}{% endblock %}
     <script>
         // Theme switcher functionality
@@ -467,41 +487,37 @@
                 });
             }
 
-            // Set up each search container
+            // Get global search overlay elements
+            const searchOverlay = document.getElementById('search-overlay');
+            const searchBackdrop = searchOverlay ? searchOverlay.querySelector('.search-backdrop') : null;
+            const searchResults = searchOverlay ? searchOverlay.querySelector('.search-results') : null;
+            const searchCount = searchOverlay ? searchOverlay.querySelector('.search-count') : null;
+
+            if (!searchOverlay || !searchResults) return;
+
+            // Handle search input across all containers
+            let activeSearchInput = null;
+
             searchContainers.forEach(function(container) {
                 const searchInput = container.querySelector('.search-input');
-                const searchModal = container.querySelector('.search-modal');
-                const searchInputModal = container.querySelector('.search-input-modal');
-                const searchResults = container.querySelector('.search-results');
-                const searchCount = container.querySelector('.search-count');
+                if (!searchInput) return;
 
-                if (!searchInput || !searchModal || !searchInputModal || !searchResults) return;
-
-                // Open modal when clicking search input
-                searchInput.addEventListener('focus', function() {
-                    searchModal.classList.remove('hidden');
-                    searchInputModal.value = searchInput.value;
-                    searchInputModal.focus();
-                    if (searchInputModal.value.trim().length >= 2) {
-                        searchInputModal.dispatchEvent(new Event('input'));
-                    }
-                });
-
-                searchInput.addEventListener('click', function() {
-                    searchModal.classList.remove('hidden');
-                    searchInputModal.value = searchInput.value;
-                    searchInputModal.focus();
-                });
-
-                // Handle modal input
-                searchInputModal.addEventListener('input', function(e) {
+                // Handle input
+                searchInput.addEventListener('input', function(e) {
+                    activeSearchInput = searchInput;
                     const query = e.target.value.trim();
 
-                    if (!query || query.length < 2 || !searchIndex) {
+                    if (!query || query.length < 2) {
+                        searchOverlay.classList.add('hidden');
                         searchResults.textContent = '';
                         if (searchCount) searchCount.textContent = '';
                         return;
                     }
+
+                    if (!searchIndex) return;
+
+                    // Show overlay
+                    searchOverlay.classList.remove('hidden');
 
                     // Perform search with lunr - try multiple search strategies
                     let results = [];
@@ -531,20 +547,33 @@
                     renderResults(results, searchResults, searchCount, query);
                 });
 
-                // Close modal with ESC
-                searchInputModal.addEventListener('keydown', function(e) {
+                // Close overlay with ESC
+                searchInput.addEventListener('keydown', function(e) {
                     if (e.key === 'Escape') {
-                        searchModal.classList.add('hidden');
-                        searchInput.focus();
+                        searchOverlay.classList.add('hidden');
+                        searchInput.blur();
                     }
                 });
+            });
 
-                // Close modal when clicking backdrop
-                searchModal.addEventListener('click', function(e) {
-                    if (e.target === searchModal) {
-                        searchModal.classList.add('hidden');
+            // Close overlay when clicking backdrop
+            if (searchBackdrop) {
+                searchBackdrop.addEventListener('click', function() {
+                    searchOverlay.classList.add('hidden');
+                    if (activeSearchInput) {
+                        activeSearchInput.blur();
                     }
                 });
+            }
+
+            // Close overlay when clicking outside
+            document.addEventListener('click', function(e) {
+                const clickedSearchContainer = e.target.closest('.search-container');
+                const clickedOverlay = e.target.closest('#search-overlay');
+
+                if (!clickedSearchContainer && !clickedOverlay) {
+                    searchOverlay.classList.add('hidden');
+                }
             });
         })();
         {% endif %}
