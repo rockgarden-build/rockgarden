@@ -7,7 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     {% if site.search_enabled %}
-    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script>
     {% endif %}
     <script>
         tailwind.config = {
@@ -153,6 +153,19 @@
         .internal-link.broken:hover {
             opacity: 0.8;
         }
+
+        /* Search modal styles */
+        .search-modal {
+            backdrop-filter: blur(4px);
+        }
+
+        .search-results mark {
+            background-color: oklch(var(--p) / 0.2);
+            color: oklch(var(--p));
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-weight: 500;
+        }
     </style>
     <script>
         (function() {
@@ -219,6 +232,26 @@
             </aside>
         </div>
     </div>
+
+    <!-- Global search results overlay (outside drawer, shared by all search inputs) -->
+    {% if site.search_enabled %}
+    <div id="search-overlay" class="hidden fixed inset-0 z-50 lg:left-64">
+        <!-- Backdrop -->
+        <div class="search-backdrop absolute inset-0 bg-base-300/80 backdrop-blur-sm"></div>
+
+        <!-- Results panel -->
+        <div class="search-results-panel relative max-w-4xl mx-auto mt-4 p-4 bg-base-100 rounded-lg shadow-2xl max-h-[calc(100vh-2rem)] overflow-hidden">
+            <!-- Results count -->
+            <div class="search-count px-6 py-3 text-sm text-base-content/60 border-b border-base-300"></div>
+
+            <!-- Results container -->
+            <div class="search-results p-6 overflow-y-auto max-h-[calc(100vh-8rem)]">
+                <!-- Results populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     {% block footer %}{% endblock %}
     <script>
         // Theme switcher functionality
@@ -307,103 +340,241 @@
         // Search functionality
         {% if site.search_enabled %}
         (function() {
-            if (!window.Fuse) return; // Skip if Fuse.js not loaded
+            if (!window.lunr) return; // Skip if lunr.js not loaded
 
             const searchContainers = document.querySelectorAll('.search-container');
             if (searchContainers.length === 0) return;
 
-            let fuse = null;
+            let searchIndex = null;
+            let documents = {};
 
-            // Load search index
+            // Load search index and build lunr index
             fetch('/search-index.json')
                 .then(r => r.json())
                 .then(data => {
-                    fuse = new Fuse(data, {
-                        keys: [
-                            { name: 'title', weight: 2 },
-                            { name: 'content', weight: 1 },
-                            { name: 'tags', weight: 1.5 }
-                        ],
-                        threshold: 0.4,  // Fuzzy matching threshold
-                        includeScore: true,
-                        minMatchCharLength: 2
+                    // Store documents by URL for later retrieval
+                    data.forEach(doc => {
+                        documents[doc.url] = doc;
+                    });
+
+                    // Build lunr index
+                    searchIndex = lunr(function() {
+                        this.ref('url');
+                        this.field('title', { boost: 10 });
+                        this.field('tags', { boost: 5 });
+                        this.field('content');
+
+                        data.forEach(doc => {
+                            this.add({
+                                url: doc.url,
+                                title: doc.title,
+                                tags: doc.tags ? doc.tags.join(' ') : '',
+                                content: doc.content || ''
+                            });
+                        });
                     });
                 })
                 .catch(err => console.error('Failed to load search index:', err));
 
+            // Highlight search terms in text
+            function highlightMatches(text, query) {
+                if (!text || !query) return text;
+                // Escape special regex characters
+                const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                // Match whole words that start with the query
+                const regex = new RegExp(`(\\b${escapedQuery}\\w*)`, 'gi');
+                return text.replace(regex, '<mark class="bg-primary/20 text-primary">$1</mark>');
+            }
+
+            // Extract multiple excerpts around matches
+            function getExcerpts(text, query, maxExcerpts = 3) {
+                if (!text) return [];
+                const lowerText = text.toLowerCase();
+                const lowerQuery = query.toLowerCase();
+                const excerpts = [];
+                let lastIndex = 0;
+
+                while (excerpts.length < maxExcerpts && lastIndex < text.length) {
+                    const index = lowerText.indexOf(lowerQuery, lastIndex);
+                    if (index === -1) break;
+
+                    const start = Math.max(0, index - 60);
+                    const end = Math.min(text.length, index + query.length + 120);
+                    let excerpt = text.substring(start, end);
+
+                    if (start > 0) excerpt = '...' + excerpt;
+                    if (end < text.length) excerpt = excerpt + '...';
+
+                    excerpts.push(excerpt);
+                    lastIndex = end;
+                }
+
+                // If no matches found, return first excerpt
+                if (excerpts.length === 0) {
+                    const excerpt = text.substring(0, 180);
+                    excerpts.push(excerpt + (text.length > 180 ? '...' : ''));
+                }
+
+                return excerpts;
+            }
+
             // Render search results
-            function renderResults(results, searchResults) {
+            function renderResults(results, searchResults, searchCount, query) {
+                // Update count
+                if (searchCount) {
+                    searchCount.textContent = results.length === 0 ?
+                        'No results found' :
+                        `${results.length} matching ${results.length === 1 ? 'page' : 'pages'}`;
+                }
+
                 // Clear previous results
                 searchResults.textContent = '';
 
                 if (results.length === 0) {
                     const noResultsDiv = document.createElement('div');
-                    noResultsDiv.className = 'p-4 text-sm text-base-content/60';
-                    noResultsDiv.textContent = 'No results found';
+                    noResultsDiv.className = 'text-center py-12 text-base-content/60';
+                    noResultsDiv.textContent = 'No pages found';
                     searchResults.appendChild(noResultsDiv);
                     return;
                 }
 
-                // Render results safely (avoid XSS)
-                results.forEach(({ item }) => {
-                    const link = document.createElement('a');
-                    link.href = item.url;
-                    link.className = 'block p-3 hover:bg-base-200 border-b border-base-300 last:border-0';
+                // Render results with mkdocs-material style
+                results.forEach(result => {
+                    const doc = documents[result.ref];
+                    if (!doc) return;
 
-                    const titleDiv = document.createElement('div');
-                    titleDiv.className = 'font-semibold text-sm';
-                    titleDiv.textContent = item.title; // Safe - uses textContent
-                    link.appendChild(titleDiv);
+                    const resultCard = document.createElement('div');
+                    resultCard.className = 'mb-8 pb-8 border-b border-base-300 last:border-0';
 
-                    if (item.tags && item.tags.length > 0) {
-                        const tagsDiv = document.createElement('div');
-                        tagsDiv.className = 'text-xs text-base-content/60 mt-1';
-                        tagsDiv.textContent = item.tags.join(', '); // Safe - uses textContent
-                        link.appendChild(tagsDiv);
+                    // Title with icon
+                    const titleLink = document.createElement('a');
+                    titleLink.href = doc.url;
+                    titleLink.className = 'flex items-start gap-3 group mb-3';
+
+                    const icon = document.createElement('div');
+                    icon.innerHTML = '<svg class="w-5 h-5 mt-1 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>';
+                    titleLink.appendChild(icon);
+
+                    const titleText = document.createElement('div');
+                    titleText.className = 'text-lg font-semibold group-hover:text-primary transition-colors';
+                    titleText.textContent = doc.title;
+                    titleLink.appendChild(titleText);
+
+                    resultCard.appendChild(titleLink);
+
+                    // Show excerpts with highlighted matches
+                    if (doc.content) {
+                        const excerpts = getExcerpts(doc.content, query, 2);
+                        excerpts.forEach((excerpt, idx) => {
+                            const excerptDiv = document.createElement('div');
+                            excerptDiv.className = 'text-sm text-base-content/80 leading-relaxed mb-2 ml-8';
+                            excerptDiv.innerHTML = highlightMatches(excerpt, query);
+                            resultCard.appendChild(excerptDiv);
+                        });
+
+                        // Show "X more on this page" if there are more matches
+                        const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                        const allMatches = (doc.content.toLowerCase().match(new RegExp(escapedQuery.toLowerCase(), 'g')) || []).length;
+                        if (allMatches > excerpts.length) {
+                            const moreLink = document.createElement('a');
+                            moreLink.href = doc.url;
+                            moreLink.className = 'text-sm text-primary hover:underline ml-8';
+                            moreLink.textContent = `${allMatches - excerpts.length} more on this page`;
+                            resultCard.appendChild(moreLink);
+                        }
                     }
 
-                    searchResults.appendChild(link);
+                    searchResults.appendChild(resultCard);
                 });
             }
 
-            // Set up each search container
+            // Get global search overlay elements
+            const searchOverlay = document.getElementById('search-overlay');
+            const searchBackdrop = searchOverlay ? searchOverlay.querySelector('.search-backdrop') : null;
+            const searchResults = searchOverlay ? searchOverlay.querySelector('.search-results') : null;
+            const searchCount = searchOverlay ? searchOverlay.querySelector('.search-count') : null;
+
+            if (!searchOverlay || !searchResults) return;
+
+            // Handle search input across all containers
+            let activeSearchInput = null;
+
             searchContainers.forEach(function(container) {
                 const searchInput = container.querySelector('.search-input');
-                const searchResults = container.querySelector('.search-results');
-
-                if (!searchInput || !searchResults) return;
+                if (!searchInput) return;
 
                 // Handle input
                 searchInput.addEventListener('input', function(e) {
+                    activeSearchInput = searchInput;
                     const query = e.target.value.trim();
 
-                    if (!query || query.length < 2 || !fuse) {
-                        searchResults.classList.add('hidden');
+                    if (!query || query.length < 2) {
+                        searchOverlay.classList.add('hidden');
+                        searchResults.textContent = '';
+                        if (searchCount) searchCount.textContent = '';
                         return;
                     }
 
-                    const results = fuse.search(query).slice(0, 10); // Top 10 results
-                    renderResults(results, searchResults);
-                    searchResults.classList.remove('hidden');
+                    if (!searchIndex) return;
+
+                    // Show overlay
+                    searchOverlay.classList.remove('hidden');
+
+                    // Perform search with lunr - try multiple search strategies
+                    let results = [];
+                    try {
+                        // Try exact match first, then wildcard, then fuzzy
+                        const exactResults = searchIndex.search(query);
+                        const wildcardResults = searchIndex.search(query + '*');
+                        const fuzzyResults = searchIndex.search(query + '~1');
+
+                        // Combine results, removing duplicates
+                        const seen = new Set();
+                        [exactResults, wildcardResults, fuzzyResults].forEach(resultSet => {
+                            resultSet.forEach(result => {
+                                if (!seen.has(result.ref)) {
+                                    seen.add(result.ref);
+                                    results.push(result);
+                                }
+                            });
+                        });
+
+                        results = results.slice(0, 20);
+                    } catch (e) {
+                        // Fallback to simple wildcard search
+                        results = searchIndex.search(query + '*').slice(0, 20);
+                    }
+
+                    renderResults(results, searchResults, searchCount, query);
                 });
 
-                // Navigate results with keyboard
+                // Close overlay with ESC
                 searchInput.addEventListener('keydown', function(e) {
                     if (e.key === 'Escape') {
-                        searchResults.classList.add('hidden');
+                        searchOverlay.classList.add('hidden');
                         searchInput.blur();
                     }
                 });
             });
 
-            // Close results when clicking outside any search container
-            document.addEventListener('click', function(e) {
-                searchContainers.forEach(function(container) {
-                    const searchResults = container.querySelector('.search-results');
-                    if (!container.contains(e.target)) {
-                        searchResults.classList.add('hidden');
+            // Close overlay when clicking backdrop
+            if (searchBackdrop) {
+                searchBackdrop.addEventListener('click', function() {
+                    searchOverlay.classList.add('hidden');
+                    if (activeSearchInput) {
+                        activeSearchInput.blur();
                     }
                 });
+            }
+
+            // Close overlay when clicking outside
+            document.addEventListener('click', function(e) {
+                const clickedSearchContainer = e.target.closest('.search-container');
+                const clickedOverlay = e.target.closest('#search-overlay');
+
+                if (!clickedSearchContainer && !clickedOverlay) {
+                    searchOverlay.classList.add('hidden');
+                }
             });
         })();
         {% endif %}
