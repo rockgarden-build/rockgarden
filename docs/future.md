@@ -12,6 +12,7 @@ Noted but not currently planned:
 - Graph visualization
 - Installable templates
 - Python plugins (see [concepts.md](concepts.md) for the plugin model)
+- Theme/plugin dependency resolution and installer — `rockgarden theme` and `rockgarden plugin` CLI subcommands that install from git URL or local dir, with themes/plugins declaring dependencies that the installer offers to also install
 - Configurable markdown preset (commonmark, gfm-like, custom plugins)
 
 Moved to roadmap:
