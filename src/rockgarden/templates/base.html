@@ -309,10 +309,8 @@
         (function() {
             if (!window.Fuse) return; // Skip if Fuse.js not loaded
 
-            const searchInput = document.getElementById('search-input');
-            const searchResults = document.getElementById('search-results');
-
-            if (!searchInput || !searchResults) return;
+            const searchContainers = document.querySelectorAll('.search-container');
+            if (searchContainers.length === 0) return;
 
             let fuse = null;
 
@@ -333,17 +331,8 @@
                 })
                 .catch(err => console.error('Failed to load search index:', err));
 
-            // Handle input
-            searchInput.addEventListener('input', function(e) {
-                const query = e.target.value.trim();
-
-                if (!query || query.length < 2 || !fuse) {
-                    searchResults.classList.add('hidden');
-                    return;
-                }
-
-                const results = fuse.search(query).slice(0, 10); // Top 10 results
-
+            // Render search results
+            function renderResults(results, searchResults) {
                 // Clear previous results
                 searchResults.textContent = '';
 
@@ -352,7 +341,6 @@
                     noResultsDiv.className = 'p-4 text-sm text-base-content/60';
                     noResultsDiv.textContent = 'No results found';
                     searchResults.appendChild(noResultsDiv);
-                    searchResults.classList.remove('hidden');
                     return;
                 }
 
@@ -376,23 +364,46 @@
 
                     searchResults.appendChild(link);
                 });
+            }
 
-                searchResults.classList.remove('hidden');
+            // Set up each search container
+            searchContainers.forEach(function(container) {
+                const searchInput = container.querySelector('.search-input');
+                const searchResults = container.querySelector('.search-results');
+
+                if (!searchInput || !searchResults) return;
+
+                // Handle input
+                searchInput.addEventListener('input', function(e) {
+                    const query = e.target.value.trim();
+
+                    if (!query || query.length < 2 || !fuse) {
+                        searchResults.classList.add('hidden');
+                        return;
+                    }
+
+                    const results = fuse.search(query).slice(0, 10); // Top 10 results
+                    renderResults(results, searchResults);
+                    searchResults.classList.remove('hidden');
+                });
+
+                // Navigate results with keyboard
+                searchInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        searchResults.classList.add('hidden');
+                        searchInput.blur();
+                    }
+                });
             });
 
-            // Close results when clicking outside
+            // Close results when clicking outside any search container
             document.addEventListener('click', function(e) {
-                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-                    searchResults.classList.add('hidden');
-                }
-            });
-
-            // Navigate results with keyboard
-            searchInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    searchResults.classList.add('hidden');
-                    searchInput.blur();
-                }
+                searchContainers.forEach(function(container) {
+                    const searchResults = container.querySelector('.search-results');
+                    if (!container.contains(e.target)) {
+                        searchResults.classList.add('hidden');
+                    }
+                });
             });
         })();
         {% endif %}
