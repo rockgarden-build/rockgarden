@@ -111,13 +111,9 @@ Templates can `{% extend %}` from any level. A site's `_templates/page.html` can
 
 Shell commands run at build lifecycle stages (`pre_build`, `post_collect`, `post_build`). This is the near-term extension mechanism — unopinionated, language-agnostic, and sufficient for data pipelines, asset compilation, and derived asset generation.
 
-### Python Plugins (future)
+### Plugins (future)
 
-For more complex needs, Python plugins in `_plugins/` could hook into:
-- Markdown preprocessing/postprocessing
-- Template context injection
-- Custom build steps
-- Additional Jinja2 filters/globals
+Python-based behavioral extensions in `_plugins/`. See [concepts.md](concepts.md) for the full extensibility model and terminology.
 
 ## Decisions
 

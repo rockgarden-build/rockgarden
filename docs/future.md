@@ -11,7 +11,7 @@ Noted but not currently planned:
 - MCP server for vault data (JSON content export makes this feasible)
 - Graph visualization
 - Installable templates
-- Python plugins (tighter integration than shell hooks)
+- Python plugins (see [concepts.md](concepts.md) for the plugin model)
 - Configurable markdown preset (commonmark, gfm-like, custom plugins)
 
 Moved to roadmap:

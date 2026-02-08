@@ -1,6 +1,6 @@
 # Feature 10: Progressive Customization (In Progress)
 
-Enable customization from zero-config to fully custom site generation.
+Enable customization from zero-config to fully custom site generation. See [concepts.md](../concepts.md) for terminology and the full 6-level customization ladder.
 
 ## Customization Levels
 
