@@ -1,6 +1,7 @@
 """Markdown rendering with markdown-it-py."""
 
 import re
+from html import escape
 
 from markdown_it import MarkdownIt
 
@@ -40,10 +41,10 @@ def render_markdown(content: str) -> str:
         from urllib.parse import unquote
         target = unquote(match.group(1))
         text = match.group(2)
-        return f'<a class="internal-link broken" data-target="{target}">{text}</a>'
+        return f'<a class="internal-link broken" data-target="{escape(target)}">{text}</a>'
 
     html = re.sub(
-        r'<a href="BROKEN::([^"]+)">([^<]+)</a>',
+        r'<a href="BROKEN::([^"]+)">(.*?)</a>',
         replace_broken_link,
         html
     )
