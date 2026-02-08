@@ -33,7 +33,7 @@ class BuildResult:
 
     Attributes:
         page_count: Number of pages built.
-        broken_links: Mapping of page slugs to lists of broken link targets.
+        broken_links: Mapping of source filenames to lists of broken link targets.
     """
 
     page_count: int
@@ -104,7 +104,8 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         all_media.update(collect_markdown_images(content, media_resolver))
         content, broken = process_wikilinks(content, store.resolve_link)
         if broken:
-            broken_links_by_page[page.slug] = [target for target, _ in broken]
+            source_file = page.source_path.name
+            broken_links_by_page[source_file] = [target for target, _ in broken]
         content = transform_md_links(content, clean_urls)
         page.html = render_markdown(content)
 
@@ -150,7 +151,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
             all_media.update(collect_markdown_images(processed, media_resolver))
             processed, broken = process_wikilinks(processed, store.resolve_link)
             if broken:
-                broken_links_by_page[folder.slug] = [target for target, _ in broken]
+                broken_links_by_page[folder_src] = [target for target, _ in broken]
             processed = transform_md_links(processed, clean_urls)
             folder.custom_content = render_markdown(processed)
 
