@@ -114,12 +114,12 @@ def image_to_html(embed: ParsedEmbed, src: str) -> str:
 
 def audio_to_html(embed: ParsedEmbed, src: str) -> str:
     """Convert parsed embed to HTML audio tag."""
-    return f'<audio controls src="{escape(src)}"></audio>'
+    return f'<audio controls preload="none" src="{escape(src)}"></audio>'
 
 
 def video_to_html(embed: ParsedEmbed, src: str) -> str:
     """Convert parsed embed to HTML video tag."""
-    attrs = [f'src="{escape(src)}"', "controls"]
+    attrs = [f'src="{escape(src)}"', "controls", 'preload="none"']
 
     if embed.width:
         attrs.append(f'width="{embed.width}"')
