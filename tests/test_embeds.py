@@ -324,7 +324,7 @@ class TestAudioEmbedToHtml:
         """Audio embed produces audio tag with controls."""
         content = "![[song.mp3]]"
         result, media = process_media_embeds(content, self._mock_resolver)
-        assert result == '<audio controls src="/song.mp3"></audio>'
+        assert result == '<audio controls preload="none" src="/song.mp3"></audio>'
         assert media == {"song.mp3"}
 
 
@@ -338,7 +338,7 @@ class TestVideoEmbedToHtml:
         """Video embed produces video tag with controls."""
         content = "![[movie.mp4]]"
         result, media = process_media_embeds(content, self._mock_resolver)
-        assert result == '<video src="/movie.mp4" controls></video>'
+        assert result == '<video src="/movie.mp4" controls preload="none"></video>'
         assert media == {"movie.mp4"}
 
     def test_video_with_dimensions(self):

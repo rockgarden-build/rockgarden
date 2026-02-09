@@ -1,6 +1,7 @@
 """Site building orchestration."""
 
 import json
+import shutil
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -23,7 +24,11 @@ from rockgarden.nav import (
     build_nav_tree,
     generate_folder_indexes,
 )
-from rockgarden.obsidian import process_callouts, process_media_embeds, process_wikilinks
+from rockgarden.obsidian import (
+    process_callouts,
+    process_media_embeds,
+    process_wikilinks,
+)
 from rockgarden.output.search import build_search_index
 from rockgarden.render import create_engine, render_markdown, render_page
 from rockgarden.urls import get_folder_url, get_output_path, get_url
@@ -42,6 +47,14 @@ class BuildResult:
     broken_links: dict[str, list[str]]
 
 
+def copy_static_files(output: Path) -> None:
+    """Copy bundled static assets (CSS, JS) to the output directory."""
+    static_src = Path(__file__).resolve().parent.parent / "static"
+    static_dst = output / "_static"
+    if static_src.exists():
+        shutil.copytree(static_src, static_dst, dirs_exist_ok=True)
+
+
 def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     """Build the static site.
 
@@ -54,6 +67,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         BuildResult with page count and broken links information.
     """
     output.mkdir(parents=True, exist_ok=True)
+    copy_static_files(output)
 
     pages = load_content(source, config.build.ignore_patterns)
     clean_urls = config.site.clean_urls

@@ -4,169 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{{ page.title }}{% if site.title %} - {{ site.title }}{% endif %}{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css" />
-    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <link href="/_static/rockgarden.css" rel="stylesheet" type="text/css" />
     {% if site.search_enabled %}
-    <script src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script>
+    <script src="/_static/lunr.min.js"></script>
     {% endif %}
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    typography: {
-                        DEFAULT: {
-                            css: {
-                                maxWidth: 'none',
-                            },
-                        },
-                    },
-                },
-            },
-        }
-    </script>
     {% block head %}{% endblock %}
-    <style>
-        .nav-tree a:hover {
-            text-decoration: underline;
-        }
-
-        /* Callout styles */
-        .callout {
-            border-left: 4px solid;
-            border-radius: 0.375rem;
-            padding: 1rem;
-            margin: 1rem 0;
-            background-color: oklch(var(--b2));
-        }
-
-        .callout-title {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .callout-icon {
-            font-size: 1.25rem;
-            line-height: 1;
-        }
-
-        .callout-content {
-            margin-left: 2rem;
-        }
-
-        .callout-content > *:first-child {
-            margin-top: 0;
-        }
-
-        .callout-content > *:last-child {
-            margin-bottom: 0;
-        }
-
-        /* Collapsible callout styles */
-        details.callout summary {
-            cursor: pointer;
-            list-style: none;
-            user-select: none;
-        }
-
-        details.callout summary::-webkit-details-marker {
-            display: none;
-        }
-
-        details.callout summary.callout-title::before {
-            content: '▶';
-            display: inline-block;
-            margin-right: 0.5rem;
-            transition: transform 0.2s;
-        }
-
-        details.callout[open] summary.callout-title::before {
-            transform: rotate(90deg);
-        }
-
-        details.callout .callout-content {
-            margin-top: 0.5rem;
-        }
-
-        /* Type-specific colors */
-        .callout-note,
-        .callout-abstract,
-        .callout-summary,
-        .callout-tldr {
-            border-color: oklch(var(--in));
-        }
-
-        .callout-info {
-            border-color: oklch(var(--pc));
-        }
-
-        .callout-tip,
-        .callout-hint,
-        .callout-important,
-        .callout-success,
-        .callout-check,
-        .callout-done {
-            border-color: oklch(var(--su));
-        }
-
-        .callout-question,
-        .callout-help,
-        .callout-faq,
-        .callout-example {
-            border-color: oklch(var(--sc));
-        }
-
-        .callout-warning,
-        .callout-caution,
-        .callout-attention {
-            border-color: oklch(var(--wa));
-        }
-
-        .callout-failure,
-        .callout-fail,
-        .callout-missing,
-        .callout-danger,
-        .callout-error,
-        .callout-bug {
-            border-color: oklch(var(--er));
-        }
-
-        .callout-quote,
-        .callout-cite {
-            border-color: oklch(var(--bc) / 0.3);
-        }
-
-        /* Broken internal links */
-        .internal-link {
-            text-decoration: underline;
-        }
-
-        .internal-link.broken {
-            color: oklch(var(--er) / 0.6);
-            opacity: 0.6;
-            text-decoration: line-through;
-            cursor: not-allowed;
-        }
-
-        .internal-link.broken:hover {
-            opacity: 0.8;
-        }
-
-        /* Search modal styles */
-        .search-modal {
-            backdrop-filter: blur(4px);
-        }
-
-        .search-results mark {
-            background-color: oklch(var(--p) / 0.2);
-            color: oklch(var(--p));
-            padding: 0.125rem 0.25rem;
-            border-radius: 0.25rem;
-            font-weight: 500;
-        }
-    </style>
     <script>
         (function() {
             const defaultTheme = '{{ site.daisyui_theme }}';
@@ -262,7 +104,6 @@
                     const theme = this.dataset.theme;
                     document.documentElement.setAttribute('data-theme', theme);
                     localStorage.setItem('theme', theme);
-                    // Close dropdown by removing focus
                     document.activeElement.blur();
                 });
             });
@@ -330,8 +171,6 @@
                         state[details.dataset.navPath] = true;
                         saveNavState(state);
                     }
-                    // Don't prevent default - let the link navigate
-                    // But stop propagation so summary doesn't toggle
                     e.stopPropagation();
                 });
             });
@@ -340,7 +179,7 @@
         // Search functionality
         {% if site.search_enabled %}
         (function() {
-            if (!window.lunr) return; // Skip if lunr.js not loaded
+            if (!window.lunr) return;
 
             const searchContainers = document.querySelectorAll('.search-container');
             if (searchContainers.length === 0) return;
@@ -348,16 +187,13 @@
             let searchIndex = null;
             let documents = {};
 
-            // Load search index and build lunr index
             fetch('/search-index.json')
                 .then(r => r.json())
                 .then(data => {
-                    // Store documents by URL for later retrieval
                     data.forEach(doc => {
                         documents[doc.url] = doc;
                     });
 
-                    // Build lunr index
                     searchIndex = lunr(function() {
                         this.ref('url');
                         this.field('title', { boost: 10 });
@@ -376,17 +212,13 @@
                 })
                 .catch(err => console.error('Failed to load search index:', err));
 
-            // Highlight search terms in text
             function highlightMatches(text, query) {
                 if (!text || !query) return text;
-                // Escape special regex characters
                 const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                // Match whole words that start with the query
                 const regex = new RegExp(`(\\b${escapedQuery}\\w*)`, 'gi');
-                return text.replace(regex, '<mark class="bg-primary/20 text-primary">$1</mark>');
+                return text.replace(regex, '<mark>$1</mark>');
             }
 
-            // Extract multiple excerpts around matches
             function getExcerpts(text, query, maxExcerpts = 3) {
                 if (!text) return [];
                 const lowerText = text.toLowerCase();
@@ -409,7 +241,6 @@
                     lastIndex = end;
                 }
 
-                // If no matches found, return first excerpt
                 if (excerpts.length === 0) {
                     const excerpt = text.substring(0, 180);
                     excerpts.push(excerpt + (text.length > 180 ? '...' : ''));
@@ -418,16 +249,13 @@
                 return excerpts;
             }
 
-            // Render search results
             function renderResults(results, searchResults, searchCount, query) {
-                // Update count
                 if (searchCount) {
                     searchCount.textContent = results.length === 0 ?
                         'No results found' :
                         `${results.length} matching ${results.length === 1 ? 'page' : 'pages'}`;
                 }
 
-                // Clear previous results
                 searchResults.textContent = '';
 
                 if (results.length === 0) {
@@ -438,7 +266,6 @@
                     return;
                 }
 
-                // Render results with mkdocs-material style
                 results.forEach(result => {
                     const doc = documents[result.ref];
                     if (!doc) return;
@@ -446,7 +273,6 @@
                     const resultCard = document.createElement('div');
                     resultCard.className = 'mb-8 pb-8 border-b border-base-300 last:border-0';
 
-                    // Title with icon
                     const titleLink = document.createElement('a');
                     titleLink.href = doc.url;
                     titleLink.className = 'flex items-start gap-3 group mb-3';
@@ -462,17 +288,15 @@
 
                     resultCard.appendChild(titleLink);
 
-                    // Show excerpts with highlighted matches
                     if (doc.content) {
                         const excerpts = getExcerpts(doc.content, query, 2);
-                        excerpts.forEach((excerpt, idx) => {
+                        excerpts.forEach(excerpt => {
                             const excerptDiv = document.createElement('div');
                             excerptDiv.className = 'text-sm text-base-content/80 leading-relaxed mb-2 ml-8';
                             excerptDiv.innerHTML = highlightMatches(excerpt, query);
                             resultCard.appendChild(excerptDiv);
                         });
 
-                        // Show "X more on this page" if there are more matches
                         const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                         const allMatches = (doc.content.toLowerCase().match(new RegExp(escapedQuery.toLowerCase(), 'g')) || []).length;
                         if (allMatches > excerpts.length) {
@@ -488,7 +312,6 @@
                 });
             }
 
-            // Get global search overlay elements
             const searchOverlay = document.getElementById('search-overlay');
             const searchBackdrop = searchOverlay ? searchOverlay.querySelector('.search-backdrop') : null;
             const searchResults = searchOverlay ? searchOverlay.querySelector('.search-results') : null;
@@ -496,14 +319,12 @@
 
             if (!searchOverlay || !searchResults) return;
 
-            // Handle search input across all containers
             let activeSearchInput = null;
 
             searchContainers.forEach(function(container) {
                 const searchInput = container.querySelector('.search-input');
                 if (!searchInput) return;
 
-                // Handle input
                 searchInput.addEventListener('input', function(e) {
                     activeSearchInput = searchInput;
                     const query = e.target.value.trim();
@@ -517,18 +338,14 @@
 
                     if (!searchIndex) return;
 
-                    // Show overlay
                     searchOverlay.classList.remove('hidden');
 
-                    // Perform search with lunr - try multiple search strategies
                     let results = [];
                     try {
-                        // Try exact match first, then wildcard, then fuzzy
                         const exactResults = searchIndex.search(query);
                         const wildcardResults = searchIndex.search(query + '*');
                         const fuzzyResults = searchIndex.search(query + '~1');
 
-                        // Combine results, removing duplicates
                         const seen = new Set();
                         [exactResults, wildcardResults, fuzzyResults].forEach(resultSet => {
                             resultSet.forEach(result => {
@@ -541,14 +358,12 @@
 
                         results = results.slice(0, 20);
                     } catch (e) {
-                        // Fallback to simple wildcard search
                         results = searchIndex.search(query + '*').slice(0, 20);
                     }
 
                     renderResults(results, searchResults, searchCount, query);
                 });
 
-                // Close overlay with ESC
                 searchInput.addEventListener('keydown', function(e) {
                     if (e.key === 'Escape') {
                         searchOverlay.classList.add('hidden');
@@ -557,7 +372,6 @@
                 });
             });
 
-            // Close overlay when clicking backdrop
             if (searchBackdrop) {
                 searchBackdrop.addEventListener('click', function() {
                     searchOverlay.classList.add('hidden');
@@ -567,7 +381,6 @@
                 });
             }
 
-            // Close overlay when clicking outside
             document.addEventListener('click', function(e) {
                 const clickedSearchContainer = e.target.closest('.search-container');
                 const clickedOverlay = e.target.closest('#search-overlay');
