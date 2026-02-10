@@ -153,10 +153,9 @@ After each step, verify incrementally:
   - **Affected file**: `src/rockgarden/obsidian/callouts.py` (rewrite to operate on HTML output instead of raw markdown), `src/rockgarden/output/builder.py` (move callout processing after `render_markdown` call)
   - **Test with**: Cathbad's Journal page — has headings, bold, italic, wiki-links, and lists inside `> [!quote]` callouts
 
-- [ ] **Newline Handling**: Enable Obsidian-style single newline → `<br>` rendering
+- [x] **Newline Handling**: Enable Obsidian-style single newline → `<br>` rendering
   - markdown-it-py `breaks` option converts `\n` to `<br>` inside paragraphs
   - Matches Obsidian's rendering behavior (important for metadata-style bold/label lines)
-  - Needs testing for unintended side effects on other content
 
 - [ ] **Template Decomposition**: Add named Jinja2 blocks to `page.html` as customization hooks
   - `before_heading`, `after_heading`, `body`, `after_body` in main content area

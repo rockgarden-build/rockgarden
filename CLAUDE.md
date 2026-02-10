@@ -64,11 +64,11 @@ When decomposing or extending templates, maintain these blocks so user template 
 
 ## Feature Implementation Workflow
 
-When implementing features:
+**REQUIRED** — every feature implementation MUST follow these steps:
 
 1. **Before starting**: Check `docs/features/README.md` and the feature's spec doc (`docs/features/NN-*.md`)
 2. **When starting**: Update `docs/implementation.md` to mark the feature as in progress
-3. **After completing**: Update both:
-   - `docs/implementation.md` - Mark feature checklist items as complete
-   - `docs/features/README.md` - Update feature status and Quartz reference checklist
-   - Feature spec doc - Update status to reflect completion
+3. **After completing**: Update all of these before considering the feature done:
+   - `docs/implementation.md` — mark checklist items as complete
+   - `docs/features/README.md` — update feature status and Quartz reference checklist
+   - Feature spec doc (if one exists) — update status to reflect completion
