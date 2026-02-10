@@ -146,8 +146,12 @@ After each step, verify incrementally:
 ## Current TODOs (Phase A - Zero-Config Release)
 
 ### Next Up
-- [ ] **Blockquote Formatting Issue**: Investigate and fix formatting issue with blockquoted text
-  - Details/examples to be provided
+- [ ] **Callout Nested Content Bug**: Nested markdown inside callouts is not rendered
+  - **Root cause**: `process_callouts` runs pre-render, converting `> [!type]` blocks to `<div>` HTML with raw markdown inside. When `render_markdown` runs later, markdown-it-py skips content inside HTML blocks (per CommonMark spec). So headings, bold, lists, wiki-links inside callouts render as plain text.
+  - **Fix (Option 3 — post-render HTML transform)**: Move callout processing to after `render_markdown`. Markdown-it-py already renders blockquote content correctly (headings, bold, links all work inside `<blockquote>`). A post-render step finds `<blockquote>` elements whose first `<p>` contains `[!type]` and re-wraps them as callout `<div>` elements. Inner HTML is already correct.
+  - **Why not a markdown-it-py plugin**: Cleaner architecturally but more complex to implement. The plugin approach would matter for nested callouts, structured content extraction, or a future migration of all preprocessors (wikilinks, embeds) into markdown-it-py plugins. Not needed for current roadmap features (TOC, search, transclusions all work fine with post-render approach).
+  - **Affected file**: `src/rockgarden/obsidian/callouts.py` (rewrite to operate on HTML output instead of raw markdown), `src/rockgarden/output/builder.py` (move callout processing after `render_markdown` call)
+  - **Test with**: Cathbad's Journal page — has headings, bold, italic, wiki-links, and lists inside `> [!quote]` callouts
 
 - [ ] **Newline Handling**: Enable Obsidian-style single newline → `<br>` rendering
   - markdown-it-py `breaks` option converts `\n` to `<br>` inside paragraphs
