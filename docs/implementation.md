@@ -145,61 +145,56 @@ After each step, verify incrementally:
 
 ## Current TODOs (Phase A - Zero-Config Release)
 
-### Next Up
+### Completed
 - [x] **Callout Nested Content Bug**: Nested markdown inside callouts is now rendered
-  - **Fix**: Moved callout processing to after `render_markdown` (post-render HTML transform). `process_callouts` now operates on rendered HTML, finding `<blockquote>` elements with `[!type]` markers and re-wrapping as callout `<div>`/`<details>` elements.
-
 - [x] **Newline Handling**: Enable Obsidian-style single newline → `<br>` rendering
-  - markdown-it-py `breaks` option converts `\n` to `<br>` inside paragraphs
-  - Matches Obsidian's rendering behavior (important for metadata-style bold/label lines)
 
-- [ ] **Template Decomposition**: Add named Jinja2 blocks to `page.html` as customization hooks
-  - `before_heading`, `after_heading`, `body`, `after_body` in main content area
-  - `toc`, `backlinks` in right sidebar (`right_sidebar` parent block)
-  - Empty blocks serve as hooks for user template overrides (e.g., custom frontmatter rendering)
-  - See Feature 10 spec for full design
-
-- [ ] **Tag Display**: Show frontmatter tags on content pages
-  - Render tags from frontmatter in the `after_heading` template block
-  - Handle mixed formats (`#npc` vs `npc` — normalize the `#` prefix)
-  - Tags already appear in folder index tables; this adds them to individual pages
-
-### High Priority
+### Priority Order
 - [ ] **Table of Contents (Feature 13)**: Extract heading structure per-page
   - Parse rendered HTML to extract h2-h6 headings with IDs
   - Generate nested TOC structure
   - Add template support for TOC display
 
-### Medium Priority
+- [ ] **Tag Display (N7)**: Show frontmatter tags on content pages
+  - Render tags from frontmatter in the `after_heading` template block
+  - Handle mixed formats (`#npc` vs `npc` — normalize the `#` prefix)
+  - Tags already appear in folder index tables; this adds them to individual pages
+
+- [ ] **Audio/Video Embeds (Feature 04)**: Extend media embed support
+  - Currently supports images only
+  - Add `<audio>` and `<video>` tag generation
+
 - [ ] **Accessibility (Feature 18)**: Basic a11y improvements
   - Skip navigation links
   - ARIA landmarks and labels
   - Focus styles for keyboard navigation
   - Alt text validation for images
 
+- [ ] **Template Decomposition (N9)**: Add named Jinja2 blocks to `page.html` as customization hooks (partial)
+  - `before_heading`, `after_heading`, `body`, `after_body` in main content area
+  - `toc`, `backlinks` in right sidebar (`right_sidebar` parent block)
+  - Empty blocks serve as hooks for user template overrides (e.g., custom frontmatter rendering)
+  - See Feature 10 spec for full design
+
+- [ ] **Note Transclusions (Feature 04)**: Embed content from other notes via `![[note.md]]`
+  - Requires cycle detection
+  - Part of existing embed feature spec
+
+- [ ] **Sitemap (Feature 13)**: XML sitemap generation
+
 - [ ] **Polish (Feature 13)**: Production readiness
-  - [ ] Sitemap generation (XML)
   - [ ] 404 page template
   - [ ] Improved error messages and validation
   - [ ] Build performance metrics
 
-### Low Priority
-- [ ] **Audio/Video Embeds (Feature 04)**: Extend media embed support
-  - Currently supports images only
-  - Add `<audio>` and `<video>` tag generation
-  - Test with example media files
-
 ### Future (Phase B+)
-- [ ] **Tag Index Pages**: Generate `/tags/<tag>/` pages listing all content with a given tag
+- [ ] **Tag Index Pages (N8)**: Generate `/tags/<tag>/` pages listing all content with a given tag
   - Depends on tag display (above) for normalization
   - Pairs naturally with collections work
 
 - [ ] **Graph View**: Interactive visualization of page connections
-  - Similar to Quartz graph view but with more semantic data
   - Requirements to be workshopped and defined
-  - Consider: backlinks, forward links, content relationships, collections, etc.
 
-- [ ] Note transclusions (`![[note.md]]`) - requires cycle detection
 - [ ] Collections and content models (Feature 14)
 - [ ] Build hooks (Feature 15)
 - [ ] Base path prefix support (Feature 12)
