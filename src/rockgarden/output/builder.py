@@ -116,7 +116,6 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
 
         page_rel_path = str(page.source_path.relative_to(source))
         media_resolver = create_media_resolver(source, page_rel_path, media_index)
-        content = process_callouts(content)
         content, media = process_media_embeds(content, media_resolver)
         all_media.update(media)
         all_media.update(collect_markdown_images(content, media_resolver))
@@ -125,7 +124,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
             source_file = page.source_path.name
             broken_links_by_page[source_file] = [target for target, _ in broken]
         content = transform_md_links(content, clean_urls)
-        page.html = render_markdown(content)
+        page.html = process_callouts(render_markdown(content))
 
         breadcrumbs = build_breadcrumbs(page, pages, config.nav, clean_urls)
 
@@ -163,7 +162,6 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
                 processed = strip_content_title(processed)
             folder_src = folder_path + "/index.md" if folder_path else "index.md"
             media_resolver = create_media_resolver(source, folder_src, media_index)
-            processed = process_callouts(processed)
             processed, media = process_media_embeds(processed, media_resolver)
             all_media.update(media)
             all_media.update(collect_markdown_images(processed, media_resolver))
@@ -171,7 +169,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
             if broken:
                 broken_links_by_page[folder_src] = [target for target, _ in broken]
             processed = transform_md_links(processed, clean_urls)
-            folder.custom_content = render_markdown(processed)
+            folder.custom_content = process_callouts(render_markdown(processed))
 
         breadcrumbs = _build_folder_breadcrumbs(folder, pages, config.nav, clean_urls)
 
