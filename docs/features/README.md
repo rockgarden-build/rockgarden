@@ -61,7 +61,7 @@ From test vaults' Quartz configs:
 - [ ] Audio/video embeds
 - [ ] Note transclusions
 - [x] Callouts
-- [ ] Table of contents
+- [x] Table of contents
 - [x] Backlinks
 - [ ] Graph visualization
 - [x] Search (index generation + client-side UI)

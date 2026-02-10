@@ -21,7 +21,11 @@
     <!-- Right sidebar (desktop only) -->
     <aside class="hidden xl:block w-64 flex-shrink-0">
         {% block right_sidebar %}
-        {% block toc %}{% endblock %}
+        {% block toc %}
+        {% if toc %}
+        {% include "components/toc.html" %}
+        {% endif %}
+        {% endblock %}
         {% block backlinks %}
         {% if backlinks %}
         {% include "components/backlinks.html" %}

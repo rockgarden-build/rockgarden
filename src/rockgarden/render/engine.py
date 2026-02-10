@@ -53,6 +53,7 @@ def render_page(
     site_config: dict,
     breadcrumbs: list | None = None,
     backlinks: NavNode | None = None,
+    toc: list | None = None,
 ) -> str:
     """Render a page using the page template.
 
@@ -62,6 +63,7 @@ def render_page(
         site_config: Site configuration to pass to template.
         breadcrumbs: Optional list of Breadcrumb objects for navigation.
         backlinks: Optional NavNode tree of pages that link to this page.
+        toc: Optional list of TocEntry trees for table of contents.
 
     Returns:
         Rendered HTML string.
@@ -72,4 +74,5 @@ def render_page(
         site=site_config,
         breadcrumbs=breadcrumbs or [],
         backlinks=backlinks,
+        toc=toc,
     )

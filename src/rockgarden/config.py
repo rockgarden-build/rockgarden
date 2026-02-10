@@ -52,6 +52,14 @@ class BacklinksConfig:
 
 
 @dataclass
+class TocConfig:
+    """Table of contents configuration."""
+
+    enabled: bool = True
+    max_depth: int = 4
+
+
+@dataclass
 class SearchConfig:
     """Search configuration."""
 
@@ -68,6 +76,7 @@ class Config:
     theme: ThemeConfig = field(default_factory=ThemeConfig)
     nav: NavConfig = field(default_factory=NavConfig)
     backlinks: BacklinksConfig = field(default_factory=BacklinksConfig)
+    toc: TocConfig = field(default_factory=TocConfig)
     search: SearchConfig = field(default_factory=SearchConfig)
 
     @classmethod
@@ -100,6 +109,7 @@ class Config:
         theme_data = data.get("theme", {})
         nav_data = data.get("nav", {})
         backlinks_data = data.get("backlinks", {})
+        toc_data = data.get("toc", {})
         search_data = data.get("search", {})
 
         site = SiteConfig(
@@ -133,6 +143,11 @@ class Config:
             enabled=backlinks_data.get("enabled", True),
         )
 
+        toc = TocConfig(
+            enabled=toc_data.get("enabled", True),
+            max_depth=toc_data.get("max_depth", 4),
+        )
+
         search = SearchConfig(
             enabled=search_data.get("enabled", True),
             include_content=search_data.get("include_content", True),
@@ -144,5 +159,6 @@ class Config:
             theme=theme,
             nav=nav,
             backlinks=backlinks,
+            toc=toc,
             search=search,
         )
