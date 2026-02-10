@@ -113,7 +113,7 @@ See [Feature 15](features/15-build-hooks.md). Shell commands at `pre_build`, `po
 ### Step 5: Navigation
 - [x] Explorer data structure
 - [x] Breadcrumb generation
-- [ ] TOC extraction
+- [x] TOC extraction
 - [x] Backlink tracking
 
 ### Step 6: Search
@@ -150,7 +150,7 @@ After each step, verify incrementally:
 - [x] **Newline Handling**: Enable Obsidian-style single newline → `<br>` rendering
 
 ### Priority Order
-- [ ] **Table of Contents (Feature 13)**: Extract heading structure per-page
+- [x] **Table of Contents (Feature 13)**: Extract heading structure per-page
   - Parse rendered HTML to extract h2-h6 headings with IDs
   - Generate nested TOC structure
   - Add template support for TOC display

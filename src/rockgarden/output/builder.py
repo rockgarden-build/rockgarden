@@ -22,6 +22,7 @@ from rockgarden.links import transform_md_links
 from rockgarden.nav import (
     build_breadcrumbs,
     build_nav_tree,
+    extract_toc,
     generate_folder_indexes,
 )
 from rockgarden.obsidian import (
@@ -126,6 +127,12 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         content = transform_md_links(content, clean_urls)
         page.html = process_callouts(render_markdown(content))
 
+        toc_entries = None
+        if config.toc.enabled:
+            page.html, toc_entries = extract_toc(
+                page.html, max_level=config.toc.max_depth
+            )
+
         breadcrumbs = build_breadcrumbs(page, pages, config.nav, clean_urls)
 
         # Get backlinks if enabled
@@ -140,7 +147,9 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
             if backlink_pages:
                 backlinks_tree = build_nav_tree(backlink_pages, config.nav, clean_urls)
 
-        html = render_page(env, page, site_config, breadcrumbs, backlinks_tree)
+        html = render_page(
+            env, page, site_config, breadcrumbs, backlinks_tree, toc_entries
+        )
 
         output_file = output / get_output_path(page.slug, clean_urls)
         output_file.parent.mkdir(parents=True, exist_ok=True)
