@@ -19,7 +19,7 @@ def get_markdown_renderer() -> MarkdownIt:
     """
     global _md
     if _md is None:
-        _md = MarkdownIt("gfm-like", {"html": True})
+        _md = MarkdownIt("gfm-like", {"html": True, "breaks": True})
     return _md
 
 
