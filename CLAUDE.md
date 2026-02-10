@@ -55,7 +55,7 @@ Module structure in `src/rockgarden/`:
 Page templates use named Jinja2 blocks as override points. When adding new features that render content on pages, place them in the appropriate block rather than adding inline to `page.html`. Empty blocks serve as hooks for user customization — preserve them even when adding default content.
 
 Current block zones in `page.html` (see Feature 10 spec for full details):
-- `before_title` / `after_title` — metadata, tags, custom frontmatter rendering
+- `before_heading` / `after_heading` — metadata, tags, custom frontmatter rendering
 - `body` — the rendered markdown
 - `after_body` — supplementary content (prev/next, etc.)
 - `right_sidebar` — TOC, backlinks

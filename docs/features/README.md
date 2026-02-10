@@ -39,7 +39,7 @@ The [PyOhio static website](https://github.com/pyohio/static-website) (Astro + P
 | N6 | Broken Link Handling | ✅ | A | Visual indication + build warnings |
 | N7 | Tag Display | ❌ | A | Show frontmatter tags on pages |
 | N8 | Tag Index Pages | ❌ | B | Generate `/tags/<tag>/` listing pages |
-| N9 | Template Decomposition | ❌ | A | Named blocks as customization hooks in page templates |
+| N9 | Template Decomposition | Partial | A | Named blocks as customization hooks in page templates |
 | N10 | Newline Handling | ❌ | A | Obsidian-style single newline → `<br>` |
 
 ## Roadmap Phases

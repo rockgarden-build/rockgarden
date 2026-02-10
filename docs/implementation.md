@@ -159,13 +159,13 @@ After each step, verify incrementally:
   - Needs testing for unintended side effects on other content
 
 - [ ] **Template Decomposition**: Add named Jinja2 blocks to `page.html` as customization hooks
-  - `before_title`, `after_title`, `body`, `after_body` in main content area
+  - `before_heading`, `after_heading`, `body`, `after_body` in main content area
   - `toc`, `backlinks` in right sidebar (`right_sidebar` parent block)
   - Empty blocks serve as hooks for user template overrides (e.g., custom frontmatter rendering)
   - See Feature 10 spec for full design
 
 - [ ] **Tag Display**: Show frontmatter tags on content pages
-  - Render tags from frontmatter in the `after_title` template block
+  - Render tags from frontmatter in the `after_heading` template block
   - Handle mixed formats (`#npc` vs `npc` — normalize the `#` prefix)
   - Tags already appear in folder index tables; this adds them to individual pages
 

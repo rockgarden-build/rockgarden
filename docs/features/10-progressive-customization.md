@@ -25,9 +25,9 @@ Templates available: `base.html`, `page.html`, `folder_index.html`, `components/
 `page.html` exposes named Jinja2 blocks as customization points. Empty blocks act as hooks — zero output by default, available for user overrides without replacing the entire template.
 
 **Content area blocks:**
-- `before_title` — empty hook (e.g., publication date)
-- `title` — page `<h1>` (has default content)
-- `after_title` — empty hook (tags, reading time, custom frontmatter like D&D Beyond links)
+- `before_heading` — empty hook (e.g., publication date)
+- `heading` — page `<h1>` (has default content; named `heading` to avoid collision with `base.html`'s `title` block for `<title>`)
+- `after_heading` — empty hook (tags, reading time, custom frontmatter like D&D Beyond links)
 - `body` — rendered markdown (has default content)
 - `after_body` — empty hook (prev/next links, supplementary content)
 
@@ -40,7 +40,7 @@ Templates available: `base.html`, `page.html`, `folder_index.html`, `components/
 ```jinja2
 {% extends "rockgarden/page.html" %}
 
-{% block after_title %}
+{% block after_heading %}
 {% if page.frontmatter.beyondUrl %}
 <a href="{{ page.frontmatter.beyondUrl }}">{{ page.title }} on D&D Beyond</a>
 {% endif %}
@@ -68,10 +68,10 @@ Replace `_templates/base.html` for complete control. **Already works.**
 - [x] Pass theme to site_config in `builder.py`
 
 ### Phase A-2: Template Decomposition
-- [ ] Add named blocks to `page.html` (`before_title`, `title`, `after_title`, `body`, `after_body`)
-- [ ] Add right sidebar blocks (`right_sidebar`, `toc`, `backlinks`)
+- [x] Add named blocks to `page.html` (`before_heading`, `heading`, `after_heading`, `body`, `after_body`)
+- [x] Add right sidebar blocks (`right_sidebar`, `toc`, `backlinks`)
 - [ ] Verify user template overrides work with new block structure (ChoiceLoader)
-- [ ] Update `folder_index.html` with equivalent blocks where applicable
+- [x] Update `folder_index.html` with common blocks (`breadcrumbs`, `before_heading`, `heading`, `after_heading`)
 
 ### Phase B: Layout System
 - [ ] Extract `base.html` to minimal skeleton
