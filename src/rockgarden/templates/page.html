@@ -4,20 +4,30 @@
 <div class="flex gap-8">
     <!-- Main content -->
     <div class="flex-1 min-w-0">
+        {% block breadcrumbs %}
         {% if breadcrumbs and breadcrumbs|length > 1 %}
         {% include "components/breadcrumbs.html" %}
         {% endif %}
+        {% endblock %}
         <article class="prose prose-base max-w-none leading-tight prose-headings:scroll-mt-20 prose-a:text-primary prose-code:before:content-none prose-code:after:content-none">
-            <h1>{{ page.title }}</h1>
-            {{ page.html | safe }}
+            {% block before_heading %}{% endblock %}
+            {% block heading %}<h1>{{ page.title }}</h1>{% endblock %}
+            {% block after_heading %}{% endblock %}
+            {% block body %}{{ page.html | safe }}{% endblock %}
+            {% block after_body %}{% endblock %}
         </article>
     </div>
 
     <!-- Right sidebar (desktop only) -->
     <aside class="hidden xl:block w-64 flex-shrink-0">
+        {% block right_sidebar %}
+        {% block toc %}{% endblock %}
+        {% block backlinks %}
         {% if backlinks %}
         {% include "components/backlinks.html" %}
         {% endif %}
+        {% endblock %}
+        {% endblock %}
     </aside>
 </div>
 {% endblock %}

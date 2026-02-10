@@ -22,10 +22,10 @@ The [PyOhio static website](https://github.com/pyohio/static-website) (Astro + P
 | 02 | [All Pages](02-all-pages.md) | ✅ | — | Render all markdown files |
 | 03 | [Wiki-Links](03-wiki-links.md) | ✅ | — | Resolve `[[Name]]` to URLs |
 | 04 | [Embeds](04-embeds.md) | Partial | — | Image embeds ✅, transclusions ❌ |
-| 05 | [Callouts](05-callouts.md) | ✅ | A | GFM alerts + Obsidian callouts |
+| 05 | [Callouts](05-callouts.md) | Bug | A | GFM alerts + Obsidian callouts (nested content not rendered) |
 | 06 | [Navigation](06-navigation.md) | ✅ | — | Sidebar, breadcrumbs, folder pages |
 | 07 | [Backlinks](07-backlinks.md) | ✅ | A | Pages that link to current page |
-| 08 | [Search](08-search.md) | ❌ | A | Client-side search |
+| 08 | [Search](08-search.md) | ✅ | A | Client-side search |
 | 09 | [Macros](09-macros.md) | ❌ | C | User-defined Jinja2 macros |
 | 10 | [Progressive Customization](10-progressive-customization.md) | In Progress | — | Themes and layouts |
 | 11 | [RSS Feed](11-rss-feed.md) | ❌ | C | RSS/Atom feed generation |
@@ -37,11 +37,15 @@ The [PyOhio static website](https://github.com/pyohio/static-website) (Astro + P
 | 17 | [SEO & Meta Tags](17-seo-meta.md) | ❌ | B | Frontmatter-driven meta, OG tags |
 | 18 | [Accessibility](18-accessibility.md) | ❌ | A | Skip links, ARIA, focus styles |
 | N6 | Broken Link Handling | ✅ | A | Visual indication + build warnings |
+| N7 | Tag Display | ❌ | A | Show frontmatter tags on pages |
+| N8 | Tag Index Pages | ❌ | B | Generate `/tags/<tag>/` listing pages |
+| N9 | Template Decomposition | Partial | A | Named blocks as customization hooks in page templates |
+| N10 | Newline Handling | ❌ | A | Obsidian-style single newline → `<br>` |
 
 ## Roadmap Phases
 
-- **Phase A — Zero-Config Release**: Callouts (05), backlinks (07), broken link handling (N6), polish (13), accessibility (18), search (08)
-- **Phase B — General SSG / PyOhio (0.9)**: Layout system (10B), collections (14), build hooks (15), base path (12), static assets (16), SEO (17)
+- **Phase A — Zero-Config Release**: Callouts (05), backlinks (07), broken link handling (N6), polish (13), accessibility (18), search (08), tag display (N7), template decomposition (N9), newline handling (N10)
+- **Phase B — General SSG / PyOhio (0.9)**: Layout system (10B), collections (14), build hooks (15), base path (12), static assets (16), SEO (17), tag index pages (N8)
 - **Phase C — Enhanced Features**: Macros (09), RSS (11)
 
 ## Quartz Features Reference
@@ -60,7 +64,7 @@ From test vaults' Quartz configs:
 - [ ] Table of contents
 - [x] Backlinks
 - [ ] Graph visualization
-- [x] Search index generation (UI pending)
+- [x] Search (index generation + client-side UI)
 
 **Output:**
 - [x] Content pages

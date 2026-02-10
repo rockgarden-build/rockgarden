@@ -3,11 +3,15 @@
 {% block title %}{{ folder.title }}{% if site.title %} - {{ site.title }}{% endif %}{% endblock %}
 
 {% block content %}
+{% block breadcrumbs %}
 {% if breadcrumbs and breadcrumbs|length > 1 %}
 {% include "components/breadcrumbs.html" %}
 {% endif %}
+{% endblock %}
 <article>
-  <h1 class="text-3xl font-bold mb-6">{{ folder.title }}</h1>
+  {% block before_heading %}{% endblock %}
+  {% block heading %}<h1 class="text-3xl font-bold mb-6">{{ folder.title }}</h1>{% endblock %}
+  {% block after_heading %}{% endblock %}
 
   {% if folder.custom_content %}
   <div class="prose prose-base max-w-none leading-tight mb-8 prose-a:text-primary">

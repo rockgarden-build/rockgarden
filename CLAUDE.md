@@ -50,6 +50,18 @@ Module structure in `src/rockgarden/`:
 - Config file: `rockgarden.toml`
 - Pre-release project: no need to preserve backwards compatibility
 
+## Template Block Conventions
+
+Page templates use named Jinja2 blocks as override points. When adding new features that render content on pages, place them in the appropriate block rather than adding inline to `page.html`. Empty blocks serve as hooks for user customization — preserve them even when adding default content.
+
+Current block zones in `page.html` (see Feature 10 spec for full details):
+- `before_heading` / `after_heading` — metadata, tags, custom frontmatter rendering
+- `body` — the rendered markdown
+- `after_body` — supplementary content (prev/next, etc.)
+- `right_sidebar` — TOC, backlinks
+
+When decomposing or extending templates, maintain these blocks so user template overrides continue to work.
+
 ## Feature Implementation Workflow
 
 When implementing features:
