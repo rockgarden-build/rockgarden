@@ -14,6 +14,9 @@ Noted but not currently planned:
 - Python plugins (see [concepts.md](concepts.md) for the plugin model)
 - Theme/plugin dependency resolution and installer — `rockgarden theme` and `rockgarden plugin` CLI subcommands that install from git URL or local dir, with themes/plugins declaring dependencies that the installer offers to also install
 - Configurable markdown preset (commonmark, gfm-like, custom plugins)
+- **Reading time**: Estimated reading time per page (word count / ~230 WPM). Optional, displayed in page metadata.
+- **Footer metadata**: Composable footer components — build timestamp, git commit info, framework version. Each opt-in via config.
+- **Configurable URL casing**: Option to preserve original filename casing in URLs instead of lowercasing/slugifying. Current slug-style is the default.
 
 Moved to roadmap:
 - ~~Content from other data sources~~ → Feature 14 (Collections) + Feature 15 (Build Hooks)

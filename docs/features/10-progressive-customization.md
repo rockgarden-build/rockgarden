@@ -20,6 +20,35 @@ _templates/components/nav.html  # Override just the nav
 ```
 Templates available: `base.html`, `page.html`, `folder_index.html`, `components/nav.html`, `components/breadcrumbs.html`, `components/theme_toggle.html`. **Already works via ChoiceLoader.**
 
+#### Template Block Hooks
+
+`page.html` exposes named Jinja2 blocks as customization points. Empty blocks act as hooks — zero output by default, available for user overrides without replacing the entire template.
+
+**Content area blocks:**
+- `before_title` — empty hook (e.g., publication date)
+- `title` — page `<h1>` (has default content)
+- `after_title` — empty hook (tags, reading time, custom frontmatter like D&D Beyond links)
+- `body` — rendered markdown (has default content)
+- `after_body` — empty hook (prev/next links, supplementary content)
+
+**Right sidebar blocks:**
+- `right_sidebar` — parent block wrapping sidebar content
+- `toc` — empty hook (table of contents)
+- `backlinks` — backlinks display (has default content)
+
+**Usage example** — a site adds a custom frontmatter link after the title:
+```jinja2
+{% extends "rockgarden/page.html" %}
+
+{% block after_title %}
+{% if page.frontmatter.beyondUrl %}
+<a href="{{ page.frontmatter.beyondUrl }}">{{ page.title }} on D&D Beyond</a>
+{% endif %}
+{% endblock %}
+```
+
+Blocks with default content can be extended with `{{ super() }}` to add to them rather than replace.
+
 ### Level 4: Custom Layouts
 ```yaml
 ---
@@ -37,6 +66,12 @@ Replace `_templates/base.html` for complete control. **Already works.**
 - [x] Add `daisyui` field to `ThemeConfig` in `config.py`
 - [x] Update `base.html` to use `{{ site.daisyui_theme }}`
 - [x] Pass theme to site_config in `builder.py`
+
+### Phase A-2: Template Decomposition
+- [ ] Add named blocks to `page.html` (`before_title`, `title`, `after_title`, `body`, `after_body`)
+- [ ] Add right sidebar blocks (`right_sidebar`, `toc`, `backlinks`)
+- [ ] Verify user template overrides work with new block structure (ChoiceLoader)
+- [ ] Update `folder_index.html` with equivalent blocks where applicable
 
 ### Phase B: Layout System
 - [ ] Extract `base.html` to minimal skeleton

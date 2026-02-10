@@ -118,8 +118,8 @@ See [Feature 15](features/15-build-hooks.md). Shell commands at `pre_build`, `po
 
 ### Step 6: Search
 - [x] Build-time index generation
-- [ ] Client-side search UI
-- [ ] Search integration in template
+- [x] Client-side search UI
+- [x] Search integration in template
 
 ---
 
@@ -149,12 +149,23 @@ After each step, verify incrementally:
 - [ ] **Blockquote Formatting Issue**: Investigate and fix formatting issue with blockquoted text
   - Details/examples to be provided
 
-### High Priority
-- [ ] **Search UI (Feature 08)**: Wire up the search index to a client-side search interface
-  - JSON index is already generated at build time
-  - Need: search input component, results display, keyboard navigation
-  - Reference: Quartz search implementation
+- [ ] **Newline Handling**: Enable Obsidian-style single newline → `<br>` rendering
+  - markdown-it-py `breaks` option converts `\n` to `<br>` inside paragraphs
+  - Matches Obsidian's rendering behavior (important for metadata-style bold/label lines)
+  - Needs testing for unintended side effects on other content
 
+- [ ] **Template Decomposition**: Add named Jinja2 blocks to `page.html` as customization hooks
+  - `before_title`, `after_title`, `body`, `after_body` in main content area
+  - `toc`, `backlinks` in right sidebar (`right_sidebar` parent block)
+  - Empty blocks serve as hooks for user template overrides (e.g., custom frontmatter rendering)
+  - See Feature 10 spec for full design
+
+- [ ] **Tag Display**: Show frontmatter tags on content pages
+  - Render tags from frontmatter in the `after_title` template block
+  - Handle mixed formats (`#npc` vs `npc` — normalize the `#` prefix)
+  - Tags already appear in folder index tables; this adds them to individual pages
+
+### High Priority
 - [ ] **Table of Contents (Feature 13)**: Extract heading structure per-page
   - Parse rendered HTML to extract h2-h6 headings with IDs
   - Generate nested TOC structure
@@ -180,6 +191,10 @@ After each step, verify incrementally:
   - Test with example media files
 
 ### Future (Phase B+)
+- [ ] **Tag Index Pages**: Generate `/tags/<tag>/` pages listing all content with a given tag
+  - Depends on tag display (above) for normalization
+  - Pairs naturally with collections work
+
 - [ ] **Graph View**: Interactive visualization of page connections
   - Similar to Quartz graph view but with more semantic data
   - Requirements to be workshopped and defined
