@@ -18,6 +18,7 @@ from rockgarden.content import (
     load_content,
     strip_content_title,
 )
+from rockgarden.icons import configure_icons_dir
 from rockgarden.links import transform_md_links
 from rockgarden.nav import (
     build_breadcrumbs,
@@ -69,6 +70,9 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     """
     output.mkdir(parents=True, exist_ok=True)
     copy_static_files(output)
+
+    if config.build.icons_dir:
+        configure_icons_dir((source.parent / config.build.icons_dir).resolve())
 
     pages = load_content(source, config.build.ignore_patterns)
     clean_urls = config.site.clean_urls
@@ -198,7 +202,9 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
 
     # Generate search index if enabled
     if config.search.enabled:
-        search_index = build_search_index(pages, config.search.include_content, clean_urls)
+        search_index = build_search_index(
+            pages, config.search.include_content, clean_urls
+        )
         search_index_file = output / "search-index.json"
         search_index_file.write_text(json.dumps(search_index))
 

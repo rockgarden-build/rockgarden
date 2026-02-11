@@ -5,13 +5,17 @@ library loader. Currently supports Lucide; new libraries can be added
 by registering a loader function in _LIBRARY_LOADERS.
 """
 
-from collections.abc import Callable
+from pathlib import Path
 
 from rockgarden.icons.lucide import load_lucide_icon
 
-_LIBRARY_LOADERS: dict[str, Callable[[str], str | None]] = {
-    "lucide": load_lucide_icon,
-}
+_icons_dir: Path | None = None
+
+
+def configure_icons_dir(path: Path | None) -> None:
+    """Set the project-local icons directory for override lookups."""
+    global _icons_dir
+    _icons_dir = path
 
 
 def resolve_icon(ref: str) -> str | None:
@@ -26,7 +30,6 @@ def resolve_icon(ref: str) -> str | None:
     if ":" not in ref:
         return None
     library, name = ref.split(":", 1)
-    loader = _LIBRARY_LOADERS.get(library)
-    if loader is None:
-        return None
-    return loader(name)
+    if library == "lucide":
+        return load_lucide_icon(name, _icons_dir)
+    return None
