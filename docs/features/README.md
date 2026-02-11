@@ -65,6 +65,7 @@ From test vaults' Quartz configs:
 - [x] Backlinks
 - [ ] Graph visualization
 - [x] Search (index generation + client-side UI)
+- [ ] Modified date display on pages
 
 **Output:**
 - [x] Content pages

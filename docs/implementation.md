@@ -155,6 +155,10 @@ After each step, verify incrementally:
   - Generate nested TOC structure
   - Add template support for TOC display
 
+- [ ] **Modified Date Display**: Show last-modified date on content pages
+  - File modified time is already tracked during content ingestion
+  - Display in the `after_heading` or `after_body` template block
+
 - [ ] **Tag Display (N7)**: Show frontmatter tags on content pages
   - Render tags from frontmatter in the `after_heading` template block
   - Handle mixed formats (`#npc` vs `npc` — normalize the `#` prefix)
