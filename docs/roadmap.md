@@ -223,6 +223,7 @@ Collections, hooks, and the features needed to rebuild PyOhio in rockgarden.
 | ID | Feature | Complexity | Notes |
 |---|---|---|---|
 | **10B** | Layout System | Medium | Already planned. Per-page layout via frontmatter. Prerequisite for different page types. |
+| **10C** | Default Theme Extraction | Low-Med | Move built-in templates to a theme directory so it works like any other theme, just shipped with rockgarden. |
 | **N1** | Collections | High | Unified content model. Progressive: namespace → schema → templates → page generation. |
 | **N2** | Build Hooks | Low-Med | Shell commands at pre/post-build + post-collect. Enables data pipelines, derived assets. |
 | **12** | Base Path Prefix | Low | Already planned. Required for subpath deployment (`/2025/`). |

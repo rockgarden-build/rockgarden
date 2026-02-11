@@ -25,8 +25,16 @@
 }
 
 .callout-icon {
-    font-size: 1.25rem;
-    line-height: 1;
+    display: flex;
+    align-items: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+}
+
+.callout-icon svg {
+    width: 100%;
+    height: 100%;
 }
 
 .callout-content {
@@ -113,6 +121,54 @@ details.callout .callout-content {
 .callout-quote,
 .callout-cite {
     border-color: oklch(var(--bc) / 0.3);
+}
+
+/* Callout icon colors (match border-color groupings) */
+.callout-note .callout-icon,
+.callout-abstract .callout-icon,
+.callout-summary .callout-icon,
+.callout-tldr .callout-icon {
+    color: oklch(var(--in));
+}
+
+.callout-info .callout-icon {
+    color: oklch(var(--pc));
+}
+
+.callout-tip .callout-icon,
+.callout-hint .callout-icon,
+.callout-important .callout-icon,
+.callout-success .callout-icon,
+.callout-check .callout-icon,
+.callout-done .callout-icon {
+    color: oklch(var(--su));
+}
+
+.callout-question .callout-icon,
+.callout-help .callout-icon,
+.callout-faq .callout-icon,
+.callout-example .callout-icon {
+    color: oklch(var(--sc));
+}
+
+.callout-warning .callout-icon,
+.callout-caution .callout-icon,
+.callout-attention .callout-icon {
+    color: oklch(var(--wa));
+}
+
+.callout-failure .callout-icon,
+.callout-fail .callout-icon,
+.callout-missing .callout-icon,
+.callout-danger .callout-icon,
+.callout-error .callout-icon,
+.callout-bug .callout-icon {
+    color: oklch(var(--er));
+}
+
+.callout-quote .callout-icon,
+.callout-cite .callout-icon {
+    color: oklch(var(--bc) / 0.3);
 }
 
 /* Internal links */

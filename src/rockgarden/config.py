@@ -22,6 +22,7 @@ class BuildConfig:
     ignore_patterns: list[str] = field(
         default_factory=lambda: [".obsidian", "private", "templates", "Templates"]
     )
+    icons_dir: Path | None = None
 
 
 @dataclass
@@ -119,10 +120,12 @@ class Config:
             clean_urls=site_data.get("clean_urls", True),
         )
 
+        icons_dir_raw = build_data.get("icons_dir")
         build = BuildConfig(
             ignore_patterns=build_data.get(
                 "ignore_patterns", BuildConfig().ignore_patterns
             ),
+            icons_dir=Path(icons_dir_raw) if icons_dir_raw else None,
         )
 
         theme = ThemeConfig(

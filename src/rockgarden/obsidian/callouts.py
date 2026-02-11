@@ -9,33 +9,35 @@ import re
 CALLOUT_MARKER_RE = re.compile(r"\[!(\w+)\]([+-])?\s*(.*)")
 
 CALLOUT_ICONS = {
-    "note": "ℹ️",
-    "abstract": "📝",
-    "summary": "📝",
-    "tldr": "📝",
-    "info": "ℹ️",
-    "tip": "💡",
-    "hint": "💡",
-    "important": "🔥",
-    "success": "✅",
-    "check": "✅",
-    "done": "✅",
-    "question": "❓",
-    "help": "❓",
-    "faq": "❓",
-    "warning": "⚠️",
-    "caution": "⚠️",
-    "attention": "⚠️",
-    "failure": "❌",
-    "fail": "❌",
-    "missing": "❌",
-    "danger": "🚨",
-    "error": "🚨",
-    "bug": "🐛",
-    "example": "📋",
-    "quote": "💭",
-    "cite": "💭",
+    "note": "lucide:info",
+    "abstract": "lucide:clipboard-list",
+    "summary": "lucide:clipboard-list",
+    "tldr": "lucide:clipboard-list",
+    "info": "lucide:info",
+    "tip": "lucide:lightbulb",
+    "hint": "lucide:lightbulb",
+    "important": "lucide:flame",
+    "success": "lucide:check",
+    "check": "lucide:check",
+    "done": "lucide:check",
+    "question": "lucide:circle-question-mark",
+    "help": "lucide:circle-question-mark",
+    "faq": "lucide:circle-question-mark",
+    "warning": "lucide:triangle-alert",
+    "caution": "lucide:triangle-alert",
+    "attention": "lucide:triangle-alert",
+    "failure": "lucide:x",
+    "fail": "lucide:x",
+    "missing": "lucide:x",
+    "danger": "lucide:zap",
+    "error": "lucide:zap",
+    "bug": "lucide:bug",
+    "example": "lucide:list",
+    "quote": "lucide:quote",
+    "cite": "lucide:quote",
 }
+
+_DEFAULT_ICON_REF = "lucide:info"
 
 
 def process_callouts(html: str) -> str:
@@ -176,12 +178,18 @@ def _build_callout_html(
 
 
 def get_callout_icon(callout_type: str) -> str:
-    """Get icon for callout type.
+    """Get inline SVG icon for callout type.
 
     Args:
         callout_type: The callout type (e.g., 'note', 'warning').
 
     Returns:
-        Emoji icon for the type, or default info icon.
+        SVG markup string for the type's icon.
     """
-    return CALLOUT_ICONS.get(callout_type, "ℹ️")
+    from rockgarden.icons import resolve_icon
+
+    ref = CALLOUT_ICONS.get(callout_type, _DEFAULT_ICON_REF)
+    svg = resolve_icon(ref)
+    if svg is None:
+        svg = resolve_icon(_DEFAULT_ICON_REF) or ""
+    return svg

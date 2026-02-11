@@ -28,8 +28,11 @@ def main_callback(
     version: Annotated[
         bool,
         typer.Option(
-            "--version", "-v", callback=version_callback, is_eager=True,
-            help="Show version and exit"
+            "--version",
+            "-v",
+            callback=version_callback,
+            is_eager=True,
+            help="Show version and exit",
         ),
     ] = False,
 ) -> None:
@@ -99,9 +102,7 @@ ignore_patterns = [".obsidian", "Templates"]
 
     gitignore_path = directory / ".gitignore"
     if not _is_in_gitignore(gitignore_path, output):
-        add_gitignore = typer.confirm(
-            f"Add '{output}/' to .gitignore?", default=True
-        )
+        add_gitignore = typer.confirm(f"Add '{output}/' to .gitignore?", default=True)
         if add_gitignore:
             _add_to_gitignore(gitignore_path, output)
             typer.echo(f"Added '{output}/' to .gitignore")
@@ -223,6 +224,69 @@ def serve(
             httpd.serve_forever()
         except KeyboardInterrupt:
             typer.echo("\nStopping server")
+
+
+icons_app = typer.Typer(no_args_is_help=True, help="Manage icon assets.")
+app.add_typer(icons_app, name="icons")
+
+
+@icons_app.command("update")
+def icons_update(
+    output: Annotated[
+        Path,
+        typer.Option("--output", "-o", help="Directory to write icons into"),
+    ] = Path("_icons"),
+) -> None:
+    """Download the latest Lucide icons for local override use."""
+    import io
+    import json
+    import urllib.request
+    import zipfile
+
+    api_url = "https://api.github.com/repos/lucide-icons/lucide/releases/latest"
+    typer.echo("Fetching latest Lucide release info...")
+
+    req = urllib.request.Request(
+        api_url, headers={"Accept": "application/vnd.github.v3+json"}
+    )
+    try:
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read())
+    except Exception as e:
+        typer.echo(f"Error fetching release info: {e}", err=True)
+        raise typer.Exit(1) from None
+
+    tag = data["tag_name"]
+    zipball_url = data["zipball_url"]
+    typer.echo(f"Downloading Lucide {tag}...")
+
+    try:
+        with urllib.request.urlopen(zipball_url) as resp:
+            release_data = resp.read()
+    except Exception as e:
+        typer.echo(f"Error downloading release: {e}", err=True)
+        raise typer.Exit(1) from None
+
+    dest = output.resolve() / "lucide"
+    dest.mkdir(parents=True, exist_ok=True)
+
+    icon_count = 0
+    with zipfile.ZipFile(io.BytesIO(release_data)) as src_zip:
+        for entry in src_zip.namelist():
+            parts = entry.split("/", 1)
+            if len(parts) < 2:
+                continue
+            rel_path = parts[1]
+            if rel_path.startswith("icons/") and rel_path.endswith(".svg"):
+                icon_name = rel_path.removeprefix("icons/")
+                svg_content = src_zip.read(entry)
+                (dest / icon_name).write_bytes(svg_content)
+                icon_count += 1
+            elif rel_path == "LICENSE":
+                (dest / "LICENSE").write_bytes(src_zip.read(entry))
+
+    typer.echo(f"Wrote {icon_count} icons to {dest}")
+    typer.echo(f'Add icons_dir = "{output}" to your [build] config to use these icons.')
 
 
 def main() -> None:
