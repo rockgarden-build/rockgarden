@@ -56,6 +56,15 @@ class TestLoadLucideIcon:
     def test_load_nonexistent(self):
         assert load_lucide_icon("not-a-real-icon-xyz") is None
 
+    def test_rejects_path_traversal(self):
+        assert load_lucide_icon("../../etc/passwd") is None
+
+    def test_rejects_slashes(self):
+        assert load_lucide_icon("sub/info") is None
+
+    def test_rejects_empty_name(self):
+        assert load_lucide_icon("") is None
+
 
 class TestProjectLocalOverride:
     """Tests for project-local icon override via icons_dir."""

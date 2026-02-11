@@ -4,12 +4,14 @@ Loads icons from a project-local override directory first, then falls
 back to the bundled lucide.zip that ships with rockgarden.
 """
 
+import re
 import zipfile
 from functools import lru_cache
 from importlib.resources import files
 from pathlib import Path
 
 _BUNDLED_ZIP = files("rockgarden.icons") / "lucide.zip"
+_SAFE_NAME = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 
 
 @lru_cache(maxsize=256)
@@ -35,6 +37,8 @@ def load_lucide_icon(name: str, icons_dir: Path | None = None) -> str | None:
     Returns:
         SVG markup string, or None if the icon doesn't exist.
     """
+    if not _SAFE_NAME.match(name):
+        return None
     if icons_dir:
         local_file = icons_dir / "lucide" / f"{name}.svg"
         if local_file.exists():

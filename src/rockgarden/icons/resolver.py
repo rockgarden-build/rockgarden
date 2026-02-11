@@ -30,6 +30,8 @@ def resolve_icon(ref: str) -> str | None:
     if ":" not in ref:
         return None
     library, name = ref.split(":", 1)
+    if not library or not name:
+        return None
     if library == "lucide":
         return load_lucide_icon(name, _icons_dir)
     return None
