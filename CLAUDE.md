@@ -43,6 +43,18 @@ Module structure in `src/rockgarden/`:
 - `render/` - Jinja2 and markdown-it-py setup
 - `output/` - Site builder
 
+## CSS / Tailwind
+
+CSS is built separately from Python via Tailwind CLI. The compiled output is committed to the repo.
+
+- **Source**: `static-src/input.css` (Tailwind directives + custom CSS)
+- **Output**: `src/rockgarden/static/rockgarden.css` (compiled, minified)
+- **Config**: `tailwind.config.js` (scans `src/rockgarden/templates/**/*.html`)
+- **Build**: `npm run build:css`
+- **Watch**: `npm run watch:css`
+
+**After any template change that adds new Tailwind/daisyUI utility classes, you MUST run `npm run build:css` to regenerate the CSS.** Never use inline styles as a workaround for missing utility classes.
+
 ## Conventions
 
 - Uses conventional commits (commitizen configured)

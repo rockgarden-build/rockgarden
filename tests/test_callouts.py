@@ -142,16 +142,21 @@ class TestGetCalloutIcon:
     """Tests for get_callout_icon function."""
 
     def test_note_icon(self):
-        assert get_callout_icon("note") == "ℹ️"
+        icon = get_callout_icon("note")
+        assert "<svg" in icon
+        assert "currentColor" in icon
 
     def test_warning_icon(self):
-        assert get_callout_icon("warning") == "⚠️"
+        icon = get_callout_icon("warning")
+        assert "<svg" in icon
 
     def test_tip_icon(self):
-        assert get_callout_icon("tip") == "💡"
+        icon = get_callout_icon("tip")
+        assert "<svg" in icon
 
     def test_unknown_type_default(self):
-        assert get_callout_icon("unknown_type") == "ℹ️"
+        icon = get_callout_icon("unknown_type")
+        assert "<svg" in icon
 
     def test_all_types_have_icons(self):
         types = [
@@ -166,5 +171,8 @@ class TestGetCalloutIcon:
         ]
         for callout_type in types:
             icon = get_callout_icon(callout_type)
-            assert icon is not None
-            assert len(icon) > 0
+            assert "<svg" in icon
+
+    def test_callout_renders_svg_icon(self):
+        result = _render_and_process("> [!note]\n> Content.")
+        assert '<span class="callout-icon"><svg' in result
