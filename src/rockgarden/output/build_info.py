@@ -2,7 +2,7 @@
 
 import subprocess
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 from rockgarden import __version__
@@ -32,7 +32,7 @@ def get_build_info(
     Returns:
         BuildInfo with build timestamp and optional git info.
     """
-    build_time = datetime.now()
+    build_time = datetime.now(tz=UTC)
     git_commit = None
     git_message = None
     git_author = None
