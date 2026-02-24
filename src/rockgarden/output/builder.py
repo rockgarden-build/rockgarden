@@ -1,5 +1,6 @@
 """Site building orchestration."""
 
+import hashlib
 import json
 import shutil
 from dataclasses import dataclass
@@ -59,6 +60,15 @@ def copy_static_files(output: Path) -> None:
         shutil.copytree(static_src, static_dst, dirs_exist_ok=True)
 
 
+def _static_hash(output: Path) -> str:
+    """Generate a short content hash of the CSS for cache busting."""
+    css_path = output / "_static" / "rockgarden.css"
+    if css_path.exists():
+        content = css_path.read_bytes()
+        return hashlib.md5(content).hexdigest()[:8]
+    return ""
+
+
 def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     """Build the static site.
 
@@ -89,6 +99,8 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
 
     env = create_engine(config, site_root=source.parent)
 
+    cache_hash = _static_hash(output)
+
     build_info = None
     if config.build.show_build_info:
         build_info = get_build_info(
@@ -104,6 +116,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         "daisyui_themes": config.theme.daisyui_themes,
         "search_enabled": config.search.enabled,
         "build_info": build_info,
+        "cache_hash": cache_hash,
     }
 
     show_index_map = {}
