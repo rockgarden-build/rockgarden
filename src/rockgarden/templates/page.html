@@ -12,14 +12,34 @@
         <article class="prose prose-base max-w-none leading-tight prose-headings:scroll-mt-20 prose-a:text-primary prose-code:before:content-none prose-code:after:content-none">
             {% block before_heading %}{% endblock %}
             {% block heading %}<h1>{{ page.title }}</h1>{% endblock %}
-            {% block after_heading %}{% endblock %}
+            {% block after_heading %}
+            {% set tags = page.frontmatter.get('tags', []) %}
+            {% if page.created or page.modified or tags %}
+            <div class="text-sm text-base-content/50 -mt-4 mb-4 flex flex-wrap items-center gap-2">
+                {% if page.created and page.modified %}
+                <span>Created <time datetime="{{ page.created.strftime('%Y-%m-%d') }}">{{ page.created.strftime('%Y-%m-%d') }}</time> · Updated <time datetime="{{ page.modified.strftime('%Y-%m-%d') }}">{{ page.modified.strftime('%Y-%m-%d') }}</time></span>
+                {% elif page.modified %}
+                <time datetime="{{ page.modified.strftime('%Y-%m-%d') }}">{{ page.modified.strftime('%Y-%m-%d') }}</time>
+                {% elif page.created %}
+                <span>Created <time datetime="{{ page.created.strftime('%Y-%m-%d') }}">{{ page.created.strftime('%Y-%m-%d') }}</time></span>
+                {% endif %}
+                {% if tags %}
+                <div class="flex flex-wrap gap-1">
+                    {% for tag in tags %}
+                    <span class="badge badge-sm badge-ghost">{{ tag.lstrip('#') }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            {% endblock %}
             {% block body %}{{ page.html | safe }}{% endblock %}
             {% block after_body %}{% endblock %}
         </article>
     </div>
 
     <!-- Right sidebar (desktop only) -->
-    <aside class="hidden xl:block w-64 flex-shrink-0">
+    <aside aria-label="Page sidebar" class="hidden xl:block w-64 flex-shrink-0">
         {% block right_sidebar %}
         {% block toc %}
         {% if toc %}

@@ -13,6 +13,7 @@ class SiteConfig:
     source: Path = field(default_factory=lambda: Path("."))
     output: Path = field(default_factory=lambda: Path("_site"))
     clean_urls: bool = True
+    base_url: str = ""
 
 
 @dataclass
@@ -69,6 +70,19 @@ class SearchConfig:
 
 
 @dataclass
+class DatesConfig:
+    """Date display configuration."""
+
+    modified_date_fields: list[str] = field(
+        default_factory=lambda: ["modified", "updated", "last_modified"]
+    )
+    created_date_fields: list[str] = field(
+        default_factory=lambda: ["created", "date", "date_created"]
+    )
+    modified_date_fallback: bool = True
+
+
+@dataclass
 class Config:
     """Root configuration object."""
 
@@ -79,6 +93,7 @@ class Config:
     backlinks: BacklinksConfig = field(default_factory=BacklinksConfig)
     toc: TocConfig = field(default_factory=TocConfig)
     search: SearchConfig = field(default_factory=SearchConfig)
+    dates: DatesConfig = field(default_factory=DatesConfig)
 
     @classmethod
     def load(cls, config_path: Path | None = None) -> "Config":
@@ -112,12 +127,14 @@ class Config:
         backlinks_data = data.get("backlinks", {})
         toc_data = data.get("toc", {})
         search_data = data.get("search", {})
+        dates_data = data.get("dates", {})
 
         site = SiteConfig(
             title=site_data.get("title", SiteConfig.title),
             source=Path(site_data.get("source", ".")),
             output=Path(site_data.get("output", "_site")),
             clean_urls=site_data.get("clean_urls", True),
+            base_url=site_data.get("base_url", "").rstrip("/"),
         )
 
         icons_dir_raw = build_data.get("icons_dir")
@@ -156,6 +173,21 @@ class Config:
             include_content=search_data.get("include_content", True),
         )
 
+        dates_defaults = DatesConfig()
+        dates = DatesConfig(
+            modified_date_fields=dates_data.get(
+                "modified_date_fields",
+                dates_defaults.modified_date_fields,
+            ),
+            created_date_fields=dates_data.get(
+                "created_date_fields",
+                dates_defaults.created_date_fields,
+            ),
+            modified_date_fallback=dates_data.get(
+                "modified_date_fallback", True
+            ),
+        )
+
         return cls(
             site=site,
             build=build,
@@ -164,4 +196,5 @@ class Config:
             backlinks=backlinks,
             toc=toc,
             search=search,
+            dates=dates,
         )

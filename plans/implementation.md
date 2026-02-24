@@ -155,36 +155,32 @@ After each step, verify incrementally:
   - Generate nested TOC structure
   - Add template support for TOC display
 
-- [ ] **Modified Date Display**: Show last-modified date on content pages
-  - File modified time is already tracked during content ingestion
-  - Display in the `after_heading` or `after_body` template block
+- [x] **Modified Date Display**: Show last-modified date on content pages
+  - `Page.modified` populated from file mtime during loading
+  - Displayed in `after_heading` template block
 
-- [ ] **Tag Display (N7)**: Show frontmatter tags on content pages
-  - Render tags from frontmatter in the `after_heading` template block
-  - Handle mixed formats (`#npc` vs `npc` — normalize the `#` prefix)
-  - Tags already appear in folder index tables; this adds them to individual pages
+- [x] **Tag Display (N7)**: Show frontmatter tags on content pages
+  - Tags rendered in `after_heading` block with `#` prefix normalized
+  - Uses same badge styling as folder index tables
 
-- [ ] **Audio/Video Embeds (Feature 04)**: Extend media embed support
-  - Currently supports images only
-  - Add `<audio>` and `<video>` tag generation
+- [x] **Audio/Video Embeds (Feature 04)**: Extend media embed support
+  - Audio, video, and PDF embeds implemented in `obsidian/embeds.py`
 
-- [ ] **Accessibility (Feature 18)**: Basic a11y improvements
-  - Skip navigation links
-  - ARIA landmarks and labels
-  - Focus styles for keyboard navigation
-  - Alt text validation for images
+- [x] **Accessibility (Feature 18)**: Basic a11y improvements
+  - Skip-to-content link, ARIA landmarks and labels
+  - Focus-visible styles for keyboard navigation
+  - Table scope attributes, search input label
 
-- [ ] **Template Decomposition (N9)**: Add named Jinja2 blocks to `page.html` as customization hooks (partial)
-  - `before_heading`, `after_heading`, `body`, `after_body` in main content area
+- [x] **Template Decomposition (N9)**: Named Jinja2 blocks in `page.html` and `folder_index.html`
+  - `before_heading`, `heading`, `after_heading`, `body`, `after_body` in main content area
   - `toc`, `backlinks` in right sidebar (`right_sidebar` parent block)
-  - Empty blocks serve as hooks for user template overrides (e.g., custom frontmatter rendering)
-  - See Feature 10 spec for full design
+  - `after_heading` populated with modified date and tags by default
 
 - [ ] **Note Transclusions (Feature 04)**: Embed content from other notes via `![[note.md]]`
   - Requires cycle detection
   - Part of existing embed feature spec
 
-- [ ] **Sitemap (Feature 13)**: XML sitemap generation
+- [x] **Sitemap (Feature 13)**: XML sitemap generation (requires `site.base_url` config)
 
 - [ ] **Polish (Feature 13)**: Production readiness
   - [ ] 404 page template

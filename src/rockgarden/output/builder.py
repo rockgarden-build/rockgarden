@@ -32,6 +32,7 @@ from rockgarden.obsidian import (
     process_wikilinks,
 )
 from rockgarden.output.search import build_search_index
+from rockgarden.output.sitemap import build_sitemap
 from rockgarden.render import create_engine, render_markdown, render_page
 from rockgarden.urls import get_folder_url, get_output_path, get_url
 
@@ -74,7 +75,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     if config.build.icons_dir:
         configure_icons_dir((source.parent / config.build.icons_dir).resolve())
 
-    pages = load_content(source, config.build.ignore_patterns)
+    pages = load_content(source, config.build.ignore_patterns, config.dates)
     clean_urls = config.site.clean_urls
 
     # Build media index before creating store so it can resolve media file links
@@ -162,6 +163,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         count += 1
 
     folder_indexes = generate_folder_indexes(pages, config.nav, clean_urls)
+    rendered_folder_indexes: list = []
     folder_template = env.get_template("folder_index.html")
 
     for folder in folder_indexes:
@@ -195,6 +197,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         output_file = output / get_output_path(folder.slug, clean_urls)
         output_file.parent.mkdir(parents=True, exist_ok=True)
         output_file.write_text(html)
+        rendered_folder_indexes.append(folder)
 
         count += 1
 
@@ -207,6 +210,13 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         )
         search_index_file = output / "search-index.json"
         search_index_file.write_text(json.dumps(search_index))
+
+    # Generate sitemap if base_url is configured
+    if config.site.base_url:
+        sitemap_xml = build_sitemap(
+            pages, rendered_folder_indexes, config.site.base_url, clean_urls
+        )
+        (output / "sitemap.xml").write_text(sitemap_xml)
 
     return BuildResult(page_count=count, broken_links=broken_links_by_page)
 
