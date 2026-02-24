@@ -147,4 +147,4 @@ Each syntax feature should have test coverage for:
 4. Mixed with other syntax
 5. Invalid syntax (graceful degradation)
 
-See individual feature docs in `docs/features/` for detailed specs.
+See individual feature docs in `plans/features/` for detailed specs.

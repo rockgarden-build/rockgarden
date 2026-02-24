@@ -15,6 +15,7 @@ class Page:
     content: str = ""
     html: str | None = None
     modified: datetime | None = None
+    created: datetime | None = None
 
     @property
     def title(self) -> str:

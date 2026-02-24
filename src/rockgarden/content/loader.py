@@ -1,13 +1,35 @@
 """Content discovery and loading."""
 
 import fnmatch
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 
 import frontmatter
 
+from rockgarden.config import DatesConfig
 from rockgarden.content.models import Page
 from rockgarden.urls import generate_slug
+
+
+def _resolve_frontmatter_date(
+    metadata: dict, field_names: list[str]
+) -> datetime | None:
+    """Check frontmatter fields in order and return the first valid date."""
+    for name in field_names:
+        value = metadata.get(name)
+        if value is None:
+            continue
+        if isinstance(value, datetime):
+            return value
+        if isinstance(value, date):
+            return datetime(value.year, value.month, value.day)
+        if isinstance(value, str):
+            for fmt in ("%Y-%m-%d", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d %H:%M:%S"):
+                try:
+                    return datetime.strptime(value, fmt)
+                except ValueError:
+                    continue
+    return None
 
 
 def should_ignore(path: Path, source: Path, patterns: list[str]) -> bool:
@@ -49,16 +71,22 @@ def path_to_slug(path: Path, source: Path) -> str:
     return generate_slug(rel_path)
 
 
-def load_page(path: Path, source: Path) -> Page:
+def load_page(
+    path: Path, source: Path, dates_config: DatesConfig | None = None
+) -> Page:
     """Load a single page from a markdown file.
 
     Args:
         path: Path to the markdown file.
         source: The source root directory.
+        dates_config: Date resolution configuration.
 
     Returns:
         A Page object with parsed frontmatter and content.
     """
+    if dates_config is None:
+        dates_config = DatesConfig()
+
     post = frontmatter.load(path)
     metadata = dict(post.metadata)
 
@@ -67,7 +95,15 @@ def load_page(path: Path, source: Path) -> Page:
     else:
         slug = path_to_slug(path, source)
 
-    modified = datetime.fromtimestamp(path.stat().st_mtime)
+    modified = _resolve_frontmatter_date(
+        metadata, dates_config.modified_date_fields
+    )
+    if modified is None and dates_config.modified_date_fallback:
+        modified = datetime.fromtimestamp(path.stat().st_mtime)
+
+    created = _resolve_frontmatter_date(
+        metadata, dates_config.created_date_fields
+    )
 
     return Page(
         source_path=path,
@@ -75,15 +111,21 @@ def load_page(path: Path, source: Path) -> Page:
         frontmatter=metadata,
         content=post.content,
         modified=modified,
+        created=created,
     )
 
 
-def load_content(source: Path, ignore_patterns: list[str]) -> list[Page]:
+def load_content(
+    source: Path,
+    ignore_patterns: list[str],
+    dates_config: DatesConfig | None = None,
+) -> list[Page]:
     """Discover and load all markdown files from source directory.
 
     Args:
         source: The source directory to scan.
         ignore_patterns: List of glob patterns to ignore.
+        dates_config: Date resolution configuration.
 
     Returns:
         List of Page objects.
@@ -94,7 +136,7 @@ def load_content(source: Path, ignore_patterns: list[str]) -> list[Page]:
         if should_ignore(path, source, ignore_patterns):
             continue
 
-        page = load_page(path, source)
+        page = load_page(path, source, dates_config)
         pages.append(page)
 
     return pages

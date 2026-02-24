@@ -75,7 +75,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     if config.build.icons_dir:
         configure_icons_dir((source.parent / config.build.icons_dir).resolve())
 
-    pages = load_content(source, config.build.ignore_patterns)
+    pages = load_content(source, config.build.ignore_patterns, config.dates)
     clean_urls = config.site.clean_urls
 
     # Build media index before creating store so it can resolve media file links
