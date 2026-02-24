@@ -24,6 +24,8 @@ class BuildConfig:
         default_factory=lambda: [".obsidian", "private", "templates", "Templates"]
     )
     icons_dir: Path | None = None
+    show_build_info: bool = True
+    show_build_commit: bool = False
 
 
 @dataclass
@@ -143,6 +145,8 @@ class Config:
                 "ignore_patterns", BuildConfig().ignore_patterns
             ),
             icons_dir=Path(icons_dir_raw) if icons_dir_raw else None,
+            show_build_info=build_data.get("show_build_info", True),
+            show_build_commit=build_data.get("show_build_commit", False),
         )
 
         theme = ThemeConfig(

@@ -31,6 +31,7 @@ from rockgarden.obsidian import (
     process_media_embeds,
     process_wikilinks,
 )
+from rockgarden.output.build_info import get_build_info
 from rockgarden.output.search import build_search_index
 from rockgarden.output.sitemap import build_sitemap
 from rockgarden.render import create_engine, render_markdown, render_page
@@ -88,6 +89,13 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
 
     env = create_engine(config, site_root=source.parent)
 
+    build_info = None
+    if config.build.show_build_info:
+        build_info = get_build_info(
+            source.parent,
+            include_git=config.build.show_build_commit,
+        )
+
     site_config = {
         "title": config.site.title,
         "nav": nav_tree,
@@ -95,6 +103,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         "daisyui_theme": config.theme.daisyui_default,
         "daisyui_themes": config.theme.daisyui_themes,
         "search_enabled": config.search.enabled,
+        "build_info": build_info,
     }
 
     show_index_map = {}

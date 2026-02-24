@@ -95,7 +95,11 @@
     </div>
     {% endif %}
 
-    {% block footer %}{% endblock %}
+    {% block footer %}
+    {% if site.build_info %}
+    {% include "components/footer.html" %}
+    {% endif %}
+    {% endblock %}
     <script>
         // Theme switcher functionality
         (function() {
