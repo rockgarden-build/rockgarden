@@ -91,7 +91,10 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
 
     build_info = None
     if config.build.show_build_info:
-        build_info = get_build_info(source.parent)
+        build_info = get_build_info(
+            source.parent,
+            include_git=config.build.show_build_commit,
+        )
 
     site_config = {
         "title": config.site.title,

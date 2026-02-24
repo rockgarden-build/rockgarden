@@ -25,6 +25,7 @@ class BuildConfig:
     )
     icons_dir: Path | None = None
     show_build_info: bool = True
+    show_build_commit: bool = False
 
 
 @dataclass
@@ -145,6 +146,7 @@ class Config:
             ),
             icons_dir=Path(icons_dir_raw) if icons_dir_raw else None,
             show_build_info=build_data.get("show_build_info", True),
+            show_build_commit=build_data.get("show_build_commit", False),
         )
 
         theme = ThemeConfig(

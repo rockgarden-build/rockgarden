@@ -20,11 +20,14 @@ class BuildInfo:
     git_date: str | None = None
 
 
-def get_build_info(site_root: Path | None = None) -> BuildInfo:
-    """Gather build info including timestamp and git commit details.
+def get_build_info(
+    site_root: Path | None = None, include_git: bool = False
+) -> BuildInfo:
+    """Gather build info including timestamp and optional git details.
 
     Args:
         site_root: Root directory of the site (for git lookups).
+        include_git: Whether to include git commit info.
 
     Returns:
         BuildInfo with build timestamp and optional git info.
@@ -35,25 +38,25 @@ def get_build_info(site_root: Path | None = None) -> BuildInfo:
     git_author = None
     git_date = None
 
-    cwd = str(site_root) if site_root else None
-
-    try:
-        result = subprocess.run(
-            ["git", "log", "-1", "--format=%H%n%s%n%an%n%aI"],
-            capture_output=True,
-            text=True,
-            cwd=cwd,
-            timeout=5,
-        )
-        if result.returncode == 0:
-            lines = result.stdout.strip().split("\n")
-            if len(lines) >= 4:
-                git_commit = lines[0]
-                git_message = lines[1]
-                git_author = lines[2]
-                git_date = lines[3]
-    except (FileNotFoundError, subprocess.TimeoutExpired):
-        pass
+    if include_git:
+        cwd = str(site_root) if site_root else None
+        try:
+            result = subprocess.run(
+                ["git", "log", "-1", "--format=%H%n%s%n%an%n%aI"],
+                capture_output=True,
+                text=True,
+                cwd=cwd,
+                timeout=5,
+            )
+            if result.returncode == 0:
+                lines = result.stdout.strip().split("\n")
+                if len(lines) >= 4:
+                    git_commit = lines[0]
+                    git_message = lines[1]
+                    git_author = lines[2]
+                    git_date = lines[3]
+        except (OSError, subprocess.TimeoutExpired):
+            pass
 
     return BuildInfo(
         build_time=build_time,
