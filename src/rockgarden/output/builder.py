@@ -32,6 +32,7 @@ from rockgarden.obsidian import (
     process_wikilinks,
 )
 from rockgarden.output.search import build_search_index
+from rockgarden.output.sitemap import build_sitemap
 from rockgarden.render import create_engine, render_markdown, render_page
 from rockgarden.urls import get_folder_url, get_output_path, get_url
 
@@ -207,6 +208,13 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         )
         search_index_file = output / "search-index.json"
         search_index_file.write_text(json.dumps(search_index))
+
+    # Generate sitemap if base_url is configured
+    if config.site.base_url:
+        sitemap_xml = build_sitemap(
+            pages, folder_indexes, config.site.base_url, clean_urls
+        )
+        (output / "sitemap.xml").write_text(sitemap_xml)
 
     return BuildResult(page_count=count, broken_links=broken_links_by_page)
 

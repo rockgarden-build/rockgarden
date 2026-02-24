@@ -18,6 +18,7 @@
     </script>
 </head>
 <body class="min-h-screen bg-base-100">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-base-100 focus:text-primary">Skip to content</a>
     <div class="drawer lg:drawer-open">
         <input id="nav-drawer" type="checkbox" class="drawer-toggle" />
 
@@ -46,7 +47,7 @@
             </div>
 
             <!-- Main content -->
-            <main class="flex-1 p-4 lg:p-8">
+            <main id="main-content" class="flex-1 p-4 lg:p-8">
                 <div class="max-w-4xl mx-auto">
                     {% block content %}{% endblock %}
                 </div>
@@ -56,7 +57,7 @@
         <!-- Sidebar -->
         <div class="drawer-side z-40">
             <label for="nav-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-            <aside class="bg-base-200 min-h-full w-64 p-4">
+            <aside aria-label="Main navigation" class="bg-base-200 min-h-full w-64 p-4">
                 <div class="flex items-center justify-between mb-4">
                     <a href="/" class="text-lg font-bold">{{ site.title or 'Home' }}</a>
                     <div class="hidden lg:block">

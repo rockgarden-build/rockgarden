@@ -21,7 +21,7 @@ The [PyOhio static website](https://github.com/pyohio/static-website) (Astro + P
 | 01 | [Home Page](01-home-page.md) | ✅ | — | Render single index.md to HTML |
 | 02 | [All Pages](02-all-pages.md) | ✅ | — | Render all markdown files |
 | 03 | [Wiki-Links](03-wiki-links.md) | ✅ | — | Resolve `[[Name]]` to URLs |
-| 04 | [Embeds](04-embeds.md) | Partial | — | Image embeds ✅, transclusions ❌ |
+| 04 | [Embeds](04-embeds.md) | Partial | — | Image/audio/video/PDF embeds ✅, transclusions ❌ |
 | 05 | [Callouts](05-callouts.md) | ✅ | A | GFM alerts + Obsidian callouts |
 | 06 | [Navigation](06-navigation.md) | ✅ | — | Sidebar, breadcrumbs, folder pages |
 | 07 | [Backlinks](07-backlinks.md) | ✅ | A | Pages that link to current page |
@@ -35,11 +35,11 @@ The [PyOhio static website](https://github.com/pyohio/static-website) (Astro + P
 | 15 | [Build Hooks](15-build-hooks.md) | ❌ | B | Pre/post-build shell commands |
 | 16 | [Static Assets](16-static-assets.md) | ❌ | B | Custom CSS & JS inclusion |
 | 17 | [SEO & Meta Tags](17-seo-meta.md) | ❌ | B | Frontmatter-driven meta, OG tags |
-| 18 | [Accessibility](18-accessibility.md) | ❌ | A | Skip links, ARIA, focus styles |
+| 18 | [Accessibility](18-accessibility.md) | ✅ | A | Skip links, ARIA, focus styles |
 | N6 | Broken Link Handling | ✅ | A | Visual indication + build warnings |
-| N7 | Tag Display | ❌ | A | Show frontmatter tags on pages |
+| N7 | Tag Display | ✅ | A | Show frontmatter tags on pages |
 | N8 | Tag Index Pages | ❌ | B | Generate `/tags/<tag>/` listing pages |
-| N9 | Template Decomposition | Partial | A | Named blocks as customization hooks in page templates |
+| N9 | Template Decomposition | ✅ | A | Named blocks as customization hooks in page templates |
 | N10 | Newline Handling | ✅ | A | Obsidian-style single newline → `<br>` |
 
 ## Roadmap Phases
@@ -58,20 +58,20 @@ From test vaults' Quartz configs:
 - [x] Section links (`[[Page#Section]]`)
 - [x] Media file links (`[[image.png]]`)
 - [x] Image embeds (with alt text, sizing)
-- [ ] Audio/video embeds
+- [x] Audio/video embeds
 - [ ] Note transclusions
 - [x] Callouts
 - [x] Table of contents
 - [x] Backlinks
 - [ ] Graph visualization
 - [x] Search (index generation + client-side UI)
-- [ ] Modified date display on pages
+- [x] Modified date display on pages
 
 **Output:**
 - [x] Content pages
 - [x] Folder pages
 - [ ] Tag pages
-- [ ] Sitemap
+- [x] Sitemap
 - [ ] RSS feed
 
 **Customizations found:**

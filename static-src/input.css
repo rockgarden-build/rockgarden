@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Focus styles */
+*:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
 /* Nav tree */
 .nav-tree a:hover {
     text-decoration: underline;

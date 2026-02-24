@@ -13,6 +13,7 @@ class SiteConfig:
     source: Path = field(default_factory=lambda: Path("."))
     output: Path = field(default_factory=lambda: Path("_site"))
     clean_urls: bool = True
+    base_url: str = ""
 
 
 @dataclass
@@ -118,6 +119,7 @@ class Config:
             source=Path(site_data.get("source", ".")),
             output=Path(site_data.get("output", "_site")),
             clean_urls=site_data.get("clean_urls", True),
+            base_url=site_data.get("base_url", "").rstrip("/"),
         )
 
         icons_dir_raw = build_data.get("icons_dir")
