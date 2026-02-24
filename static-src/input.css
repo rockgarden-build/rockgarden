@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Skip link */
+.skip-link {
+    position: absolute;
+    left: -9999px;
+    z-index: 50;
+    padding: 1rem;
+    background-color: oklch(var(--b1));
+    color: oklch(var(--p));
+}
+
+.skip-link:focus {
+    left: 0;
+}
+
 /* Focus styles */
 *:focus-visible {
     outline: 2px solid currentColor;
