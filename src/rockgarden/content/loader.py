@@ -67,7 +67,7 @@ def load_page(path: Path, source: Path) -> Page:
     else:
         slug = path_to_slug(path, source)
 
-    modified = datetime.fromtimestamp(path.stat().st_mtime) if path.exists() else None
+    modified = datetime.fromtimestamp(path.stat().st_mtime)
 
     return Page(
         source_path=path,
