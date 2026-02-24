@@ -12,7 +12,13 @@
         <article class="prose prose-base max-w-none leading-tight prose-headings:scroll-mt-20 prose-a:text-primary prose-code:before:content-none prose-code:after:content-none">
             {% block before_heading %}{% endblock %}
             {% block heading %}<h1>{{ page.title }}</h1>{% endblock %}
-            {% block after_heading %}{% endblock %}
+            {% block after_heading %}
+            {% if page.modified %}
+            <div class="text-sm text-base-content/50 -mt-4 mb-4">
+                <time datetime="{{ page.modified.strftime('%Y-%m-%d') }}">{{ page.modified.strftime('%Y-%m-%d') }}</time>
+            </div>
+            {% endif %}
+            {% endblock %}
             {% block body %}{{ page.html | safe }}{% endblock %}
             {% block after_body %}{% endblock %}
         </article>

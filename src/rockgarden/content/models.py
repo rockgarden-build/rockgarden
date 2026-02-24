@@ -1,6 +1,7 @@
 """Content data models."""
 
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
 
 
@@ -13,6 +14,7 @@ class Page:
     frontmatter: dict = field(default_factory=dict)
     content: str = ""
     html: str | None = None
+    modified: datetime | None = None
 
     @property
     def title(self) -> str:

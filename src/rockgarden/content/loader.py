@@ -1,6 +1,7 @@
 """Content discovery and loading."""
 
 import fnmatch
+from datetime import datetime
 from pathlib import Path
 
 import frontmatter
@@ -66,11 +67,14 @@ def load_page(path: Path, source: Path) -> Page:
     else:
         slug = path_to_slug(path, source)
 
+    modified = datetime.fromtimestamp(path.stat().st_mtime) if path.exists() else None
+
     return Page(
         source_path=path,
         slug=slug,
         frontmatter=metadata,
         content=post.content,
+        modified=modified,
     )
 
 
