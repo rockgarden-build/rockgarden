@@ -195,3 +195,9 @@ class TestIntegration:
         md = "## Heading\n\nSome paragraph.\n"
         html, _ = _render_and_extract(md)
         assert '<h2 id="heading">' in html
+
+    def test_html_entities_unescaped_in_toc_text(self):
+        """HTML entities in headings should be unescaped in TOC text."""
+        md = "## Expectations & Assumptions\n"
+        _, entries = _render_and_extract(md)
+        assert entries[0].text == "Expectations & Assumptions"

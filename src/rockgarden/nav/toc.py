@@ -2,6 +2,7 @@
 
 import re
 from dataclasses import dataclass, field
+from html import unescape
 
 HEADING_RE = re.compile(
     r"<(h[2-6])(\s[^>]*)?>(.+?)</\1>", re.DOTALL
@@ -28,8 +29,8 @@ def _slugify(text: str) -> str:
 
 
 def _strip_tags(html: str) -> str:
-    """Remove HTML tags to get plain text."""
-    return TAG_RE.sub("", html).strip()
+    """Remove HTML tags and unescape entities to get plain text."""
+    return unescape(TAG_RE.sub("", html).strip())
 
 
 def _build_tree(flat: list[TocEntry]) -> list[TocEntry]:
