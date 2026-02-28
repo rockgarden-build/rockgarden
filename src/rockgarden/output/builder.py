@@ -258,6 +258,12 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
             processed, media = process_media_embeds(processed, media_resolver)
             all_media.update(media)
             all_media.update(collect_markdown_images(processed, media_resolver))
+            processed = process_note_transclusions(
+                processed,
+                _make_note_resolver(
+                    store, source, media_index, clean_urls, frozenset(), all_media
+                ),
+            )
             processed, broken = process_wikilinks(processed, store.resolve_link)
             if broken:
                 broken_links_by_page[folder_src] = [target for target, _ in broken]
