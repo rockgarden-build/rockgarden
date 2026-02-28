@@ -9,7 +9,7 @@ Dark mode, responsive design, sitemap, and other finishing touches.
 ### Dark Mode ✅ (via DaisyUI)
 
 Already supported via DaisyUI theme toggle. Users can:
-- Set default theme in config: `[theme] daisyui = "dark"`
+- Set default theme in config: `[theme] daisyui_default = "dark"`
 - Toggle via theme switch in UI
 - System preference detection
 

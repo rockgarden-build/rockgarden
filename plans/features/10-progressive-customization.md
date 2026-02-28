@@ -1,107 +1,149 @@
-# Feature 10: Progressive Customization (In Progress)
+# Feature 10: Progressive Customization
 
-Enable customization from zero-config to fully custom site generation. See [concepts.md](../concepts.md) for terminology and the full 6-level customization ladder.
+Enable customization from zero-config to fully custom site generation.
+
+## Status: In Progress (Phase A complete, Phase B planned)
 
 ## Customization Levels
 
-### Level 1: Zero Config
-`rockgarden build` produces working site with default DaisyUI "light" theme. **Already works.**
+| Level | What | How |
+|-------|------|-----|
+| 0 | Zero-config vault publishing | `rockgarden build` — default theme, no config |
+| 1 | Color scheme | `[theme] daisyui_default = "dark"` — swap DaisyUI palette |
+| 2 | Patch a component | `_templates/components/nav.html` — override one file |
+| 3 | Add content blocks | Extend `page.html` named blocks (`after_heading`, `after_body`, etc.) |
+| 4 | Custom page layouts | `_templates/layouts/speaker.html` + frontmatter `layout: speaker` |
+| 5 | Custom theme | `_themes/pyohio/` — own base, own CSS, own components |
+| 6 | Export default theme | `rockgarden theme export` → copy default theme as starting point |
 
-### Level 2: DaisyUI Theme Selection
+## Core vs. Default Theme
+
+See `docs/architecture.md` for the full boundary. In summary:
+
+- **Core** provides content ingestion, the content store, template infrastructure, and the build pipeline. It has no visible output without a theme.
+- **Default theme** provides all templates, the sidebar/drawer layout, DaisyUI + Tailwind CSS, and the search UI. It ships bundled and is active with zero config.
+
+## Template Resolution
+
+Templates are resolved by `render/engine.py` using a 3-tier ChoiceLoader:
+
+1. `_templates/` — site-level overrides (highest priority)
+2. `_themes/<name>/` — active when `[theme] name` is set
+3. Built-in package templates — always the fallback
+
+A custom theme set with `theme.name = "pyohio"` loads templates from `_themes/pyohio/`. Any templates not present in the theme directory fall through to the built-in defaults.
+
+## Configuration Boundary
+
+Theme-related settings live under `[theme]`:
+
 ```toml
 [theme]
-daisyui = "cupcake"
+name = ""                        # theme directory; empty = built-in default
+toc = true                       # show TOC panel (theme-general)
+backlinks = true                 # show backlinks panel (theme-general)
+search = true                    # show search UI (theme-general)
+daisyui_default = "light"        # DaisyUI palette (default theme)
+daisyui_themes = []              # available palettes for switcher (default theme)
+nav_default_state = "collapsed"  # sidebar nav state (default theme)
+show_build_info = true           # footer build info (default theme)
+show_build_commit = false        # footer git commit (default theme)
 ```
-Available themes: light, dark, cupcake, cyberpunk, forest, etc. ([DaisyUI themes](https://daisyui.com/docs/themes/))
 
-### Level 3: Override Specific Templates
-```
-_templates/components/nav.html  # Override just the nav
-```
-Templates available: `base.html`, `page.html`, `folder_index.html`, `components/nav.html`, `components/breadcrumbs.html`, `components/theme_toggle.html`. **Already works via ChoiceLoader.**
+## Named Blocks in page.html
 
-#### Template Block Hooks
+`page.html` exposes Jinja2 blocks as extension points. A site can extend `page.html` and override only the blocks it needs, using `{{ super() }}` to preserve default content:
 
-`page.html` exposes named Jinja2 blocks as customization points. Empty blocks act as hooks — zero output by default, available for user overrides without replacing the entire template.
-
-**Content area blocks:**
-- `before_heading` — empty hook (e.g., publication date)
-- `heading` — page `<h1>` (has default content; named `heading` to avoid collision with `base.html`'s `title` block for `<title>`)
-- `after_heading` — empty hook (tags, reading time, custom frontmatter like D&D Beyond links)
-- `body` — rendered markdown (has default content)
-- `after_body` — empty hook (prev/next links, supplementary content)
-
-**Right sidebar blocks:**
-- `right_sidebar` — parent block wrapping sidebar content
-- `toc` — empty hook (table of contents)
-- `backlinks` — backlinks display (has default content)
-
-**Usage example** — a site adds a custom frontmatter link after the title:
 ```jinja2
-{% extends "rockgarden/page.html" %}
+{# _templates/page.html #}
+{% extends "page.html" %}
 
 {% block after_heading %}
+{{ super() }}
 {% if page.frontmatter.beyondUrl %}
 <a href="{{ page.frontmatter.beyondUrl }}">{{ page.title }} on D&D Beyond</a>
 {% endif %}
 {% endblock %}
 ```
 
-Blocks with default content can be extended with `{{ super() }}` to add to them rather than replace.
+Available blocks:
 
-### Level 4: Custom Layouts
+| Block | Default content |
+|-------|----------------|
+| `before_heading` | *(empty hook)* |
+| `heading` | `<h1>{{ page.title }}</h1>` |
+| `after_heading` | Created/modified dates, tags |
+| `body` | `{{ page.html \| safe }}` |
+| `after_body` | *(empty hook)* |
+| `right_sidebar` | TOC + backlinks |
+| `toc` | Table of contents |
+| `backlinks` | Backlinks panel |
+
+## Phase A: Complete ✅
+
+- [x] DaisyUI theme selection via `[theme] daisyui_default`
+- [x] Named blocks in `page.html` and `folder_index.html`
+- [x] Template override via `_templates/` (ChoiceLoader)
+- [x] Named theme via `_themes/<name>/` (ChoiceLoader)
+- [x] Config separation: display/rendering settings moved to `[theme]`
+
+## Phase B: Layout System
+
+### Problem
+
+`base.html` currently hardcodes the drawer/sidebar layout. A custom theme must replace `base.html` entirely for a different outer structure. There is no per-page layout variation.
+
+### Design
+
+**`base.html` → minimal HTML skeleton** (head, body wrapper, script injection only — no layout structure)
+
+**`layouts/` directory** in default theme:
+- `layouts/docs.html` — current sidebar/drawer layout (extracted from current `base.html`)
+- `layouts/page.html` — simple full-width, no sidebar
+
+**Per-page layout via frontmatter:**
 ```yaml
 ---
-layout: landing
+layout: talk   # resolves to layouts/talk.html
 ---
 ```
-Create `_templates/layouts/landing.html` extending `base.html`. Use `{% block body %}` for content.
 
-### Level 5: Full Theme Replacement
-Replace `_templates/base.html` for complete control. **Already works.**
+**`resolve_layout(page, config, env)` in `render/engine.py`:**
+1. `page.frontmatter.get("layout")` → `layouts/<name>.html`
+2. Collection default layout (planned with collections feature)
+3. `config.theme.default_layout` → `layouts/<name>.html`
+4. Default: `layouts/docs.html`
 
-## Implementation Phases
+**`page.html` and `folder_index.html`** extend `layout_template` (a variable) rather than `base.html`:
+```jinja2
+{% extends layout_template %}
+```
 
-### Phase A: DaisyUI Theme Config ✅
-- [x] Add `daisyui` field to `ThemeConfig` in `config.py`
-- [x] Update `base.html` to use `{{ site.daisyui_theme }}`
-- [x] Pass theme to site_config in `builder.py`
+The `layout_template` string is injected into the render context by `render_page()`.
 
-### Phase A-2: Template Decomposition
-- [x] Add named blocks to `page.html` (`before_heading`, `heading`, `after_heading`, `body`, `after_body`)
-- [x] Add right sidebar blocks (`right_sidebar`, `toc`, `backlinks`)
-- [ ] Verify user template overrides work with new block structure (ChoiceLoader)
-- [x] Update `folder_index.html` with common blocks (`breadcrumbs`, `before_heading`, `heading`, `after_heading`)
+### Tasks
 
-### Phase B: Layout System
-- [ ] Extract `base.html` to minimal skeleton
-- [ ] Create `layouts/docs.html` (current sidebar layout)
-- [ ] Create `layouts/landing.html` (simple full-width)
-- [ ] Add `resolve_layout()` to `engine.py`
-- [ ] Update `page.html` and `folder_index.html` to extend variable layout
+- [ ] Refactor `base.html` to minimal skeleton
+- [ ] Create `layouts/docs.html` (current sidebar layout extracted from `base.html`)
+- [ ] Add `resolve_layout()` to `render/engine.py`
+- [ ] Update `render_page()` to inject `layout_template`
+- [ ] Update `page.html` and `folder_index.html` to extend `layout_template`
+- [ ] Add `theme.default_layout` config field (already added to `ThemeConfig`)
 
-### Phase C: Documentation
-- [ ] Document template override system
-- [ ] Document available blocks and context variables
-- [ ] Document layout creation
+## Phase B: Theme Export CLI
 
-## Files to Modify
+**`rockgarden theme export`** copies the bundled default theme to `_themes/default/` in the site root and sets `theme.name = "default"` in `rockgarden.toml`. This gives users a complete, editable starting point.
 
-| File | Phase | Changes |
-|------|-------|---------|
-| `config.py` | A | Add `daisyui` field |
-| `builder.py` | A | Pass theme to site_config |
-| `templates/base.html` | A, B | Use theme var; extract to skeleton |
-| `templates/layouts/docs.html` | B | New - current sidebar layout |
-| `templates/layouts/landing.html` | B | New - simple layout |
-| `templates/page.html` | B | Extend layout_template variable |
-| `templates/folder_index.html` | B | Extend layout_template variable |
-| `render/engine.py` | B | Add `resolve_layout()`, update `render_page()` |
+The `theme` CLI group may grow over time (e.g., `rockgarden theme list`, `rockgarden theme install`).
 
-## Verification
+### Tasks
 
-- `uv run pytest`
-- Build with no config → "light" theme
-- Build with `daisyui = "dark"` → dark theme
-- Page with `layout: landing` → no sidebar
-- Custom `_templates/layouts/custom.html` → works when specified
+- [ ] Add `theme` command group to `cli.py`
+- [ ] Implement `rockgarden theme export` subcommand
+- [ ] Document the exported directory structure
+
+## Phase C: Documentation
+
+- [ ] Full template override guide in `docs/`
+- [ ] Custom theme creation guide (with PyOhio as the worked example)
+- [ ] Available blocks + context variables reference
