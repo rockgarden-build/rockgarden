@@ -106,6 +106,7 @@ def _make_note_resolver(
         sub_content = page.content
         sub_content, media = process_media_embeds(sub_content, media_resolver)
         all_media.update(media)
+        all_media.update(collect_markdown_images(sub_content, media_resolver))
         sub_content = process_note_transclusions(
             sub_content,
             _make_note_resolver(
