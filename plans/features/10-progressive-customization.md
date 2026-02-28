@@ -9,7 +9,7 @@ Enable customization from zero-config to fully custom site generation.
 | Level | What | How |
 |-------|------|-----|
 | 0 | Zero-config vault publishing | `rockgarden build` — default theme, no config |
-| 1 | Color scheme | `[theme] daisyui = "dark"` — swap DaisyUI palette |
+| 1 | Color scheme | `[theme] daisyui_default = "dark"` — swap DaisyUI palette |
 | 2 | Patch a component | `_templates/components/nav.html` — override one file |
 | 3 | Add content blocks | Extend `page.html` named blocks (`after_heading`, `after_body`, etc.) |
 | 4 | Custom page layouts | `_templates/layouts/speaker.html` + frontmatter `layout: speaker` |
@@ -43,7 +43,7 @@ name = ""                        # theme directory; empty = built-in default
 toc = true                       # show TOC panel (theme-general)
 backlinks = true                 # show backlinks panel (theme-general)
 search = true                    # show search UI (theme-general)
-daisyui = "light"                # DaisyUI palette (default theme)
+daisyui_default = "light"        # DaisyUI palette (default theme)
 daisyui_themes = []              # available palettes for switcher (default theme)
 nav_default_state = "collapsed"  # sidebar nav state (default theme)
 show_build_info = true           # footer build info (default theme)

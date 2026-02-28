@@ -5,20 +5,26 @@
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
 │ Content Sources │ ──▶ │  Content Store  │ ──▶ │     Output      │
-│   (Markdown)    │     │  (In-Memory)    │     │  (HTML/Assets)  │
+│ (MD/YAML/JSON)  │     │  (Collections)  │     │  (HTML/Assets)  │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
+         ↑                       ↑                       ↑
+     pre_build              post_collect             post_build
+       hooks                  hooks                    hooks
 ```
 
-Each build is a full rebuild. Rockgarden reads all source files, builds an in-memory content store, then renders every page. The build pipeline is:
+Each build is a full rebuild. The build pipeline is:
 
-1. Load markdown files → parse frontmatter, extract content
+1. Load content files → parse frontmatter, extract content
 2. Build content store → backlinks index, nav tree, media index
 3. For each page: process Obsidian syntax → render markdown → apply template
 4. Write HTML + copy assets → generate search index, sitemap, 404
 
+**Current implementation:** markdown files only; in-memory store; no hooks. The diagram reflects the target architecture — see [Collections (Feature 14)](../plans/features/14-collections.md) and [Build Hooks (Feature 15)](../plans/features/15-build-hooks.md) for the planned extensions.
+
 ## Design Principles
 
 - **Works with Obsidian vaults as-is.** Point rockgarden at any vault and get a working site. No special folder structure required.
+- **Everything is a collection.** Without config, all content is in an implicit default collection. Named collections carve out directory subsets with progressively configurable behavior (schema, non-markdown formats, custom templates, page generation).
 - **Custom behavior is additive.** Site-specific customizations are layered on top, not patched into the core.
 - **Pre-1.0:** No backwards compatibility guarantees. Breaking changes are acceptable.
 
@@ -103,7 +109,7 @@ name = ""                      # theme name (empty = built-in default)
 toc = true                     # show TOC panel
 backlinks = true               # show backlinks panel
 search = true                  # show search UI
-daisyui = "light"              # DaisyUI color palette (default theme)
+daisyui_default = "light"      # DaisyUI color palette (default theme)
 daisyui_themes = []            # available palettes for switcher (default theme)
 nav_default_state = "collapsed"  # sidebar nav state (default theme)
 show_build_info = true         # footer build timestamp (default theme)
@@ -117,7 +123,7 @@ show_build_commit = false      # footer git commit info (default theme)
 | Level | What | How |
 |-------|------|-----|
 | 0 | Zero-config vault publishing | `rockgarden build` — default theme, no config |
-| 1 | Color scheme | `[theme] daisyui = "dark"` — swap DaisyUI palette |
+| 1 | Color scheme | `[theme] daisyui_default = "dark"` — swap DaisyUI palette |
 | 2 | Patch a component | `_templates/components/nav.html` — override one file |
 | 3 | Add content blocks | Extend `page.html` named blocks (`after_heading`, `after_body`, etc.) |
 | 4 | Custom page layouts | `_templates/layouts/speaker.html` + frontmatter `layout: speaker` |
