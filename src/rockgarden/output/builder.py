@@ -267,7 +267,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
             processed = process_note_transclusions(
                 processed,
                 _make_note_resolver(
-                    store, source, media_index, clean_urls, frozenset(), all_media, broken_links_by_page
+                    store, source, media_index, clean_urls, frozenset({folder.slug}), all_media, broken_links_by_page
                 ),
             )
             processed, broken = process_wikilinks(processed, store.resolve_link)
