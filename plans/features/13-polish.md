@@ -2,7 +2,7 @@
 
 Dark mode, responsive design, sitemap, and other finishing touches.
 
-## Status: Not Started
+## Status: Complete
 
 ## Components
 
@@ -19,7 +19,7 @@ Current templates use Tailwind responsive utilities:
 - Mobile: Drawer nav hidden, hamburger menu
 - Desktop: Sidebar visible
 
-### Sitemap
+### Sitemap ✅
 
 Generate `sitemap.xml` for search engines:
 
@@ -45,7 +45,7 @@ def generate_sitemap(pages: list[Page], base_url: str) -> str:
     return render_sitemap_xml(urls)
 ```
 
-### Table of Contents
+### Table of Contents ✅
 
 Auto-generate TOC from page headings:
 
@@ -56,7 +56,7 @@ def extract_toc(html: str) -> list[TocEntry]:
 
 Display in sidebar or at top of long pages.
 
-### Build Info Footer
+### Build Info Footer ✅
 
 Show build timestamp and git commit:
 
@@ -66,9 +66,9 @@ Show build timestamp and git commit:
 </footer>
 ```
 
-### 404 Page
+### 404 Page ✅
 
-Generate custom 404 page from `404.md` if present, otherwise use default template.
+Always generates `404.html` in the output root. Default template extends `base.html` with a "Page Not Found" message. Can be overridden by placing `404.html` in `_templates/`. See `docs/deployment.md` for hosting provider configuration.
 
 ## Configuration
 

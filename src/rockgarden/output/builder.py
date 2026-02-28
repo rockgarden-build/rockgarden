@@ -3,6 +3,7 @@
 import hashlib
 import json
 import shutil
+import time
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -30,6 +31,7 @@ from rockgarden.nav import (
 from rockgarden.obsidian import (
     process_callouts,
     process_media_embeds,
+    process_note_transclusions,
     process_wikilinks,
 )
 from rockgarden.output.build_info import get_build_info
@@ -46,10 +48,12 @@ class BuildResult:
     Attributes:
         page_count: Number of pages built.
         broken_links: Mapping of source filenames to lists of broken link targets.
+        duration_seconds: Total build time in seconds.
     """
 
     page_count: int
     broken_links: dict[str, list[str]]
+    duration_seconds: float = 0.0
 
 
 def copy_static_files(output: Path) -> None:
@@ -69,6 +73,46 @@ def _static_hash(output: Path) -> str:
     return ""
 
 
+def _make_note_resolver(
+    store,
+    source: Path,
+    media_index: dict,
+    clean_urls: bool,
+    visited: frozenset[str],
+):
+    """Return a transclusion resolver that renders a note's content as HTML.
+
+    The resolver performs cycle detection via the visited set and runs the same
+    processing pipeline as the main build loop (media embeds, transclusions,
+    wikilinks, markdown render, callouts).
+    """
+
+    def resolve(target: str) -> str | None:
+        name = target.strip()
+        if name.lower().endswith(".md"):
+            name = name[:-3]
+
+        page = store.get_by_name(name)
+        if page is None or page.slug in visited:
+            return None
+
+        new_visited = visited | {page.slug}
+        page_rel_path = str(page.source_path.relative_to(source))
+        media_resolver = create_media_resolver(source, page_rel_path, media_index)
+
+        sub_content = page.content
+        sub_content, _ = process_media_embeds(sub_content, media_resolver)
+        sub_content = process_note_transclusions(
+            sub_content,
+            _make_note_resolver(store, source, media_index, clean_urls, new_visited),
+        )
+        sub_content, _ = process_wikilinks(sub_content, store.resolve_link)
+        sub_content = transform_md_links(sub_content, clean_urls)
+        return process_callouts(render_markdown(sub_content))
+
+    return resolve
+
+
 def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     """Build the static site.
 
@@ -80,6 +124,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     Returns:
         BuildResult with page count and broken links information.
     """
+    _start = time.perf_counter()
     output.mkdir(parents=True, exist_ok=True)
     copy_static_files(output)
 
@@ -147,6 +192,12 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         content, media = process_media_embeds(content, media_resolver)
         all_media.update(media)
         all_media.update(collect_markdown_images(content, media_resolver))
+        content = process_note_transclusions(
+            content,
+            _make_note_resolver(
+                store, source, media_index, clean_urls, frozenset({page.slug})
+            ),
+        )
         content, broken = process_wikilinks(content, store.resolve_link)
         if broken:
             source_file = page.source_path.name
@@ -240,7 +291,15 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         )
         (output / "sitemap.xml").write_text(sitemap_xml)
 
-    return BuildResult(page_count=count, broken_links=broken_links_by_page)
+    # Generate 404 page
+    not_found_template = env.get_template("404.html")
+    (output / "404.html").write_text(not_found_template.render(site=site_config))
+
+    return BuildResult(
+        page_count=count,
+        broken_links=broken_links_by_page,
+        duration_seconds=time.perf_counter() - _start,
+    )
 
 
 def _build_folder_breadcrumbs(folder, pages, nav_config, clean_urls=True):
