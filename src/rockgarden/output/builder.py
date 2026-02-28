@@ -80,13 +80,14 @@ def _make_note_resolver(
     clean_urls: bool,
     visited: frozenset[str],
     all_media: set[str],
+    broken_links: dict[str, list[str]],
 ):
     """Return a transclusion resolver that renders a note's content as HTML.
 
     The resolver performs cycle detection via the visited set and runs the same
     processing pipeline as the main build loop (media embeds, transclusions,
-    wikilinks, markdown render, callouts). Media files found inside transclusions
-    are added to all_media so they get copied to the output directory.
+    wikilinks, markdown render, callouts). Media files and broken links found
+    inside transclusions are propagated to the caller's all_media and broken_links.
     """
 
     def resolve(target: str) -> str | None:
@@ -108,10 +109,14 @@ def _make_note_resolver(
         sub_content = process_note_transclusions(
             sub_content,
             _make_note_resolver(
-                store, source, media_index, clean_urls, new_visited, all_media
+                store, source, media_index, clean_urls, new_visited, all_media, broken_links
             ),
         )
-        sub_content, _ = process_wikilinks(sub_content, store.resolve_link)
+        sub_content, sub_broken = process_wikilinks(sub_content, store.resolve_link)
+        if sub_broken:
+            broken_links.setdefault(page.source_path.name, []).extend(
+                t for t, _ in sub_broken
+            )
         sub_content = transform_md_links(sub_content, clean_urls)
         return process_callouts(render_markdown(sub_content))
 
@@ -200,7 +205,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         content = process_note_transclusions(
             content,
             _make_note_resolver(
-                store, source, media_index, clean_urls, frozenset({page.slug}), all_media
+                store, source, media_index, clean_urls, frozenset({page.slug}), all_media, broken_links_by_page
             ),
         )
         content, broken = process_wikilinks(content, store.resolve_link)
@@ -261,7 +266,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
             processed = process_note_transclusions(
                 processed,
                 _make_note_resolver(
-                    store, source, media_index, clean_urls, frozenset(), all_media
+                    store, source, media_index, clean_urls, frozenset(), all_media, broken_links_by_page
                 ),
             )
             processed, broken = process_wikilinks(processed, store.resolve_link)
