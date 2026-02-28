@@ -21,7 +21,7 @@ The [PyOhio static website](https://github.com/pyohio/static-website) (Astro + P
 | 01 | [Home Page](01-home-page.md) | ✅ | — | Render single index.md to HTML |
 | 02 | [All Pages](02-all-pages.md) | ✅ | — | Render all markdown files |
 | 03 | [Wiki-Links](03-wiki-links.md) | ✅ | — | Resolve `[[Name]]` to URLs |
-| 04 | [Embeds](04-embeds.md) | Partial | — | Image/audio/video/PDF embeds ✅, transclusions ❌ |
+| 04 | [Embeds](04-embeds.md) | ✅ | — | Image/audio/video/PDF embeds, note transclusions |
 | 05 | [Callouts](05-callouts.md) | ✅ | A | GFM alerts + Obsidian callouts |
 | 06 | [Navigation](06-navigation.md) | ✅ | — | Sidebar, breadcrumbs, folder pages |
 | 07 | [Backlinks](07-backlinks.md) | ✅ | A | Pages that link to current page |
@@ -30,7 +30,7 @@ The [PyOhio static website](https://github.com/pyohio/static-website) (Astro + P
 | 10 | [Progressive Customization](10-progressive-customization.md) | In Progress | — | Themes and layouts |
 | 11 | [RSS Feed](11-rss-feed.md) | ❌ | C | RSS/Atom feed generation |
 | 12 | [Base Path Prefix](12-base-path-prefix.md) | ❌ | B | Deploy to subdirectories |
-| 13 | [Polish](13-polish.md) | ❌ | A | Sitemap, 404, TOC |
+| 13 | [Polish](13-polish.md) | ✅ | A | Sitemap, 404, TOC, build info, timing |
 | 14 | [Collections](14-collections.md) | ❌ | B | Unified content model, progressive collections |
 | 15 | [Build Hooks](15-build-hooks.md) | ❌ | B | Pre/post-build shell commands |
 | 16 | [Static Assets](16-static-assets.md) | ❌ | B | Custom CSS & JS inclusion |
@@ -44,7 +44,7 @@ The [PyOhio static website](https://github.com/pyohio/static-website) (Astro + P
 
 ## Roadmap Phases
 
-- **Phase A — Zero-Config Release**: Callouts (05), backlinks (07), broken link handling (N6), polish (13), accessibility (18), search (08), tag display (N7), template decomposition (N9), newline handling (N10)
+- **Phase A — Zero-Config Release** ✅: Callouts (05), backlinks (07), broken link handling (N6), polish (13), accessibility (18), search (08), tag display (N7), template decomposition (N9), newline handling (N10), embeds incl. transclusions (04)
 - **Phase B — General SSG / PyOhio (0.9)**: Layout system (10B), collections (14), build hooks (15), base path (12), static assets (16), SEO (17), tag index pages (N8)
 - **Phase C — Enhanced Features**: Macros (09), RSS (11)
 
@@ -59,7 +59,7 @@ From test vaults' Quartz configs:
 - [x] Media file links (`[[image.png]]`)
 - [x] Image embeds (with alt text, sizing)
 - [x] Audio/video embeds
-- [ ] Note transclusions
+- [x] Note transclusions
 - [x] Callouts
 - [x] Table of contents
 - [x] Backlinks

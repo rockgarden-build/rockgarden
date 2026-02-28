@@ -176,16 +176,16 @@ After each step, verify incrementally:
   - `toc`, `backlinks` in right sidebar (`right_sidebar` parent block)
   - `after_heading` populated with modified date and tags by default
 
-- [ ] **Note Transclusions (Feature 04)**: Embed content from other notes via `![[note.md]]`
-  - Requires cycle detection
-  - Part of existing embed feature spec
+- [x] **Note Transclusions (Feature 04)**: Embed content from other notes via `![[note.md]]`
+  - Cycle detection via visited set
+  - Heading refs stripped for lookup (full note inlined); section-level extraction deferred
 
 - [x] **Sitemap (Feature 13)**: XML sitemap generation (requires `site.base_url` config)
 
-- [ ] **Polish (Feature 13)**: Production readiness
-  - [ ] 404 page template
-  - [ ] Improved error messages and validation
-  - [ ] Build performance metrics
+- [x] **Polish (Feature 13)**: Production readiness
+  - [x] 404 page template (always generated; override via `_templates/404.html`)
+  - [x] Build timing in CLI output (`Built N pages in X.Xs → /path`)
+  - Detailed error validation and per-phase metrics deferred to future improvement
 
 ### Future (Phase B+)
 - [ ] **Tag Index Pages (N8)**: Generate `/tags/<tag>/` pages listing all content with a given tag
