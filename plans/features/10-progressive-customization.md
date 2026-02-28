@@ -81,7 +81,7 @@ Available blocks:
 
 ## Phase A: Complete ✅
 
-- [x] DaisyUI theme selection via `[theme] daisyui`
+- [x] DaisyUI theme selection via `[theme] daisyui_default`
 - [x] Named blocks in `page.html` and `folder_index.html`
 - [x] Template override via `_templates/` (ChoiceLoader)
 - [x] Named theme via `_themes/<name>/` (ChoiceLoader)
