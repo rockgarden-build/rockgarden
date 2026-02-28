@@ -203,42 +203,43 @@ PyOhio targets WCAG 2.1 AA. Rockgarden's default templates lack skip links, ARIA
 
 Two-phase approach: ship the zero-config Obsidian vault experience first, then build toward general-purpose SSG (PyOhio benchmark) as the 0.9 prerelease target.
 
-### Phase A: Zero-Config Release
+### Phase A: Zero-Config Release ✅
 
-Complete the Obsidian vault experience. These are what zero-config users will notice.
-
-| ID | Feature | Complexity | Notes |
-|---|---|---|---|
-| **05** | Callouts | Low | Obsidian callout syntax. High visibility for vault users. |
-| **07** | Backlinks | Low | Pages that link to current page. Core Obsidian/Quartz feature. |
-| **N6** | Broken Link Handling | Low-Med | Visual indication + build warnings + summary report. |
-| **13** | Polish (sitemap, 404, TOC) | Medium | Already planned. |
-| **N5** | Accessibility Defaults | Low | Template improvements only. |
-| **08** | Search | Medium | Client-side index. Expected by Quartz users. |
+| ID | Feature | Notes |
+|---|---|---|
+| **05** | Callouts | ✅ |
+| **07** | Backlinks | ✅ |
+| **N6** | Broken Link Handling | ✅ |
+| **13** | Polish (sitemap, 404, TOC, build info) | ✅ |
+| **N5** | Accessibility Defaults | ✅ |
+| **08** | Search | ✅ |
+| **04** | Embeds incl. note transclusions | ✅ |
+| **N7** | Tag Display | ✅ |
+| **N9** | Template Decomposition | ✅ |
+| **N10** | Newline Handling | ✅ |
+| **10A** | Config separation (core vs. theme) | ✅ |
 
 ### Phase B: General SSG / PyOhio (0.9 Prerelease)
 
-Collections, hooks, and the features needed to rebuild PyOhio in rockgarden.
+Ordered by dependency. The layout system and static assets are prerequisites for a custom PyOhio theme.
 
 | ID | Feature | Complexity | Notes |
 |---|---|---|---|
-| **10B** | Layout System | Medium | Already planned. Per-page layout via frontmatter. Prerequisite for different page types. |
-| **10C** | Default Theme Extraction | Low-Med | Move built-in templates to a theme directory so it works like any other theme, just shipped with rockgarden. |
-| **N1** | Collections | High | Unified content model. Progressive: namespace → schema → templates → page generation. |
-| **N2** | Build Hooks | Low-Med | Shell commands at pre/post-build + post-collect. Enables data pipelines, derived assets. |
-| **12** | Base Path Prefix | Low | Already planned. Required for subpath deployment (`/2025/`). |
-| **N3** | Static Assets (CSS/JS) | Low | `_styles/` and `_scripts/` conventions. Quick win. |
-| **N4** | SEO & Meta Tags | Medium | Frontmatter-driven meta, OG tags. Default template updates. |
+| **10B** | Layout System | Medium | Per-page layouts via frontmatter. Refactor `base.html` to skeleton + `layouts/docs.html`. Prerequisite for custom themes. |
+| **16** | Static Assets (CSS/JS) | Low | `_themes/<name>/static/` convention. Required for themes that bring their own CSS. |
+| **10C** | Theme Export CLI | Low | `rockgarden theme export` copies default theme to `_themes/default/`. |
+| **14** | Collections | High | Directory-scoped content namespaces, optional schemas, YAML/JSON formats, custom templates/URLs. |
+| **15** | Build Hooks | Low-Med | Shell commands at `pre_build`, `post_collect`, `post_build`. Enables data pipelines, derived assets. |
+| **12** | Base Path Prefix | Low | Required for subpath deployment (e.g., `/2025/`). |
+| **17** | SEO & Meta Tags | Medium | Frontmatter-driven `<meta>`, Open Graph tags. |
 
 ### Phase C: Enhanced Features
 
-Nice-to-haves, not required for either release target.
-
 | ID | Feature | Complexity | Notes |
 |---|---|---|---|
-| **09** | Macros | Medium | Already planned. Jinja2 component reuse. |
-| **11** | RSS Feed | Low | Already planned. |
-| **N7** | Config Validator | Low | Validate config file on load, warn about unknown fields, deprecated locations. UX improvement. |
+| **09** | Macros | Medium | User-defined Jinja2 macros/components. |
+| **11** | RSS Feed | Low | RSS/Atom feed generation. |
+| **N8** | Tag Index Pages | Medium | `/tags/<tag>/` listing pages. |
 
 ---
 

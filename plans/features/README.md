@@ -27,7 +27,7 @@ The [PyOhio static website](https://github.com/pyohio/static-website) (Astro + P
 | 07 | [Backlinks](07-backlinks.md) | ✅ | A | Pages that link to current page |
 | 08 | [Search](08-search.md) | ✅ | A | Client-side search |
 | 09 | [Macros](09-macros.md) | ❌ | C | User-defined Jinja2 macros |
-| 10 | [Progressive Customization](10-progressive-customization.md) | In Progress | — | Themes and layouts |
+| 10 | [Progressive Customization](10-progressive-customization.md) | In Progress | B | Config separation ✅, layout system + theme export pending |
 | 11 | [RSS Feed](11-rss-feed.md) | ❌ | C | RSS/Atom feed generation |
 | 12 | [Base Path Prefix](12-base-path-prefix.md) | ❌ | B | Deploy to subdirectories |
 | 13 | [Polish](13-polish.md) | ✅ | A | Sitemap, 404, TOC, build info, timing |
@@ -45,7 +45,7 @@ The [PyOhio static website](https://github.com/pyohio/static-website) (Astro + P
 ## Roadmap Phases
 
 - **Phase A — Zero-Config Release** ✅: Callouts (05), backlinks (07), broken link handling (N6), polish (13), accessibility (18), search (08), tag display (N7), template decomposition (N9), newline handling (N10), embeds incl. transclusions (04)
-- **Phase B — General SSG / PyOhio (0.9)**: Layout system (10B), collections (14), build hooks (15), base path (12), static assets (16), SEO (17), tag index pages (N8)
+- **Phase B — General SSG / PyOhio (0.9)**: Layout system (10B), static assets (16), theme export CLI (10C), collections (14), build hooks (15), base path (12), SEO (17), tag index pages (N8)
 - **Phase C — Enhanced Features**: Macros (09), RSS (11)
 
 ## Quartz Features Reference
@@ -76,5 +76,5 @@ From test vaults' Quartz configs:
 
 **Customizations found:**
 - [ ] `BeyondLink` component (frontmatter-driven D&D Beyond links)
-- [ ] Build info in footer (timestamp, git commit)
+- [x] Build info in footer (timestamp, git commit)
 - [x] Ignore patterns (private, templates, .obsidian)
