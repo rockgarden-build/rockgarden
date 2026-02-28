@@ -158,19 +158,19 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     cache_hash = _static_hash(output)
 
     build_info = None
-    if config.build.show_build_info:
+    if config.theme.show_build_info:
         build_info = get_build_info(
             source.parent,
-            include_git=config.build.show_build_commit,
+            include_git=config.theme.show_build_commit,
         )
 
     site_config = {
         "title": config.site.title,
         "nav": nav_tree,
-        "nav_default_state": config.nav.default_state,
+        "nav_default_state": config.theme.nav_default_state,
         "daisyui_theme": config.theme.daisyui_default,
         "daisyui_themes": config.theme.daisyui_themes,
-        "search_enabled": config.search.enabled,
+        "search_enabled": config.theme.search,
         "build_info": build_info,
         "cache_hash": cache_hash,
     }
@@ -217,7 +217,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         page.html = process_callouts(render_markdown(content))
 
         toc_entries = None
-        if config.toc.enabled:
+        if config.theme.toc:
             page.html, toc_entries = extract_toc(
                 page.html, max_level=config.toc.max_depth
             )
@@ -226,7 +226,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
 
         # Get backlinks if enabled
         backlinks_tree = None
-        if config.backlinks.enabled:
+        if config.theme.backlinks:
             backlink_slugs = link_index.get_backlinks(page.slug)
             backlink_pages = [
                 store.get_by_slug(slug)
@@ -294,7 +294,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     copy_assets(all_media, source, output)
 
     # Generate search index if enabled
-    if config.search.enabled:
+    if config.theme.search:
         search_index = build_search_index(
             pages, config.search.include_content, clean_urls
         )

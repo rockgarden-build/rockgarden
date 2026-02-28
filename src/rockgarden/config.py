@@ -24,24 +24,38 @@ class BuildConfig:
         default_factory=lambda: [".obsidian", "private", "templates", "Templates"]
     )
     icons_dir: Path | None = None
+
+
+@dataclass
+class ThemeConfig:
+    """Theme configuration.
+
+    Contains both theme-general settings (which any well-built theme should
+    honour) and default-theme-specific settings (DaisyUI, build info footer,
+    nav display state).
+    """
+
+    # Theme selection
+    name: str = ""
+    default_layout: str = ""
+
+    # Theme-general feature flags
+    toc: bool = True
+    backlinks: bool = True
+    search: bool = True
+
+    # Default theme specific
+    daisyui_default: str = "light"
+    daisyui_themes: list[str] = field(default_factory=list)
+    nav_default_state: str = "collapsed"
     show_build_info: bool = True
     show_build_commit: bool = False
 
 
 @dataclass
-class ThemeConfig:
-    """Theme configuration."""
-
-    name: str = ""
-    daisyui_default: str = "light"
-    daisyui_themes: list[str] = field(default_factory=list)
-
-
-@dataclass
 class NavConfig:
-    """Navigation configuration."""
+    """Navigation structure configuration."""
 
-    default_state: str = "collapsed"
     hide: list[str] = field(default_factory=list)
     labels: dict[str, str] = field(default_factory=dict)
     sort: str = "files-first"
@@ -49,25 +63,16 @@ class NavConfig:
 
 
 @dataclass
-class BacklinksConfig:
-    """Backlinks configuration."""
-
-    enabled: bool = True
-
-
-@dataclass
 class TocConfig:
-    """Table of contents configuration."""
+    """Table of contents extraction configuration."""
 
-    enabled: bool = True
     max_depth: int = 4
 
 
 @dataclass
 class SearchConfig:
-    """Search configuration."""
+    """Search index configuration."""
 
-    enabled: bool = True
     include_content: bool = True
 
 
@@ -92,7 +97,6 @@ class Config:
     build: BuildConfig = field(default_factory=BuildConfig)
     theme: ThemeConfig = field(default_factory=ThemeConfig)
     nav: NavConfig = field(default_factory=NavConfig)
-    backlinks: BacklinksConfig = field(default_factory=BacklinksConfig)
     toc: TocConfig = field(default_factory=TocConfig)
     search: SearchConfig = field(default_factory=SearchConfig)
     dates: DatesConfig = field(default_factory=DatesConfig)
@@ -126,7 +130,6 @@ class Config:
         build_data = data.get("build", {})
         theme_data = data.get("theme", {})
         nav_data = data.get("nav", {})
-        backlinks_data = data.get("backlinks", {})
         toc_data = data.get("toc", {})
         search_data = data.get("search", {})
         dates_data = data.get("dates", {})
@@ -145,35 +148,33 @@ class Config:
                 "ignore_patterns", BuildConfig().ignore_patterns
             ),
             icons_dir=Path(icons_dir_raw) if icons_dir_raw else None,
-            show_build_info=build_data.get("show_build_info", True),
-            show_build_commit=build_data.get("show_build_commit", False),
         )
 
         theme = ThemeConfig(
             name=theme_data.get("name", ""),
+            default_layout=theme_data.get("default_layout", ""),
+            toc=theme_data.get("toc", True),
+            backlinks=theme_data.get("backlinks", True),
+            search=theme_data.get("search", True),
             daisyui_default=theme_data.get("daisyui_default", "light"),
             daisyui_themes=theme_data.get("daisyui_themes", []),
+            nav_default_state=theme_data.get("nav_default_state", "collapsed"),
+            show_build_info=theme_data.get("show_build_info", True),
+            show_build_commit=theme_data.get("show_build_commit", False),
         )
 
         nav = NavConfig(
-            default_state=nav_data.get("default_state", "collapsed"),
             hide=nav_data.get("hide", []),
             labels=nav_data.get("labels", {}),
             sort=nav_data.get("sort", "files-first"),
             link_auto_index=nav_data.get("link_auto_index", False),
         )
 
-        backlinks = BacklinksConfig(
-            enabled=backlinks_data.get("enabled", True),
-        )
-
         toc = TocConfig(
-            enabled=toc_data.get("enabled", True),
             max_depth=toc_data.get("max_depth", 4),
         )
 
         search = SearchConfig(
-            enabled=search_data.get("enabled", True),
             include_content=search_data.get("include_content", True),
         )
 
@@ -197,7 +198,6 @@ class Config:
             build=build,
             theme=theme,
             nav=nav,
-            backlinks=backlinks,
             toc=toc,
             search=search,
             dates=dates,
