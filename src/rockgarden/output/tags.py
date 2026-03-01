@@ -32,6 +32,7 @@ def build_tag_pages(
     site_config: dict,
     output: Path,
     clean_urls: bool = True,
+    base_path: str = "",
 ) -> None:
     """Generate /tags/<slug>/ and /tags/ pages in the output directory."""
     tag_index_template = env.get_template("tag_index.html")
@@ -39,7 +40,7 @@ def build_tag_pages(
 
     for tag_slug, tagged_pages in tags.items():
         page_entries = [
-            {"title": p.title, "url": get_url(p.slug, clean_urls)}
+            {"title": p.title, "url": get_url(p.slug, clean_urls, base_path)}
             for p in tagged_pages
         ]
         html = tag_index_template.render(

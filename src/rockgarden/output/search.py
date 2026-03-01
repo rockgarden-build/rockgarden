@@ -35,7 +35,7 @@ def strip_html(html: str) -> str:
 
 
 def build_search_index(
-    pages: list[Page], include_content: bool = True, clean_urls: bool = True
+    pages: list[Page], include_content: bool = True, clean_urls: bool = True, base_path: str = ""
 ) -> list[dict]:
     """Generate search index from pages.
 
@@ -53,7 +53,7 @@ def build_search_index(
         # Build basic entry
         entry = {
             "title": page.title,
-            "url": get_url(page.slug, clean_urls),
+            "url": get_url(page.slug, clean_urls, base_path),
         }
 
         # Add tags if present

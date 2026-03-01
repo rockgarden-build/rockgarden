@@ -39,7 +39,7 @@ from rockgarden.output.search import build_search_index
 from rockgarden.output.sitemap import build_sitemap
 from rockgarden.output.tags import build_tag_pages, collect_tags
 from rockgarden.render import create_engine, render_markdown, render_page
-from rockgarden.urls import get_folder_url, get_output_path, get_url
+from rockgarden.urls import get_base_path, get_folder_url, get_output_path, get_url
 
 
 @dataclass
@@ -145,6 +145,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
 
     pages = load_content(source, config.build.ignore_patterns, config.dates)
     clean_urls = config.site.clean_urls
+    base_path = get_base_path(config.site.base_url)
 
     # Build media index before creating store so it can resolve media file links
     media_index = build_media_index(source)
@@ -152,9 +153,9 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
 
     link_index = build_link_index(pages, store)
 
-    nav_tree = build_nav_tree(pages, config.nav, clean_urls)
+    nav_tree = build_nav_tree(pages, config.nav, clean_urls, base_path)
 
-    env = create_engine(config, site_root=source.parent)
+    env = create_engine(config, site_root=source.parent, base_path=base_path)
 
     cache_hash = _static_hash(output)
 
@@ -170,6 +171,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         "description": config.site.description,
         "og_image": config.site.og_image,
         "base_url": config.site.base_url,
+        "base_path": base_path,
         "clean_urls": config.site.clean_urls,
         "tag_index": config.theme.tag_index,
         "nav": nav_tree,
@@ -227,7 +229,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
                 page.html, max_level=config.toc.max_depth
             )
 
-        breadcrumbs = build_breadcrumbs(page, pages, config.nav, clean_urls)
+        breadcrumbs = build_breadcrumbs(page, pages, config.nav, clean_urls, base_path)
 
         # Get backlinks if enabled
         backlinks_tree = None
@@ -239,7 +241,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
                 if store.get_by_slug(slug)
             ]
             if backlink_pages:
-                backlinks_tree = build_nav_tree(backlink_pages, config.nav, clean_urls)
+                backlinks_tree = build_nav_tree(backlink_pages, config.nav, clean_urls, base_path)
 
         html = render_page(
             env, page, site_config, breadcrumbs, backlinks_tree, toc_entries
@@ -251,7 +253,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
 
         count += 1
 
-    folder_indexes = generate_folder_indexes(pages, config.nav, clean_urls)
+    folder_indexes = generate_folder_indexes(pages, config.nav, clean_urls, base_path)
     rendered_folder_indexes: list = []
     folder_template = env.get_template("folder_index.html")
 
@@ -280,7 +282,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
             processed = transform_md_links(processed, clean_urls)
             folder.custom_content = process_callouts(render_markdown(processed))
 
-        breadcrumbs = _build_folder_breadcrumbs(folder, pages, config.nav, clean_urls)
+        breadcrumbs = _build_folder_breadcrumbs(folder, pages, config.nav, clean_urls, base_path)
 
         html = folder_template.render(
             folder=folder,
@@ -300,7 +302,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     # Generate search index if enabled
     if config.theme.search:
         search_index = build_search_index(
-            pages, config.search.include_content, clean_urls
+            pages, config.search.include_content, clean_urls, base_path
         )
         search_index_file = output / "search-index.json"
         search_index_file.write_text(json.dumps(search_index))
@@ -309,7 +311,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     if config.theme.tag_index:
         tags = collect_tags(pages)
         if tags:
-            build_tag_pages(tags, env, site_config, output, clean_urls)
+            build_tag_pages(tags, env, site_config, output, clean_urls, base_path)
 
     # Generate sitemap if base_url is configured
     if config.site.base_url:
@@ -329,7 +331,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     )
 
 
-def _build_folder_breadcrumbs(folder, pages, nav_config, clean_urls=True):
+def _build_folder_breadcrumbs(folder, pages, nav_config, clean_urls=True, base_path=""):
     """Build breadcrumbs for a folder index page."""
     from rockgarden.nav import Breadcrumb, resolve_label
 
@@ -343,7 +345,7 @@ def _build_folder_breadcrumbs(folder, pages, nav_config, clean_urls=True):
     breadcrumbs = []
 
     root_label = resolve_label("", "Home", nav_config.labels, folder_pages)
-    root_path = get_folder_url("", clean_urls)
+    root_path = get_folder_url("", clean_urls, base_path)
     breadcrumbs.append(Breadcrumb(label=root_label, path=root_path))
 
     folder_path = folder.slug.rsplit("/", 1)[0] if "/" in folder.slug else ""
@@ -358,7 +360,7 @@ def _build_folder_breadcrumbs(folder, pages, nav_config, clean_urls=True):
         path = "/".join(current_parts)
 
         label = resolve_label(path, part, nav_config.labels, folder_pages)
-        folder_url = get_folder_url(path, clean_urls)
+        folder_url = get_folder_url(path, clean_urls, base_path)
         breadcrumbs.append(Breadcrumb(label=label, path=folder_url))
 
     return breadcrumbs

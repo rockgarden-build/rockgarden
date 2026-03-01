@@ -29,6 +29,7 @@ def _make_format_datetime(tz_name: str):
 def create_engine(
     config: Config,
     site_root: Path | None = None,
+    base_path: str = "",
 ) -> Environment:
     """Create a Jinja2 environment with layered template loading.
 
@@ -65,8 +66,8 @@ def create_engine(
     env.filters["format_datetime"] = _make_format_datetime(config.dates.timezone)
     clean_urls = config.site.clean_urls
     env.globals["normalize_tag"] = normalize_tag
-    env.globals["tag_url"] = lambda slug: get_tag_url(slug, clean_urls)
-    env.globals["tags_root_url"] = get_tags_root_url(clean_urls)
+    env.globals["tag_url"] = lambda slug: get_tag_url(slug, clean_urls, base_path)
+    env.globals["tags_root_url"] = get_tags_root_url(clean_urls, base_path)
     return env
 
 
