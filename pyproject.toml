@@ -25,6 +25,7 @@ dependencies = [
     "python-frontmatter>=1.0.0",
     "linkify-it-py>=2.0.3",
     "tzdata>=2024.1",
+    "pydantic>=2.12.5",
 ]
 
 [project.scripts]

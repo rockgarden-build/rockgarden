@@ -11,6 +11,7 @@ my-site/
 ├── _themes/<name>/      # complete theme packages
 ├── _plugins/<name>/     # behavioral extensions (future)
 ├── _macros/             # reusable Jinja2 snippets (planned — Feature 09)
+├── _models/             # Pydantic models for typed collection entry validation
 ├── _styles/             # custom CSS (planned — Feature 16)
 ├── _scripts/            # custom JS (planned — Feature 16)
 └── content/
@@ -58,6 +59,18 @@ A shell command or Python callable that runs at a build lifecycle stage.
 Hooks can be declared directly in `rockgarden.toml` under `[hooks]`, or provided by a plugin.
 
 Status: planned (Feature 15, Phase B).
+
+## Model
+
+An optional Pydantic `BaseModel` subclass that defines the schema for collection entries.
+
+- Lives in `_models/<name>.py` (site-level) or `_themes/<name>/_models/<name>.py` (theme-provided)
+- Class name is the title-cased filename (`speaker.py` → `Speaker`)
+- Referenced by `model = "speaker"` in a `[[collections]]` config block
+- Resolution cascade: site-level overrides theme-provided (same pattern as templates)
+- Without a model, collection entries are plain dicts; with a model, entries are validated on load
+
+Status: planned (Feature 14, Phase B).
 
 ## Macro
 

@@ -20,6 +20,8 @@ Noted but not currently planned:
 - **Configurable reserved directory names**: The special directories `_templates/`, `_themes/`, and `_static/` (output) are currently hardcoded. These should be configurable via `[build]` config with the current names as documented defaults. Useful for sites where those names conflict with content. (`_site` output is already configurable via `[site] output`.)
 - **Extract icon handling**: Move icon resolution (`rockgarden.icons`) into a standalone generic Jinja icons package. Current implementation is bordering on out-of-scope for a static site generator.
 
+- **Theme manifest collection defaults**: A `theme.toml` in a theme directory that declares per-collection defaults (`template`, `url_pattern`, `model`). Sites using the theme would only need to provide `source` in their `[[collections]]` config. Deferred from Phase 2 — currently sites must declare all collection fields explicitly, and themes provide model classes via `_themes/<name>/_models/` cascade.
+
 Moved to roadmap:
 - ~~Content from other data sources~~ → Feature 14 (Collections) + Feature 15 (Build Hooks)
 
