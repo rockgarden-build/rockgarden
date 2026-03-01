@@ -1,20 +1,28 @@
 """Tag index page generation."""
 
+import re
 from pathlib import Path
 
 from jinja2 import Environment
 
 from rockgarden.content.models import Page
-from rockgarden.urls import get_url
+from rockgarden.urls import get_tag_url, get_tags_root_url, get_url
 
 
 def normalize_tag(tag: str) -> str:
     """Normalize a tag to a URL-safe slug.
 
-    Strips leading '#' and lowercases. Tags 'Python', '#python', and 'python'
-    all normalize to 'python'.
+    Strips leading '#', lowercases, and replaces any character that is not
+    alphanumeric, hyphen, or underscore with a hyphen. This prevents path
+    traversal via tags containing '/' or '..'.
+
+    Tags 'Python', '#python', and 'python' all normalize to 'python'.
+    Obsidian nested tags like 'character/pc' normalize to 'character-pc'.
     """
-    return tag.lstrip("#").lower()
+    slug = tag.lstrip("#").lower()
+    slug = re.sub(r"[^a-z0-9_-]", "-", slug)
+    slug = re.sub(r"-+", "-", slug)
+    return slug.strip("-")
 
 
 def collect_tags(pages: list[Page]) -> dict[str, list[Page]]:
@@ -56,7 +64,10 @@ def build_tag_pages(
             pages=page_entries,
             site=site_config,
         )
-        out_file = output / "tags" / tag_slug / "index.html"
+        if clean_urls:
+            out_file = output / "tags" / tag_slug / "index.html"
+        else:
+            out_file = output / "tags" / f"{tag_slug}.html"
         out_file.parent.mkdir(parents=True, exist_ok=True)
         out_file.write_text(html)
 

@@ -73,6 +73,28 @@ def get_url(slug: str, clean_urls: bool = True) -> str:
     return f"/{slug}.html"
 
 
+def get_tag_url(tag_slug: str, clean_urls: bool = True) -> str:
+    """Get URL for a tag index page.
+
+    Args:
+        tag_slug: Normalized tag slug (e.g., "python").
+        clean_urls: If True, uses trailing slash format.
+
+    Returns:
+        URL path:
+        - clean_urls=True:  "python" → "/tags/python/"
+        - clean_urls=False: "python" → "/tags/python.html"
+    """
+    if clean_urls:
+        return f"/tags/{tag_slug}/"
+    return f"/tags/{tag_slug}.html"
+
+
+def get_tags_root_url(clean_urls: bool = True) -> str:
+    """Get URL for the tags root index page."""
+    return "/tags/" if clean_urls else "/tags/index.html"
+
+
 def get_folder_url(folder_path: str, clean_urls: bool = True) -> str:
     """Get URL for a folder.
 

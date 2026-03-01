@@ -10,6 +10,7 @@ from jinja2 import ChoiceLoader, Environment, FileSystemLoader, PackageLoader
 from rockgarden.config import Config
 from rockgarden.content.models import Page
 from rockgarden.nav.tree import NavNode
+from rockgarden.urls import get_tag_url, get_tags_root_url
 
 
 def _make_format_datetime(tz_name: str):
@@ -62,6 +63,9 @@ def create_engine(
         autoescape=True,
     )
     env.filters["format_datetime"] = _make_format_datetime(config.dates.timezone)
+    clean_urls = config.site.clean_urls
+    env.globals["tag_url"] = lambda slug: get_tag_url(slug, clean_urls)
+    env.globals["tags_root_url"] = get_tags_root_url(clean_urls)
     return env
 
 
