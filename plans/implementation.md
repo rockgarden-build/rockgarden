@@ -195,6 +195,7 @@ After each step, verify incrementally:
 - [ ] **Graph View**: Interactive visualization of page connections
   - Requirements to be workshopped and defined
 
+- [ ] Config validation command + theme manifest (N11)
 - [ ] Collections and content models (Feature 14)
 - [ ] Build hooks (Feature 15)
 - [ ] Base path prefix support (Feature 12)
