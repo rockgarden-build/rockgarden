@@ -24,6 +24,7 @@ dependencies = [
     "markdown-it-py>=3.0.0",
     "python-frontmatter>=1.0.0",
     "linkify-it-py>=2.0.3",
+    "tzdata>=2024.1",
 ]
 
 [project.scripts]
