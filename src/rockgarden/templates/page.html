@@ -17,11 +17,11 @@
             {% if page.created or page.modified or tags %}
             <div class="text-sm text-base-content/50 -mt-4 mb-4 flex flex-wrap items-center gap-2">
                 {% if page.created and page.modified %}
-                <span>Created <time datetime="{{ page.created.strftime('%Y-%m-%d') }}">{{ page.created.strftime('%Y-%m-%d') }}</time> · Updated <time datetime="{{ page.modified.strftime('%Y-%m-%d') }}">{{ page.modified.strftime('%Y-%m-%d') }}</time></span>
+                <span>Created <time datetime="{{ page.created | format_datetime }}">{{ page.created | format_datetime }}</time> · Updated <time datetime="{{ page.modified | format_datetime }}">{{ page.modified | format_datetime }}</time></span>
                 {% elif page.modified %}
-                <time datetime="{{ page.modified.strftime('%Y-%m-%d') }}">{{ page.modified.strftime('%Y-%m-%d') }}</time>
+                <time datetime="{{ page.modified | format_datetime }}">{{ page.modified | format_datetime }}</time>
                 {% elif page.created %}
-                <span>Created <time datetime="{{ page.created.strftime('%Y-%m-%d') }}">{{ page.created.strftime('%Y-%m-%d') }}</time></span>
+                <span>Created <time datetime="{{ page.created | format_datetime }}">{{ page.created | format_datetime }}</time></span>
                 {% endif %}
                 {% if tags %}
                 <div class="flex flex-wrap gap-1">
