@@ -51,6 +51,11 @@
                 <div class="max-w-4xl mx-auto">
                     {% block content %}{% endblock %}
                 </div>
+                {% block footer %}
+                {% if site.build_info %}
+                {% include "components/footer.html" %}
+                {% endif %}
+                {% endblock %}
             </main>
         </div>
 
@@ -95,11 +100,6 @@
     </div>
     {% endif %}
 
-    {% block footer %}
-    {% if site.build_info %}
-    {% include "components/footer.html" %}
-    {% endif %}
-    {% endblock %}
     <script>
         // Theme switcher functionality
         (function() {
