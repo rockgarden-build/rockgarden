@@ -274,7 +274,7 @@
                         excerpts.forEach(function(excerpt) {
                             const excerptDiv = document.createElement('div');
                             excerptDiv.className = 'text-sm text-base-content/80 leading-relaxed mb-2 ml-8';
-                            excerptDiv.textContent = excerpt;
+                            excerptDiv.innerHTML = highlightMatches(excerpt, query);
                             resultCard.appendChild(excerptDiv);
                         });
 
