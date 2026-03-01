@@ -1,6 +1,7 @@
 """Centralized URL and path generation utilities."""
 
 import re
+from urllib.parse import urlparse
 
 
 def normalize_tag(tag: str) -> str:
@@ -17,6 +18,20 @@ def normalize_tag(tag: str) -> str:
     slug = re.sub(r"[^a-z0-9_-]", "-", slug)
     slug = re.sub(r"-+", "-", slug)
     return slug.strip("-")
+
+
+def get_base_path(base_url: str) -> str:
+    """Extract the path component from a base URL for use as a path prefix.
+
+    Examples:
+        "https://example.com/docs/" → "/docs"
+        "https://example.com/" → ""
+        "" → ""
+    """
+    if not base_url:
+        return ""
+    path = urlparse(base_url).path.rstrip("/")
+    return path
 
 
 def generate_slug(relative_path: str) -> str:
@@ -63,12 +78,13 @@ def get_output_path(slug: str, clean_urls: bool = True) -> str:
     return f"{slug}.html"
 
 
-def get_url(slug: str, clean_urls: bool = True) -> str:
+def get_url(slug: str, clean_urls: bool = True, base_path: str = "") -> str:
     """Get URL for a page.
 
     Args:
         slug: The page slug (e.g., "about", "folder/page").
         clean_urls: If True, uses trailing slash format.
+        base_path: Optional path prefix (e.g., "/docs").
 
     Returns:
         URL path:
@@ -81,20 +97,21 @@ def get_url(slug: str, clean_urls: bool = True) -> str:
     if parts[-1] == "index":
         folder_path = "/".join(parts[:-1])
         if folder_path:
-            return f"/{folder_path}/"
-        return "/"
+            return f"{base_path}/{folder_path}/"
+        return f"{base_path}/"
 
     if clean_urls:
-        return f"/{slug}/"
-    return f"/{slug}.html"
+        return f"{base_path}/{slug}/"
+    return f"{base_path}/{slug}.html"
 
 
-def get_tag_url(tag_slug: str, clean_urls: bool = True) -> str:
+def get_tag_url(tag_slug: str, clean_urls: bool = True, base_path: str = "") -> str:
     """Get URL for a tag index page.
 
     Args:
         tag_slug: Normalized tag slug (e.g., "python").
         clean_urls: If True, uses trailing slash format.
+        base_path: Optional path prefix (e.g., "/docs").
 
     Returns:
         URL path:
@@ -102,21 +119,22 @@ def get_tag_url(tag_slug: str, clean_urls: bool = True) -> str:
         - clean_urls=False: "python" → "/tags/python.html"
     """
     if clean_urls:
-        return f"/tags/{tag_slug}/"
-    return f"/tags/{tag_slug}.html"
+        return f"{base_path}/tags/{tag_slug}/"
+    return f"{base_path}/tags/{tag_slug}.html"
 
 
-def get_tags_root_url(clean_urls: bool = True) -> str:
+def get_tags_root_url(clean_urls: bool = True, base_path: str = "") -> str:
     """Get URL for the tags root index page."""
-    return "/tags/" if clean_urls else "/tags/index.html"
+    return f"{base_path}/tags/" if clean_urls else f"{base_path}/tags/index.html"
 
 
-def get_folder_url(folder_path: str, clean_urls: bool = True) -> str:
+def get_folder_url(folder_path: str, clean_urls: bool = True, base_path: str = "") -> str:
     """Get URL for a folder.
 
     Args:
         folder_path: Path to folder (e.g., "examples", "docs/api").
         clean_urls: If True, uses trailing slash format.
+        base_path: Optional path prefix (e.g., "/docs").
 
     Returns:
         URL path:
@@ -125,8 +143,8 @@ def get_folder_url(folder_path: str, clean_urls: bool = True) -> str:
         - Root folder:      "" → "/" or "/index.html"
     """
     if not folder_path:
-        return "/" if clean_urls else "/index.html"
+        return f"{base_path}/" if clean_urls else f"{base_path}/index.html"
 
     if clean_urls:
-        return f"/{folder_path}/"
-    return f"/{folder_path}/index.html"
+        return f"{base_path}/{folder_path}/"
+    return f"{base_path}/{folder_path}/index.html"

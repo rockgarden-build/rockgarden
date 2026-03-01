@@ -74,6 +74,7 @@ def build_nav_tree(
     pages: list[Page],
     config: NavConfig | None = None,
     clean_urls: bool = True,
+    base_path: str = "",
 ) -> NavNode:
     """Build navigation tree from a list of pages.
 
@@ -159,13 +160,13 @@ def build_nav_tree(
             if is_folder:
                 original_name = data.get("_original_name", name)
                 label = resolve_label(path, original_name, config.labels, folder_pages)
-                url_path = get_folder_url(path, clean_urls)
+                url_path = get_folder_url(path, clean_urls, base_path)
                 if path in folder_pages:
                     nav_order = folder_pages[path].frontmatter.get("nav_order")
             else:
                 page = data.get("_page")
                 label = page.title if page else name
-                url_path = get_url(path, clean_urls)
+                url_path = get_url(path, clean_urls, base_path)
                 if page:
                     nav_order = page.frontmatter.get("nav_order")
 
@@ -176,7 +177,7 @@ def build_nav_tree(
             if is_folder:
                 if path in folder_pages:
                     index_page = folder_pages[path]
-                    index_path = get_url(index_page.slug, clean_urls)
+                    index_path = get_url(index_page.slug, clean_urls, base_path)
                 elif config.link_auto_index:
                     index_path = url_path
 
@@ -199,7 +200,7 @@ def build_nav_tree(
 
     return NavNode(
         name="",
-        path=get_folder_url("", clean_urls),
+        path=get_folder_url("", clean_urls, base_path),
         label=root_label,
         is_folder=True,
         children=root_children,

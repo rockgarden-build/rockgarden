@@ -52,6 +52,7 @@ def generate_folder_indexes(
     pages: list[Page],
     config: NavConfig | None = None,
     clean_urls: bool = True,
+    base_path: str = "",
 ) -> list[FolderIndex]:
     """Generate folder index data for all folders.
 
@@ -81,7 +82,7 @@ def generate_folder_indexes(
         if _should_hide(folder_path, config.hide):
             continue
 
-        children = _get_folder_children(folder_path, pages, config, clean_urls)
+        children = _get_folder_children(folder_path, pages, config, clean_urls, base_path)
 
         if folder_path in existing_indexes:
             index_page = existing_indexes[folder_path]
@@ -157,6 +158,7 @@ def _get_folder_children(
     pages: list[Page],
     config: NavConfig,
     clean_urls: bool = True,
+    base_path: str = "",
 ) -> list[FolderChild]:
     """Get direct children of a folder."""
     children: list[FolderChild] = []
@@ -194,7 +196,7 @@ def _get_folder_children(
             children.append(
                 FolderChild(
                     title=page.title,
-                    path=get_url(page.slug, clean_urls),
+                    path=get_url(page.slug, clean_urls, base_path),
                     is_folder=False,
                     modified=modified,
                     tags=page.frontmatter.get("tags", []),
@@ -221,7 +223,7 @@ def _get_folder_children(
                 children.append(
                     FolderChild(
                         title=label,
-                        path=get_folder_url(subfolder_path, clean_urls),
+                        path=get_folder_url(subfolder_path, clean_urls, base_path),
                         is_folder=True,
                         nav_order=nav_order,
                     )
