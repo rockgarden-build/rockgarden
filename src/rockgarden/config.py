@@ -1,33 +1,34 @@
 """Configuration loading and defaults for rockgarden."""
 
 import tomllib
-from dataclasses import dataclass, field
 from pathlib import Path
 
+from pydantic import BaseModel, Field, field_validator
 
-@dataclass
-class SiteConfig:
+
+class SiteConfig(BaseModel):
     """Site-level configuration."""
 
     title: str = "My Site"
-    source: Path = field(default_factory=lambda: Path("."))
-    output: Path = field(default_factory=lambda: Path("_site"))
+    source: Path = Path(".")
+    output: Path = Path("_site")
     clean_urls: bool = True
     base_url: str = ""
 
+    @field_validator("base_url", mode="after")
+    @classmethod
+    def strip_trailing_slash(cls, v: str) -> str:
+        return v.rstrip("/")
 
-@dataclass
-class BuildConfig:
+
+class BuildConfig(BaseModel):
     """Build-related configuration."""
 
-    ignore_patterns: list[str] = field(
-        default_factory=lambda: [".obsidian", "private", "templates", "Templates"]
-    )
+    ignore_patterns: list[str] = [".obsidian", "private", "templates", "Templates"]
     icons_dir: Path | None = None
 
 
-@dataclass
-class ThemeConfig:
+class ThemeConfig(BaseModel):
     """Theme configuration.
 
     Contains both theme-general settings (which any well-built theme should
@@ -46,61 +47,65 @@ class ThemeConfig:
 
     # Default theme specific
     daisyui_default: str = "light"
-    daisyui_themes: list[str] = field(default_factory=list)
+    daisyui_themes: list[str] = Field(default_factory=list)
     nav_default_state: str = "collapsed"
     show_build_info: bool = True
     show_build_commit: bool = False
 
 
-@dataclass
-class NavConfig:
+class NavConfig(BaseModel):
     """Navigation structure configuration."""
 
-    hide: list[str] = field(default_factory=list)
-    labels: dict[str, str] = field(default_factory=dict)
+    hide: list[str] = Field(default_factory=list)
+    labels: dict[str, str] = Field(default_factory=dict)
     sort: str = "files-first"
     link_auto_index: bool = False
 
 
-@dataclass
-class TocConfig:
+class TocConfig(BaseModel):
     """Table of contents extraction configuration."""
 
     max_depth: int = 4
 
 
-@dataclass
-class SearchConfig:
+class SearchConfig(BaseModel):
     """Search index configuration."""
 
     include_content: bool = True
 
 
-@dataclass
-class DatesConfig:
+class DatesConfig(BaseModel):
     """Date display configuration."""
 
-    modified_date_fields: list[str] = field(
-        default_factory=lambda: ["modified", "updated", "last_modified"]
-    )
-    created_date_fields: list[str] = field(
-        default_factory=lambda: ["created", "date", "date_created"]
-    )
+    modified_date_fields: list[str] = ["modified", "updated", "last_modified"]
+    created_date_fields: list[str] = ["created", "date", "date_created"]
     modified_date_fallback: bool = False
     timezone: str = "UTC"
 
 
-@dataclass
-class Config:
+class CollectionConfig(BaseModel):
+    """Configuration for a named content collection."""
+
+    name: str
+    source: str
+    template: str | None = None
+    url_pattern: str | None = None
+    pages: bool = True
+    nav: bool = False
+    model: str | None = None
+
+
+class Config(BaseModel):
     """Root configuration object."""
 
-    site: SiteConfig = field(default_factory=SiteConfig)
-    build: BuildConfig = field(default_factory=BuildConfig)
-    theme: ThemeConfig = field(default_factory=ThemeConfig)
-    nav: NavConfig = field(default_factory=NavConfig)
-    toc: TocConfig = field(default_factory=TocConfig)
-    search: SearchConfig = field(default_factory=SearchConfig)
-    dates: DatesConfig = field(default_factory=DatesConfig)
+    site: SiteConfig = Field(default_factory=SiteConfig)
+    build: BuildConfig = Field(default_factory=BuildConfig)
+    theme: ThemeConfig = Field(default_factory=ThemeConfig)
+    nav: NavConfig = Field(default_factory=NavConfig)
+    toc: TocConfig = Field(default_factory=TocConfig)
+    search: SearchConfig = Field(default_factory=SearchConfig)
+    dates: DatesConfig = Field(default_factory=DatesConfig)
+    collections: list[CollectionConfig] = Field(default_factory=list)
 
     @classmethod
     def load(cls, config_path: Path | None = None) -> "Config":
@@ -122,85 +127,4 @@ class Config:
         with open(config_path, "rb") as f:
             data = tomllib.load(f)
 
-        return cls.from_dict(data)
-
-    @classmethod
-    def from_dict(cls, data: dict) -> "Config":
-        """Create Config from dictionary (parsed TOML)."""
-        site_data = data.get("site", {})
-        build_data = data.get("build", {})
-        theme_data = data.get("theme", {})
-        nav_data = data.get("nav", {})
-        toc_data = data.get("toc", {})
-        search_data = data.get("search", {})
-        dates_data = data.get("dates", {})
-
-        site = SiteConfig(
-            title=site_data.get("title", SiteConfig.title),
-            source=Path(site_data.get("source", ".")),
-            output=Path(site_data.get("output", "_site")),
-            clean_urls=site_data.get("clean_urls", True),
-            base_url=site_data.get("base_url", "").rstrip("/"),
-        )
-
-        icons_dir_raw = build_data.get("icons_dir")
-        build = BuildConfig(
-            ignore_patterns=build_data.get(
-                "ignore_patterns", BuildConfig().ignore_patterns
-            ),
-            icons_dir=Path(icons_dir_raw) if icons_dir_raw else None,
-        )
-
-        theme = ThemeConfig(
-            name=theme_data.get("name", ""),
-            default_layout=theme_data.get("default_layout", ""),
-            toc=theme_data.get("toc", True),
-            backlinks=theme_data.get("backlinks", True),
-            search=theme_data.get("search", True),
-            daisyui_default=theme_data.get("daisyui_default", "light"),
-            daisyui_themes=theme_data.get("daisyui_themes", []),
-            nav_default_state=theme_data.get("nav_default_state", "collapsed"),
-            show_build_info=theme_data.get("show_build_info", True),
-            show_build_commit=theme_data.get("show_build_commit", False),
-        )
-
-        nav = NavConfig(
-            hide=nav_data.get("hide", []),
-            labels=nav_data.get("labels", {}),
-            sort=nav_data.get("sort", "files-first"),
-            link_auto_index=nav_data.get("link_auto_index", False),
-        )
-
-        toc = TocConfig(
-            max_depth=toc_data.get("max_depth", 4),
-        )
-
-        search = SearchConfig(
-            include_content=search_data.get("include_content", True),
-        )
-
-        dates_defaults = DatesConfig()
-        dates = DatesConfig(
-            modified_date_fields=dates_data.get(
-                "modified_date_fields",
-                dates_defaults.modified_date_fields,
-            ),
-            created_date_fields=dates_data.get(
-                "created_date_fields",
-                dates_defaults.created_date_fields,
-            ),
-            modified_date_fallback=dates_data.get(
-                "modified_date_fallback", False
-            ),
-            timezone=dates_data.get("timezone", "UTC"),
-        )
-
-        return cls(
-            site=site,
-            build=build,
-            theme=theme,
-            nav=nav,
-            toc=toc,
-            search=search,
-            dates=dates,
-        )
+        return cls.model_validate(data)

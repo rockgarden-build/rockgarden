@@ -12,11 +12,11 @@ Collections are progressively configurable:
 
 ```
 Just a name + source  → namespace/grouping only, renders markdown pages normally
-  + model             → schema/field expectations
   + formats           → load YAML/JSON/TOML in addition to markdown
   + template/url      → custom page generation
   + pages = false     → data-only, queryable but no output
   + nav = true        → appears in sidebar
+  + model             → typed entry validation via Pydantic BaseModel
 ```
 
 ## Use Cases
@@ -57,14 +57,9 @@ url_pattern = "/speakers/{slug}/"
 name = "schedule"
 source = "_data/schedule"
 pages = false
-
-# Optional models
-[models.pc]
-fields = ["name", "class", "level", "race"]
-
-[models.npc]
-fields = ["name", "location", "faction"]
 ```
+
+Models are defined as Python files, not in TOML — see [Content Models](#content-models) below.
 
 ## Nesting Behavior
 
@@ -86,11 +81,34 @@ This gives "NPC extends Character" behavior without explicit inheritance — it 
 | `url_pattern` | no | — | URL pattern with `{field}` placeholders |
 | `pages` | no | `true` | Whether to generate pages (requires template + url_pattern) |
 | `nav` | no | `false` | Whether generated pages appear in sidebar nav |
-| `model` | no | — | Name of a model from `[models.*]` config |
+| `model` | no | — | Model name — resolved to a Pydantic BaseModel via cascade (see below) |
+
+## Content Models
+
+Models are optional Python files containing a Pydantic `BaseModel` subclass. When a collection has `model = "speaker"`, rockgarden looks for a `Speaker` class using this cascade (first match wins):
+
+1. `_models/speaker.py` — site-level (highest priority)
+2. `_themes/<active-theme>/_models/speaker.py` — theme-provided
+
+Class name is the title-cased filename (`speaker.py` → `Speaker`).
+
+Example:
+
+```python
+# _models/speaker.py
+from pydantic import BaseModel
+
+class Speaker(BaseModel):
+    name: str
+    bio: str = ""
+    photo: str | None = None
+```
+
+Without a model, collection entries are plain dicts. With a model, entries are validated and coerced on load — missing required fields produce a build error.
 
 ## Data Layer
 
-The `ContentStore` stays in-memory (Python dicts/dataclasses) and becomes collection-aware. No external database required.
+The `ContentStore` stays in-memory and becomes collection-aware. No external database required.
 
 ```python
 store.list_content()                              # default collection
@@ -113,8 +131,7 @@ For hook scripts that need access to collected data, content is exported to JSON
 ### 1. Config
 
 ```python
-@dataclass
-class CollectionConfig:
+class CollectionConfig(BaseModel):
     name: str
     source: str
     template: str | None = None
@@ -122,13 +139,18 @@ class CollectionConfig:
     pages: bool = True
     nav: bool = False
     model: str | None = None
-
-@dataclass
-class ModelConfig:
-    fields: list[str]
 ```
 
-### 2. Collection-Aware ContentStore
+Added to the root `Config` model:
+```python
+collections: list[CollectionConfig] = Field(default_factory=list)
+```
+
+### 2. Model Resolution
+
+A `resolve_model(name, config, theme_dir)` function that walks the cascade and returns the Pydantic BaseModel class (or `None` if no model file is found).
+
+### 3. Collection-Aware ContentStore
 
 Extend `ContentStore` to track collection membership. Without config, all content is in the default collection. Named collections carve out subsets.
 
@@ -142,7 +164,7 @@ class ContentStore:
         """Export all collections to JSON for hook scripts."""
 ```
 
-### 3. Collection Loader
+### 4. Collection Loader
 
 Load files from collection source directories. Supported formats:
 - `.yaml` / `.yml` — parsed as dict of fields
@@ -150,20 +172,20 @@ Load files from collection source directories. Supported formats:
 - `.toml` — parsed as dict of fields
 - `.md` — frontmatter as fields, body rendered as HTML and available as `content`
 
-Each entry gets a `slug` derived from filename (or overridden by a `slug` field).
+Each entry gets a `slug` derived from filename (or overridden by a `slug` field). If a model is configured, entries are validated through it on load.
 
-### 4. Template Context
+### 5. Template Context
 
-All collections available in every template as `collections.<name>` (list of dicts). Jinja2's built-in filters handle querying.
+All collections available in every template as `collections.<name>` (list of dicts or model instances serialized to dict). Jinja2's built-in filters handle querying.
 
-### 5. Page Generation
+### 6. Page Generation
 
 For collections with `pages = true` and a `template` + `url_pattern`:
 - Generate one page per entry
 - URL from `url_pattern` with `{field}` replaced by entry fields
 - Render using specified template with entry data in context
 
-### 6. Nav Integration
+### 7. Nav Integration
 
 For collections with `nav = true`:
 - Add generated pages to nav tree
@@ -172,13 +194,14 @@ For collections with `nav = true`:
 ## Key Files to Create/Modify
 
 - `content/store.py` — Extend with collection awareness and JSON export
-- `content/collection.py` — New module: collection loading, format parsing
-- `config.py` — Add `CollectionConfig`, `ModelConfig` dataclasses
+- `content/collection.py` — New module: collection loading, format parsing, model resolution
+- `config.py` — Add `CollectionConfig` Pydantic BaseModel; add `collections` field to `Config`
 - `output/builder.py` — Load collections, generate pages, pass to templates
 - `render/engine.py` — Add collections to template context
 
 ## Dependencies
 
+- `pydantic>=2.0` (added for config migration)
 - `pyyaml` (already used by python-frontmatter)
 - `tomllib` (stdlib in 3.11+)
 - `json` (stdlib)
