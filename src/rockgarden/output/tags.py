@@ -1,28 +1,11 @@
 """Tag index page generation."""
 
-import re
 from pathlib import Path
 
 from jinja2 import Environment
 
 from rockgarden.content.models import Page
-from rockgarden.urls import get_tag_url, get_tags_root_url, get_url
-
-
-def normalize_tag(tag: str) -> str:
-    """Normalize a tag to a URL-safe slug.
-
-    Strips leading '#', lowercases, and replaces any character that is not
-    alphanumeric, hyphen, or underscore with a hyphen. This prevents path
-    traversal via tags containing '/' or '..'.
-
-    Tags 'Python', '#python', and 'python' all normalize to 'python'.
-    Obsidian nested tags like 'character/pc' normalize to 'character-pc'.
-    """
-    slug = tag.lstrip("#").lower()
-    slug = re.sub(r"[^a-z0-9_-]", "-", slug)
-    slug = re.sub(r"-+", "-", slug)
-    return slug.strip("-")
+from rockgarden.urls import get_tag_url, get_tags_root_url, get_url, normalize_tag
 
 
 def collect_tags(pages: list[Page]) -> dict[str, list[Page]]:

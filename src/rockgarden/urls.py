@@ -3,6 +3,22 @@
 import re
 
 
+def normalize_tag(tag: str) -> str:
+    """Normalize a tag to a URL-safe slug.
+
+    Strips leading '#', lowercases, and replaces any character that is not
+    alphanumeric, hyphen, or underscore with a hyphen. Prevents path traversal
+    via tags containing '/' or '..'.
+
+    Tags 'Python', '#python', and 'python' all normalize to 'python'.
+    Obsidian nested tags like 'character/pc' normalize to 'character-pc'.
+    """
+    slug = tag.lstrip("#").lower()
+    slug = re.sub(r"[^a-z0-9_-]", "-", slug)
+    slug = re.sub(r"-+", "-", slug)
+    return slug.strip("-")
+
+
 def generate_slug(relative_path: str) -> str:
     """Generate URL-safe slug from a relative file path.
 

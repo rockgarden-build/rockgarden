@@ -26,7 +26,7 @@
                 {% if tags %}
                 <div class="flex flex-wrap gap-1">
                     {% for tag in tags %}
-                    {% set tag_slug = tag.lstrip('#').lower() %}
+                    {% set tag_slug = normalize_tag(tag) %}
                     {% if site.tag_index %}
                     <a href="{{ tag_url(tag_slug) }}" class="badge badge-sm badge-ghost hover:badge-primary">{{ tag.lstrip('#') }}</a>
                     {% else %}
