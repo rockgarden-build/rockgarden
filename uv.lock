@@ -353,7 +353,7 @@ wheels = [
 
 [[package]]
 name = "rockgarden"
-version = "0.4.10"
+version = "0.4.11"
 source = { editable = "." }
 dependencies = [
     { name = "jinja2" },
