@@ -9,6 +9,9 @@
     {% if site.search_enabled %}
     <script src="{{ site.base_path }}/_static/lunr.min.js{% if site.cache_hash %}?v={{ site.cache_hash }}{% endif %}"></script>
     {% endif %}
+    {% for style in site.user_styles %}
+    <link rel="stylesheet" href="{{ site.base_path }}/styles/{{ style }}" />
+    {% endfor %}
     {% block head %}{% endblock %}
     <script>
         (function() {

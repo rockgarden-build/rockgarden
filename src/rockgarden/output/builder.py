@@ -65,6 +65,36 @@ def copy_static_files(output: Path) -> None:
         shutil.copytree(static_src, static_dst, dirs_exist_ok=True)
 
 
+def discover_user_assets(site_root: Path) -> tuple[list[str], list[str]]:
+    """Discover user-provided CSS and JS files.
+
+    Args:
+        site_root: Root directory of the site (parent of content source).
+
+    Returns:
+        Tuple of (style filenames, script filenames), each sorted.
+    """
+    styles_dir = site_root / "_styles"
+    scripts_dir = site_root / "_scripts"
+    styles = sorted(p.name for p in styles_dir.glob("*.css")) if styles_dir.exists() else []
+    scripts = sorted(p.name for p in scripts_dir.glob("*.js")) if scripts_dir.exists() else []
+    return styles, scripts
+
+
+def copy_user_assets(site_root: Path, output: Path, styles: list[str], scripts: list[str]) -> None:
+    """Copy user-provided CSS and JS files to the output directory."""
+    if styles:
+        out_styles = output / "styles"
+        out_styles.mkdir(parents=True, exist_ok=True)
+        for name in styles:
+            shutil.copy2(site_root / "_styles" / name, out_styles / name)
+    if scripts:
+        out_scripts = output / "scripts"
+        out_scripts.mkdir(parents=True, exist_ok=True)
+        for name in scripts:
+            shutil.copy2(site_root / "_scripts" / name, out_scripts / name)
+
+
 def _static_hash(output: Path) -> str:
     """Generate a short content hash of the CSS for cache busting."""
     css_path = output / "_static" / "rockgarden.css"
@@ -140,6 +170,10 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     output.mkdir(parents=True, exist_ok=True)
     copy_static_files(output)
 
+    site_root = source.parent
+    user_styles, user_scripts = discover_user_assets(site_root)
+    copy_user_assets(site_root, output, user_styles, user_scripts)
+
     if config.build.icons_dir:
         configure_icons_dir((source.parent / config.build.icons_dir).resolve())
 
@@ -181,6 +215,8 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         "search_enabled": config.theme.search,
         "build_info": build_info,
         "cache_hash": cache_hash,
+        "user_styles": user_styles,
+        "user_scripts": user_scripts,
     }
 
     show_index_map = {}

@@ -224,10 +224,10 @@ Work in batches, one feature per PR.
 - [x] Update `page.html` and `folder_index.html` to `{% extends layout_template %}`
 - [x] Add `theme.default_layout` config field
 
-#### Feature 16: Static Assets (CSS & JS)
-- [ ] Discover files in `_styles/` and `_scripts/` at build time
-- [ ] Copy to `_site/styles/` and `_site/scripts/`
-- [ ] Inject `<link>` and `<script>` tags in `base.html`
+#### Feature 16: Static Assets (CSS & JS) ✅
+- [x] Discover files in `_styles/` and `_scripts/` at build time
+- [x] Copy to `_site/styles/` and `_site/scripts/`
+- [x] Inject `<link>` and `<script>` tags in `base.html` / `layouts/default.html`
 
 #### Feature 10C: Theme Export CLI
 - [ ] Add `theme` command group to `cli.py`

@@ -373,4 +373,7 @@
         })();
         {% endif %}
     </script>
+    {% for script in site.user_scripts %}
+    <script src="{{ site.base_path }}/scripts/{{ script }}"></script>
+    {% endfor %}
 {% endblock %}
