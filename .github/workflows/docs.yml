@@ -48,4 +48,5 @@ jobs:
           URL: ${{ steps.deploy.outputs.deployment-url }}
           PR_NUMBER: ${{ github.event.number }}
         run: |
-          gh pr comment "$PR_NUMBER" --edit-last --body "**Docs Site** preview: $URL"
+          gh pr comment "$PR_NUMBER" --edit-last --body "**Docs Site** preview: $URL" \
+            || gh pr comment "$PR_NUMBER" --body "**Docs Site** preview: $URL"

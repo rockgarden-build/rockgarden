@@ -44,7 +44,7 @@
             <a href="{{ child.path }}" class="link link-hover link-primary">{{ child.title }}</a>
             {% endif %}
           </td>
-          <td class="text-base-content/60 text-sm">{{ child.modified.strftime('%Y-%m-%d') if child.modified else '' }}</td>
+          <td class="text-base-content/60 text-sm">{{ child.modified | format_datetime }}</td>
           <td>
             {% if child.tags %}
             <div class="flex flex-wrap gap-1">

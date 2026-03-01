@@ -3,6 +3,7 @@ title = "Rockgarden"
 clean_urls = true
 output = "../_site"
 ignore_patterns = []
+timezone = "US/Eastern"
 
 [nav]
 sort = "files-first"

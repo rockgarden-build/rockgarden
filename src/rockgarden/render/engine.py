@@ -1,12 +1,28 @@
 """Jinja2 template engine setup."""
 
+from datetime import datetime
+from datetime import timezone as dt_timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from jinja2 import ChoiceLoader, Environment, FileSystemLoader, PackageLoader
 
 from rockgarden.config import Config
 from rockgarden.content.models import Page
 from rockgarden.nav.tree import NavNode
+
+
+def _make_format_datetime(tz_name: str):
+    tz = ZoneInfo(tz_name)
+
+    def format_datetime(dt: datetime | None, fmt: str = "%Y-%m-%d") -> str:
+        if dt is None:
+            return ""
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=dt_timezone.utc)
+        return dt.astimezone(tz).strftime(fmt)
+
+    return format_datetime
 
 
 def create_engine(
@@ -41,10 +57,12 @@ def create_engine(
 
     loaders.append(PackageLoader("rockgarden", "templates"))
 
-    return Environment(
+    env = Environment(
         loader=ChoiceLoader(loaders),
         autoescape=True,
     )
+    env.filters["format_datetime"] = _make_format_datetime(config.site.timezone)
+    return env
 
 
 def render_page(
