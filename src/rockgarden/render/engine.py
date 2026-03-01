@@ -61,7 +61,7 @@ def create_engine(
         loader=ChoiceLoader(loaders),
         autoescape=True,
     )
-    env.filters["format_datetime"] = _make_format_datetime(config.site.timezone)
+    env.filters["format_datetime"] = _make_format_datetime(config.dates.timezone)
     return env
 
 

@@ -14,7 +14,6 @@ class SiteConfig:
     output: Path = field(default_factory=lambda: Path("_site"))
     clean_urls: bool = True
     base_url: str = ""
-    timezone: str = "UTC"
 
 
 @dataclass
@@ -87,7 +86,8 @@ class DatesConfig:
     created_date_fields: list[str] = field(
         default_factory=lambda: ["created", "date", "date_created"]
     )
-    modified_date_fallback: bool = True
+    modified_date_fallback: bool = False
+    timezone: str = "UTC"
 
 
 @dataclass
@@ -141,7 +141,6 @@ class Config:
             output=Path(site_data.get("output", "_site")),
             clean_urls=site_data.get("clean_urls", True),
             base_url=site_data.get("base_url", "").rstrip("/"),
-            timezone=site_data.get("timezone", "UTC"),
         )
 
         icons_dir_raw = build_data.get("icons_dir")
@@ -191,8 +190,9 @@ class Config:
                 dates_defaults.created_date_fields,
             ),
             modified_date_fallback=dates_data.get(
-                "modified_date_fallback", True
+                "modified_date_fallback", False
             ),
+            timezone=dates_data.get("timezone", "UTC"),
         )
 
         return cls(
