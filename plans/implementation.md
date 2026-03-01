@@ -195,11 +195,10 @@ Work in batches, one feature per PR.
 
 ### Batch 1 — Independent Quick Wins
 
-#### N8: Tag Index Pages
-- [ ] Generate `/tags/<tag>/` listing pages for all unique tags
-- [ ] Link tag badges on pages to their index page
-- [ ] Add tag index entry to nav (optional, config-controlled)
-- [ ] Generate tag index root page (`/tags/`) listing all tags
+#### N8: Tag Index Pages ✅
+- [x] Generate `/tags/<tag>/` listing pages for all unique tags
+- [x] Link tag badges on pages to their index page
+- [x] Generate tag index root page (`/tags/`) listing all tags
 
 #### Feature 17: SEO & Meta Tags ✅
 - [x] Add `description` and `og_image` to `SiteConfig`

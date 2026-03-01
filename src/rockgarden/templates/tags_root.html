@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Tags{% if site.title %} - {{ site.title }}{% endif %}{% endblock %}
+
+{% block content %}
+<div class="flex gap-8">
+    <div class="flex-1 min-w-0">
+        <nav aria-label="Breadcrumb" class="text-sm breadcrumbs mb-4">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li>Tags</li>
+            </ul>
+        </nav>
+        <article>
+            <h1 class="text-3xl font-bold mb-6">Tags</h1>
+            {% if tags %}
+            <div class="flex flex-wrap gap-3">
+                {% for tag_slug, count in tags.items() %}
+                <a href="/tags/{{ tag_slug }}/" class="badge badge-lg badge-ghost hover:badge-primary gap-1">
+                    #{{ tag_slug }}
+                    <span class="text-base-content/50 text-xs">{{ count }}</span>
+                </a>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </article>
+    </div>
+</div>
+{% endblock %}

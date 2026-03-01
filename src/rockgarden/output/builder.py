@@ -37,6 +37,7 @@ from rockgarden.obsidian import (
 from rockgarden.output.build_info import get_build_info
 from rockgarden.output.search import build_search_index
 from rockgarden.output.sitemap import build_sitemap
+from rockgarden.output.tags import build_tag_pages, collect_tags
 from rockgarden.render import create_engine, render_markdown, render_page
 from rockgarden.urls import get_folder_url, get_output_path, get_url
 
@@ -170,6 +171,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         "og_image": config.site.og_image,
         "base_url": config.site.base_url,
         "clean_urls": config.site.clean_urls,
+        "tag_index": config.theme.tag_index,
         "nav": nav_tree,
         "nav_default_state": config.theme.nav_default_state,
         "daisyui_theme": config.theme.daisyui_default,
@@ -302,6 +304,12 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         )
         search_index_file = output / "search-index.json"
         search_index_file.write_text(json.dumps(search_index))
+
+    # Generate tag index pages if enabled
+    if config.theme.tag_index:
+        tags = collect_tags(pages)
+        if tags:
+            build_tag_pages(tags, env, site_config, output, clean_urls)
 
     # Generate sitemap if base_url is configured
     if config.site.base_url:
