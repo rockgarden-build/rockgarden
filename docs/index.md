@@ -8,5 +8,5 @@ A Python static site generator that works with Obsidian vaults and plain markdow
 
 - [[Architecture]] - Build pipeline and module structure
 - [[Deployment]] - Hosting and CI/CD
-- [[Markdown Support]] - Supported syntax reference
+- [[markdown-support|Markdown Support]] - Supported syntax reference
 - [[Vision]] - Goals and design philosophy
