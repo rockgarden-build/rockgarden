@@ -46,6 +46,7 @@ class ThemeConfig(BaseModel):
     toc: bool = True
     backlinks: bool = True
     search: bool = True
+    tag_index: bool = True
 
     # Default theme specific
     daisyui_default: str = "light"

@@ -49,7 +49,12 @@
             {% if child.tags %}
             <div class="flex flex-wrap gap-1">
               {% for tag in child.tags %}
-              <span class="badge badge-sm badge-ghost">{{ tag }}</span>
+              {% set tag_slug = normalize_tag(tag) %}
+              {% if site.tag_index %}
+              <a href="{{ tag_url(tag_slug) }}" class="badge badge-sm badge-ghost hover:badge-primary">{{ tag.lstrip('#') }}</a>
+              {% else %}
+              <span class="badge badge-sm badge-ghost">{{ tag.lstrip('#') }}</span>
+              {% endif %}
               {% endfor %}
             </div>
             {% endif %}

@@ -2,7 +2,7 @@
 
 Generate `/tags/<tag>/` listing pages for all unique tags found in content.
 
-## Status: Not Started (Phase B, Batch 1)
+## Status: Complete ✅
 
 ## Goal
 
