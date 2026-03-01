@@ -2,7 +2,7 @@
 
 Support deploying to subdirectories (e.g., `example.com/docs/`).
 
-## Status: Not Started
+## Status: Complete
 
 ## Goal
 

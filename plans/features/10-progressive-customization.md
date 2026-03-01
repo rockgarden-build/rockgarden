@@ -123,12 +123,12 @@ The `layout_template` string is injected into the render context by `render_page
 
 ### Tasks
 
-- [ ] Refactor `base.html` to minimal skeleton
-- [ ] Create `layouts/docs.html` (current sidebar layout extracted from `base.html`)
-- [ ] Add `resolve_layout()` to `render/engine.py`
-- [ ] Update `render_page()` to inject `layout_template`
-- [ ] Update `page.html` and `folder_index.html` to extend `layout_template`
-- [ ] Add `theme.default_layout` config field (already added to `ThemeConfig`)
+- [x] Refactor `base.html` to minimal skeleton
+- [x] Create `layouts/docs.html` (current sidebar layout extracted from `base.html`)
+- [x] Add `resolve_layout()` to `render/engine.py`
+- [x] Update `render_page()` to inject `layout_template`
+- [x] Update `page.html` and `folder_index.html` to extend `layout_template`
+- [x] Add `theme.default_layout` config field (already added to `ThemeConfig`)
 
 ## Phase B: Theme Export CLI
 

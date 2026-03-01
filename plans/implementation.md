@@ -207,12 +207,12 @@ Work in batches, one feature per PR.
 
 ### Batch 2 — Base Path Prefix
 
-#### Feature 12: Base Path Prefix
-- [ ] Confirm `base_url` handling in `SiteConfig` (already used for sitemap)
-- [ ] Update URL generation helpers to include base path
-- [ ] Update all templates to use `base_url` for asset and internal link references
-- [ ] Update search index URL generation
-- [ ] Verify wiki-link resolution is unaffected
+#### Feature 12: Base Path Prefix ✅
+- [x] Confirm `base_url` handling in `SiteConfig` (already used for sitemap)
+- [x] Update URL generation helpers to include base path
+- [x] Update all templates to use `base_url` for asset and internal link references
+- [x] Update search index URL generation
+- [x] Verify wiki-link resolution is unaffected
 
 ### Batch 3 — Theming Foundation
 
