@@ -216,13 +216,13 @@ Work in batches, one feature per PR.
 
 ### Batch 3 — Theming Foundation
 
-#### Feature 10B: Layout System
-- [ ] Refactor `base.html` to minimal HTML skeleton (head, body wrapper, script injection only)
-- [ ] Create `layouts/docs.html` (extract current sidebar/drawer layout from `base.html`)
-- [ ] Add `resolve_layout()` to `render/engine.py`
-- [ ] Update `render_page()` to inject `layout_template` into render context
-- [ ] Update `page.html` and `folder_index.html` to `{% extends layout_template %}`
-- [ ] Add `theme.default_layout` config field
+#### Feature 10B: Layout System ✅
+- [x] Refactor `base.html` to minimal HTML skeleton (head, body wrapper, script injection only)
+- [x] Create `layouts/default.html` (extract current sidebar/drawer layout from `base.html`)
+- [x] Add `resolve_layout()` to `render/engine.py`
+- [x] Update `render_page()` to inject `layout_template` into render context
+- [x] Update `page.html` and `folder_index.html` to `{% extends layout_template %}`
+- [x] Add `theme.default_layout` config field
 
 #### Feature 16: Static Assets (CSS & JS)
 - [ ] Discover files in `_styles/` and `_scripts/` at build time

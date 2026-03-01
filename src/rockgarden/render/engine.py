@@ -71,6 +71,27 @@ def create_engine(
     return env
 
 
+def resolve_layout(frontmatter: dict, default_layout: str = "") -> str:
+    """Resolve the layout template name for a page.
+
+    Resolution order:
+    1. Page frontmatter ``layout`` key
+    2. ``default_layout`` from theme config
+    3. Built-in default: ``layouts/default.html``
+
+    Args:
+        frontmatter: Page or folder frontmatter dict.
+        default_layout: Theme-level default layout name (e.g. "wide").
+
+    Returns:
+        Template name string (e.g. "layouts/default.html").
+    """
+    name = frontmatter.get("layout") or default_layout
+    if name:
+        return f"layouts/{name}.html"
+    return "layouts/default.html"
+
+
 def render_page(
     env: Environment,
     page: Page,
@@ -78,6 +99,7 @@ def render_page(
     breadcrumbs: list | None = None,
     backlinks: NavNode | None = None,
     toc: list | None = None,
+    layout_template: str = "layouts/default.html",
 ) -> str:
     """Render a page using the page template.
 
@@ -88,6 +110,7 @@ def render_page(
         breadcrumbs: Optional list of Breadcrumb objects for navigation.
         backlinks: Optional NavNode tree of pages that link to this page.
         toc: Optional list of TocEntry trees for table of contents.
+        layout_template: Layout template name to extend.
 
     Returns:
         Rendered HTML string.
@@ -99,4 +122,5 @@ def render_page(
         breadcrumbs=breadcrumbs or [],
         backlinks=backlinks,
         toc=toc,
+        layout_template=layout_template,
     )

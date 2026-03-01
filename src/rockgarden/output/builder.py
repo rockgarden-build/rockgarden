@@ -38,7 +38,7 @@ from rockgarden.output.build_info import get_build_info
 from rockgarden.output.search import build_search_index
 from rockgarden.output.sitemap import build_sitemap
 from rockgarden.output.tags import build_tag_pages, collect_tags
-from rockgarden.render import create_engine, render_markdown, render_page
+from rockgarden.render import create_engine, render_markdown, render_page, resolve_layout
 from rockgarden.urls import get_base_path, get_folder_url, get_output_path, get_url
 
 
@@ -243,8 +243,9 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
             if backlink_pages:
                 backlinks_tree = build_nav_tree(backlink_pages, config.nav, clean_urls, base_path)
 
+        layout_template = resolve_layout(page.frontmatter, config.theme.default_layout)
         html = render_page(
-            env, page, site_config, breadcrumbs, backlinks_tree, toc_entries
+            env, page, site_config, breadcrumbs, backlinks_tree, toc_entries, layout_template
         )
 
         output_file = output / get_output_path(page.slug, clean_urls)
@@ -284,10 +285,12 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
 
         breadcrumbs = _build_folder_breadcrumbs(folder, pages, config.nav, clean_urls, base_path)
 
+        folder_layout = resolve_layout(folder.frontmatter, config.theme.default_layout)
         html = folder_template.render(
             folder=folder,
             site=site_config,
             breadcrumbs=breadcrumbs,
+            layout_template=folder_layout,
         )
 
         output_file = output / get_output_path(folder.slug, clean_urls)
