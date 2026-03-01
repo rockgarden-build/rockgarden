@@ -8,21 +8,24 @@ Rockgarden is a Python-based static site generator designed to work directly wit
 
 ## Development Commands
 
+Use `just` for common tasks (see `justfile` for full list):
+
 ```bash
-# Install dependencies (uses uv)
-uv sync
+just install       # Install Python + Node dependencies
+just test          # Run tests
+just check         # Lint and format check
+just format        # Auto-fix lint and format
+just build         # Build the demo site (./site)
+just build-docs    # Build the docs site (./docs)
+just serve         # Serve output directory locally
+just css           # Compile Tailwind CSS
+just css-watch     # Watch and recompile Tailwind CSS
+```
 
-# Run tests
-uv run pytest
+For single tests or other direct invocations:
 
-# Run a single test
+```bash
 uv run pytest tests/test_cli.py::test_version
-
-# Lint and format
-uv run ruff check .
-uv run ruff format .
-
-# Run CLI
 uv run rockgarden --help
 uv run rgdn --help  # short alias
 ```
@@ -50,10 +53,10 @@ CSS is built separately from Python via Tailwind CLI. The compiled output is com
 - **Source**: `static-src/input.css` (Tailwind directives + custom CSS)
 - **Output**: `src/rockgarden/static/rockgarden.css` (compiled, minified)
 - **Config**: `tailwind.config.js` (scans `src/rockgarden/templates/**/*.html`)
-- **Build**: `npm run build:css`
-- **Watch**: `npm run watch:css`
+- **Build**: `just css`
+- **Watch**: `just css-watch`
 
-**After any template change that adds new Tailwind/daisyUI utility classes, you MUST run `npm run build:css` to regenerate the CSS.** Never use inline styles as a workaround for missing utility classes.
+**After any template change that adds new Tailwind/daisyUI utility classes, you MUST run `just css` to regenerate the CSS.** Never use inline styles as a workaround for missing utility classes.
 
 ## Conventions
 

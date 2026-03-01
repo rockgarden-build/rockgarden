@@ -67,6 +67,17 @@ ignore_patterns = [".obsidian", "Templates"]
 sort = "files-first"
 ```
 
+## Development
+
+Requires [just](https://just.systems) and [uv](https://docs.astral.sh/uv/).
+
+```bash
+just install   # install dependencies
+just test      # run tests
+just check     # lint and format check
+just build     # build the demo site
+```
+
 ## Requirements
 
 Python 3.13+
