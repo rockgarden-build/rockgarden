@@ -39,10 +39,12 @@ class ContentStore:
         pages: list[Page],
         clean_urls: bool = True,
         media_index: dict[str, list[str]] | None = None,
+        base_path: str = "",
     ) -> None:
         self.pages = pages
         self.clean_urls = clean_urls
         self.media_index = media_index or {}
+        self.base_path = base_path
         self._by_slug: dict[str, Page] = {}
         self._by_name: dict[str, Page] = {}
 
@@ -98,7 +100,7 @@ class ContentStore:
         # Try to resolve as a page first
         page = self.get_by_name(page_name)
         if page:
-            url = get_url(page.slug, self.clean_urls)
+            url = get_url(page.slug, self.clean_urls, self.base_path)
             if fragment:
                 url = f"{url}#{fragment}"
             return url
@@ -126,7 +128,6 @@ class ContentStore:
         filename = target.rsplit("/", 1)[-1].lower()
         matches = self.media_index.get(filename)
         if matches:
-            # Return the first match
-            return "/" + matches[0]
+            return f"{self.base_path}/{matches[0]}"
 
         return None

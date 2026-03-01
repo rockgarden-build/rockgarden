@@ -149,7 +149,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
 
     # Build media index before creating store so it can resolve media file links
     media_index = build_media_index(source)
-    store = ContentStore(pages, clean_urls, media_index)
+    store = ContentStore(pages, clean_urls, media_index, base_path)
 
     link_index = build_link_index(pages, store)
 
