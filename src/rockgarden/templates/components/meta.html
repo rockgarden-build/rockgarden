@@ -31,12 +31,12 @@
 <meta property="og:url" content="{{ site.base_url }}{{ _page_path }}">
 {% endif %}
 
-{% if description %}
 <meta name="twitter:card" content="{% if og_image %}summary_large_image{% else %}summary{% endif %}">
 <meta name="twitter:title" content="{{ page.title }}{% if site.title %} - {{ site.title }}{% endif %}">
+{% if description %}
 <meta name="twitter:description" content="{{ description }}">
+{% endif %}
 {% if og_image %}
 <meta name="twitter:image" content="{{ og_image }}">
-{% endif %}
 {% endif %}
 {% endif %}
