@@ -47,9 +47,14 @@
             </div>
 
             <!-- Main content -->
-            <main id="main-content" class="flex-1 p-4 lg:p-8">
+            <main id="main-content" class="flex-1 p-4 lg:p-8 lg:min-h-screen">
                 <div class="max-w-4xl mx-auto">
                     {% block content %}{% endblock %}
+                    {% block footer %}
+                    {% if site.build_info %}
+                    {% include "components/footer.html" %}
+                    {% endif %}
+                    {% endblock %}
                 </div>
             </main>
         </div>
@@ -95,11 +100,6 @@
     </div>
     {% endif %}
 
-    {% block footer %}
-    {% if site.build_info %}
-    {% include "components/footer.html" %}
-    {% endif %}
-    {% endblock %}
     <script>
         // Theme switcher functionality
         (function() {

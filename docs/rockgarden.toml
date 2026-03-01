@@ -3,6 +3,8 @@ title = "Rockgarden"
 clean_urls = true
 output = "../_site"
 ignore_patterns = []
+
+[dates]
 timezone = "US/Eastern"
 
 [nav]
