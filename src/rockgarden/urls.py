@@ -31,7 +31,7 @@ def get_base_path(base_url: str) -> str:
     if not base_url:
         return ""
     path = urlparse(base_url).path.rstrip("/")
-    return path if path != "/" else ""
+    return path
 
 
 def generate_slug(relative_path: str) -> str:
