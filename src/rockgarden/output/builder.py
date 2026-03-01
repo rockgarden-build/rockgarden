@@ -195,8 +195,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
 
         content = page.content
 
-        if page.frontmatter.get("title"):
-            content = strip_content_title(content)
+        content = strip_content_title(content)
 
         page_rel_path = str(page.source_path.relative_to(source))
         media_resolver = create_media_resolver(source, page_rel_path, media_index)
@@ -257,8 +256,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
 
         if folder.custom_content:
             processed = folder.custom_content
-            if folder.frontmatter.get("title"):
-                processed = strip_content_title(processed)
+            processed = strip_content_title(processed)
             folder_src = folder_path + "/index.md" if folder_path else "index.md"
             media_resolver = create_media_resolver(source, folder_src, media_index)
             processed, media = process_media_embeds(processed, media_resolver)

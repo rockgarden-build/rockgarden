@@ -1,6 +1,8 @@
 """Tests for stripping H1 from content."""
 
 from rockgarden.content import strip_content_title
+from rockgarden.output.builder import build_site
+from rockgarden.config import Config
 
 
 class TestStripContentTitle:
@@ -43,3 +45,31 @@ class TestStripContentTitle:
         content = "# Just a Title"
         result = strip_content_title(content)
         assert result == ""
+
+
+class TestBuildSiteStripTitle:
+    """Test that build_site strips H1 from page output."""
+
+    def test_strips_h1_when_title_in_frontmatter(self, tmp_path):
+        """H1 should not appear twice when title is set in frontmatter."""
+        source = tmp_path / "source"
+        source.mkdir()
+        (source / "page.md").write_text("---\ntitle: My Page\n---\n\n# My Page\n\nSome content.")
+
+        output = tmp_path / "output"
+        build_site(Config.load(None), source, output)
+
+        html = (output / "page" / "index.html").read_text()
+        assert html.count("<h1") == 1
+
+    def test_strips_h1_when_title_derived_from_filename(self, tmp_path):
+        """H1 should not appear twice when title is derived from filename (no frontmatter)."""
+        source = tmp_path / "source"
+        source.mkdir()
+        (source / "my-page.md").write_text("# My Page\n\nSome content.")
+
+        output = tmp_path / "output"
+        build_site(Config.load(None), source, output)
+
+        html = (output / "my-page" / "index.html").read_text()
+        assert html.count("<h1") == 1
