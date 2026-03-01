@@ -1,0 +1,33 @@
+{% if page is defined %}
+{% set description = page.frontmatter.get("description") or site.description %}
+{% set og_image = page.frontmatter.get("og_image") or site.og_image %}
+{% set keywords = page.frontmatter.get("keywords") %}
+
+{% if description %}
+<meta name="description" content="{{ description }}">
+{% endif %}
+{% if keywords %}
+<meta name="keywords" content="{{ keywords }}">
+{% endif %}
+
+<meta property="og:title" content="{{ page.title }}{% if site.title %} - {{ site.title }}{% endif %}">
+<meta property="og:type" content="article">
+{% if description %}
+<meta property="og:description" content="{{ description }}">
+{% endif %}
+{% if og_image %}
+<meta property="og:image" content="{{ og_image }}">
+{% endif %}
+{% if site.base_url %}
+<meta property="og:url" content="{{ site.base_url }}/{{ page.slug }}/">
+{% endif %}
+
+{% if description %}
+<meta name="twitter:card" content="{% if og_image %}summary_large_image{% else %}summary{% endif %}">
+<meta name="twitter:title" content="{{ page.title }}{% if site.title %} - {{ site.title }}{% endif %}">
+<meta name="twitter:description" content="{{ description }}">
+{% if og_image %}
+<meta name="twitter:image" content="{{ og_image }}">
+{% endif %}
+{% endif %}
+{% endif %}

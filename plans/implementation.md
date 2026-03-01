@@ -201,10 +201,10 @@ Work in batches, one feature per PR.
 - [ ] Add tag index entry to nav (optional, config-controlled)
 - [ ] Generate tag index root page (`/tags/`) listing all tags
 
-#### Feature 17: SEO & Meta Tags
-- [ ] Add `description` and `og_image` to `SiteConfig`
-- [ ] Create `templates/components/meta.html` with conditional meta tag rendering
-- [ ] Include meta component in `base.html` `<head>`
+#### Feature 17: SEO & Meta Tags ✅
+- [x] Add `description` and `og_image` to `SiteConfig`
+- [x] Create `templates/components/meta.html` with conditional meta tag rendering
+- [x] Include meta component in `base.html` `<head>`
 
 ### Batch 2 — Base Path Prefix
 

@@ -166,6 +166,9 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
 
     site_config = {
         "title": config.site.title,
+        "description": config.site.description,
+        "og_image": config.site.og_image,
+        "base_url": config.site.base_url,
         "nav": nav_tree,
         "nav_default_state": config.theme.nav_default_state,
         "daisyui_theme": config.theme.daisyui_default,

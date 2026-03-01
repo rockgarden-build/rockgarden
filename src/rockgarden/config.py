@@ -10,6 +10,8 @@ class SiteConfig(BaseModel):
     """Site-level configuration."""
 
     title: str = "My Site"
+    description: str = ""
+    og_image: str = ""
     source: Path = Path(".")
     output: Path = Path("_site")
     clean_urls: bool = True
