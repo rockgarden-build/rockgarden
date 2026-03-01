@@ -79,6 +79,8 @@ When decomposing or extending templates, maintain these blocks so user template 
 
 ## Feature Implementation Workflow
 
+Phase B work is one feature per PR. Implement → open PR → get reviewed → merge → move to next feature.
+
 **REQUIRED** — every feature implementation MUST follow these steps:
 
 1. **Before starting**: Check `plans/features/README.md` and the feature's spec doc (`plans/features/NN-*.md`)
@@ -87,3 +89,4 @@ When decomposing or extending templates, maintain these blocks so user template 
    - `plans/implementation.md` — mark checklist items as complete
    - `plans/features/README.md` — update feature status and Quartz reference checklist
    - Feature spec doc (if one exists) — update status to reflect completion
+4. **Open a PR** and wait for review before starting the next feature

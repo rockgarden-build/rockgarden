@@ -187,17 +187,79 @@ After each step, verify incrementally:
   - [x] Build timing in CLI output (`Built N pages in X.Xs → /path`)
   - Detailed error validation and per-phase metrics deferred to future improvement
 
-### Future (Phase B+)
-- [ ] **Tag Index Pages (N8)**: Generate `/tags/<tag>/` pages listing all content with a given tag
-  - Depends on tag display (above) for normalization
-  - Pairs naturally with collections work
+---
 
-- [ ] **Graph View**: Interactive visualization of page connections
-  - Requirements to be workshopped and defined
+## Phase B: General SSG / PyOhio (0.9 Prerelease)
 
-- [ ] Config validation command + theme manifest (N11)
-- [ ] Collections and content models (Feature 14)
-- [ ] Build hooks (Feature 15)
-- [ ] Base path prefix support (Feature 12)
-- [ ] Static asset inclusion (Feature 16)
-- [ ] SEO & meta tags (Feature 17)
+Work in batches, one feature per PR.
+
+### Batch 1 — Independent Quick Wins
+
+#### N8: Tag Index Pages
+- [ ] Generate `/tags/<tag>/` listing pages for all unique tags
+- [ ] Link tag badges on pages to their index page
+- [ ] Add tag index entry to nav (optional, config-controlled)
+- [ ] Generate tag index root page (`/tags/`) listing all tags
+
+#### Feature 17: SEO & Meta Tags ✅
+- [x] Add `description` and `og_image` to `SiteConfig`
+- [x] Create `templates/components/meta.html` with conditional meta tag rendering
+- [x] Include meta component in `base.html` `<head>`
+
+### Batch 2 — Base Path Prefix
+
+#### Feature 12: Base Path Prefix
+- [ ] Confirm `base_url` handling in `SiteConfig` (already used for sitemap)
+- [ ] Update URL generation helpers to include base path
+- [ ] Update all templates to use `base_url` for asset and internal link references
+- [ ] Update search index URL generation
+- [ ] Verify wiki-link resolution is unaffected
+
+### Batch 3 — Theming Foundation
+
+#### Feature 10B: Layout System
+- [ ] Refactor `base.html` to minimal HTML skeleton (head, body wrapper, script injection only)
+- [ ] Create `layouts/docs.html` (extract current sidebar/drawer layout from `base.html`)
+- [ ] Add `resolve_layout()` to `render/engine.py`
+- [ ] Update `render_page()` to inject `layout_template` into render context
+- [ ] Update `page.html` and `folder_index.html` to `{% extends layout_template %}`
+- [ ] Add `theme.default_layout` config field
+
+#### Feature 16: Static Assets (CSS & JS)
+- [ ] Discover files in `_styles/` and `_scripts/` at build time
+- [ ] Copy to `_site/styles/` and `_site/scripts/`
+- [ ] Inject `<link>` and `<script>` tags in `base.html`
+
+#### Feature 10C: Theme Export CLI
+- [ ] Add `theme` command group to `cli.py`
+- [ ] Implement `rockgarden theme export` — copies bundled theme to `_themes/default/`
+
+### Batch 4 — Build Pipeline
+
+#### Feature 15: Build Hooks
+- [ ] Add `[hooks]` section to config (`pre_build`, `post_collect`, `post_build`)
+- [ ] Export content store to `.rockgarden/content.json` after collection
+- [ ] Execute hook shell commands at each stage with error handling
+
+#### Feature 14: Collections
+- [ ] Collection-aware `ContentStore` (`list_content("name")`, `get_content("name", slug=...)`)
+- [ ] Config: `[[collections]]` with `name` and `source` fields
+- [ ] Named collection carves its directory out of the default collection
+- [ ] Nested collection support (content in `a/b/` belongs to both `b` and `a`)
+- [ ] Optional model/schema (`[models.x]` with `fields`)
+- [ ] Non-markdown format loading (YAML/JSON/TOML) when collection config enables it
+- [ ] Custom template and URL pattern per collection
+- [ ] Collection page generation controls (`pages = false`, `nav = true`)
+
+### Anytime: N11 Config Validation
+
+#### Feature N11: Config Validation
+- [ ] New `validation.py` with `validate_config()` and `load_theme_manifest()`
+- [ ] `rockgarden validate` CLI command (exits 1 on errors, 0 on warnings)
+- [ ] Known-key validation derived from dataclass field names
+- [ ] Theme manifest (`_themes/<name>/theme.toml`) loading and required-key check
+
+### Future / Deferred
+
+- [ ] **Graph View**: Interactive visualization of page connections — requirements TBD
+- [ ] **Tag Index in Nav**: Defer to after N8 is done, decide based on usage

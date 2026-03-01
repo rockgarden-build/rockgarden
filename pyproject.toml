@@ -65,6 +65,7 @@ select = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+filterwarnings = ["ignore::DeprecationWarning:frontmatter"]
 
 [tool.commitizen]
 name = "cz_conventional_commits"
