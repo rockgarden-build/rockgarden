@@ -17,6 +17,7 @@ Noted but not currently planned:
 - **Reading time**: Estimated reading time per page (word count / ~230 WPM). Optional, displayed in page metadata.
 - **Footer metadata**: Composable footer components — build timestamp, git commit info, framework version. Each opt-in via config.
 - **Configurable URL casing**: Option to preserve original filename casing in URLs instead of lowercasing/slugifying. Current slug-style is the default.
+- **Configurable reserved directory names**: The special directories `_templates/`, `_themes/`, and `_static/` (output) are currently hardcoded. These should be configurable via `[build]` config with the current names as documented defaults. Useful for sites where those names conflict with content. (`_site` output is already configurable via `[site] output`.)
 - **Extract icon handling**: Move icon resolution (`rockgarden.icons`) into a standalone generic Jinja icons package. Current implementation is bordering on out-of-scope for a static site generator.
 
 Moved to roadmap:
