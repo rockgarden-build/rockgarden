@@ -15,6 +15,7 @@ just install       # Install Python + Node dependencies
 just test          # Run tests
 just check         # Lint and format check
 just format        # Auto-fix lint and format
+just ci            # Run lint + tests (CI equivalent — run before marking work done)
 just build         # Build the demo site (./site)
 just build-docs    # Build the docs site (./docs)
 just serve         # Serve output directory locally
@@ -89,4 +90,5 @@ Phase B work is one feature per PR. Implement → open PR → get reviewed → m
    - `plans/implementation.md` — mark checklist items as complete
    - `plans/features/README.md` — update feature status and Quartz reference checklist
    - Feature spec doc (if one exists) — update status to reflect completion
-4. **Open a PR** and wait for review before starting the next feature
+4. **Before opening a PR**: Run `just ci` — all lint and tests must pass
+5. **Open a PR** and wait for review before starting the next feature

@@ -36,7 +36,8 @@ def render_markdown(content: str) -> str:
     html = md.render(content)
 
     # Post-process to handle broken links
-    # Replace <a href="BROKEN::target">text</a> with <a class="internal-link broken" data-target="target">text</a>
+    # Replace <a href="BROKEN::target">text</a>
+    # with <a class="internal-link broken" data-target="target">text</a>
     def replace_broken_link(match):
         from urllib.parse import unquote
 

@@ -42,7 +42,8 @@ class TestProcessNoteTransclusions:
             return None
 
         content = "![[My Note.md]]"
-        # .md stripping happens in builder resolver, not here — raw target passed through
+        # .md stripping happens in builder resolver, not here — raw target passed
+        # through
         # This test confirms the pattern matches and passes target as-is to resolver
         result = process_note_transclusions(content, resolver_with_md)
         # resolver receives "My Note.md" (builder strips .md, not this function)
@@ -67,7 +68,8 @@ class TestProcessNoteTransclusions:
         assert "Content of Note B" in result
 
     def test_cycle_detection_via_resolver(self):
-        """Cycle detection is the resolver's responsibility; returning None leaves embed unchanged."""
+        """Cycle detection is the resolver's responsibility; returning None leaves embed
+        unchanged."""
         call_count = 0
 
         def cycle_resolver(target: str) -> str | None:

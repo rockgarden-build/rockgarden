@@ -6,15 +6,22 @@ from rockgarden.output.builder import BuildResult, build_site
 from rockgarden.render.markdown import render_markdown
 
 
+def _no_resolver(x):
+    return None
+
+
+def _valid_resolver(x):
+    return "/valid/" if x == "Valid" else None
+
+
 class TestProcessWikilinks:
     """Test that process_wikilinks tracks broken links."""
 
     def test_returns_tuple_with_content_and_broken_links(self):
         """Should return tuple of (content, broken_links)."""
         content = "Link to [[Target]]"
-        resolver = lambda x: None  # All links fail
 
-        result, broken = process_wikilinks(content, resolver)
+        result, broken = process_wikilinks(content, _no_resolver)
 
         assert isinstance(result, str)
         assert isinstance(broken, list)
@@ -22,9 +29,8 @@ class TestProcessWikilinks:
     def test_tracks_single_broken_link(self):
         """Should track a single broken link."""
         content = "Link to [[NonExistent]]"
-        resolver = lambda x: None
 
-        _, broken = process_wikilinks(content, resolver)
+        _, broken = process_wikilinks(content, _no_resolver)
 
         assert len(broken) == 1
         assert broken[0] == ("NonExistent", "NonExistent")
@@ -32,9 +38,8 @@ class TestProcessWikilinks:
     def test_tracks_multiple_broken_links(self):
         """Should track multiple broken links."""
         content = "Link to [[First]] and [[Second]]"
-        resolver = lambda x: None
 
-        _, broken = process_wikilinks(content, resolver)
+        _, broken = process_wikilinks(content, _no_resolver)
 
         assert len(broken) == 2
         assert broken[0] == ("First", "First")
@@ -43,9 +48,8 @@ class TestProcessWikilinks:
     def test_tracks_broken_link_with_display_text(self):
         """Should track broken link with custom display text."""
         content = "Link to [[Target|Display Text]]"
-        resolver = lambda x: None
 
-        _, broken = process_wikilinks(content, resolver)
+        _, broken = process_wikilinks(content, _no_resolver)
 
         assert len(broken) == 1
         assert broken[0] == ("Target", "Display Text")
@@ -53,18 +57,16 @@ class TestProcessWikilinks:
     def test_does_not_track_resolved_links(self):
         """Should not track links that resolve successfully."""
         content = "Link to [[Valid]]"
-        resolver = lambda x: "/valid/" if x == "Valid" else None
 
-        _, broken = process_wikilinks(content, resolver)
+        _, broken = process_wikilinks(content, _valid_resolver)
 
         assert len(broken) == 0
 
     def test_tracks_only_broken_links_in_mixed_content(self):
         """Should track only broken links when some resolve."""
         content = "Link to [[Valid]] and [[Broken]]"
-        resolver = lambda x: "/valid/" if x == "Valid" else None
 
-        _, broken = process_wikilinks(content, resolver)
+        _, broken = process_wikilinks(content, _valid_resolver)
 
         assert len(broken) == 1
         assert broken[0] == ("Broken", "Broken")
@@ -72,18 +74,16 @@ class TestProcessWikilinks:
     def test_converts_broken_link_to_special_marker(self):
         """Should convert broken links to BROKEN:: marker in content."""
         content = "Link to [[NonExistent]]"
-        resolver = lambda x: None
 
-        result, _ = process_wikilinks(content, resolver)
+        result, _ = process_wikilinks(content, _no_resolver)
 
         assert "[NonExistent](BROKEN::NonExistent)" in result
 
     def test_preserves_broken_links_in_code_blocks(self):
         """Should not process wiki-links inside code blocks."""
         content = "Normal [[Broken]]\n```\n[[InCode]]\n```"
-        resolver = lambda x: None
 
-        result, broken = process_wikilinks(content, resolver)
+        result, broken = process_wikilinks(content, _no_resolver)
 
         assert len(broken) == 1
         assert broken[0] == ("Broken", "Broken")
