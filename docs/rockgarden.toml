@@ -7,6 +7,8 @@ ignore_patterns = []
 [dates]
 timezone = "US/Eastern"
 
+[theme]
+nav_default_state = "expanded"
+
 [nav]
 sort = "files-first"
-default_state = "open"

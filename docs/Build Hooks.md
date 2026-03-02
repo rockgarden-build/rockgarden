@@ -1,5 +1,5 @@
 ---
-tags: [hooks, configuration]
+tags: [configuration]
 ---
 
 # Build Hooks
@@ -25,11 +25,11 @@ Commands run sequentially within each stage. The build aborts if any command exi
 
 ## Stages
 
-| Stage | When | Content JSON Available | Typical Use |
-|-------|------|------------------------|-------------|
-| `pre_build` | Before content loading | No | Data fetching, file generation |
-| `post_collect` | After content collected, before rendering | Yes | Derived assets (OG images), data transforms |
-| `post_build` | After all output written | Yes | CSS/JS compilation, image optimization, validation |
+| Stage          | When                                      | Content JSON Available | Typical Use                                        |
+| -------------- | ----------------------------------------- | ---------------------- | -------------------------------------------------- |
+| `pre_build`    | Before content loading                    | No                     | Data fetching, file generation                     |
+| `post_collect` | After content collected, before rendering | Yes                    | Derived assets (OG images), data transforms        |
+| `post_build`   | After all output written                  | Yes                    | CSS/JS compilation, image optimization, validation |
 
 ## Content JSON Export
 
@@ -56,10 +56,10 @@ The JSON contains an array of objects, one per page:
 
 Hooks receive these environment variables:
 
-| Variable | Description |
-|----------|-------------|
-| `ROCKGARDEN_SOURCE` | Absolute path to the source content directory |
-| `ROCKGARDEN_OUTPUT` | Absolute path to the output directory |
+| Variable                  | Description                                                                                |
+| ------------------------- | ------------------------------------------------------------------------------------------ |
+| `ROCKGARDEN_SOURCE`       | Absolute path to the source content directory                                              |
+| `ROCKGARDEN_OUTPUT`       | Absolute path to the output directory                                                      |
 | `ROCKGARDEN_CONTENT_JSON` | Absolute path to `.rockgarden/content.json` (only set for `post_collect` and `post_build`) |
 
 ## Working Directory
