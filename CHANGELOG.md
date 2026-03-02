@@ -1,3 +1,9 @@
+## v0.5.1 (2026-03-02)
+
+### Minor / Bug Fixes
+
+- fix tag index page rendering (#39)
+
 ## v0.5.0 (2026-03-02)
 
 ### Features
