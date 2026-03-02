@@ -1,22 +1,21 @@
-## Unreleased
+## v0.5.0 (2026-03-02)
 
 ### Features
 
 - add collections support (#35)
-- switch to Pydantic for content modeling (#26)
+- switch to Pydantic for modeling (#26)
 
 ### Minor / Bug Fixes
 
 - add collection page generation (#36)
 - fix media paths (#34)
 - add build hooks (#33)
-- add linting and testing workflows (#32)
 - implement theme export CLI (#31)
-- add static asset handling (custom CSS/JS)
+- handle static assets
 - add default layout system (#30)
-- support base URL / base path for subdirectory deploys (#29)
+- support base URL/ base path (#29)
 - implement tag index pages (#28)
-- add SEO / meta tags from frontmatter (#27)
+- add SEO / meta tags by frontmatter (#27)
 
 ## v0.4.11 (2026-03-01)
 
