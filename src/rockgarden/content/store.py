@@ -1,10 +1,16 @@
 """Content store for page lookups."""
 
+from __future__ import annotations
+
 import unicodedata
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from rockgarden.content.models import Page
 from rockgarden.urls import get_url
+
+if TYPE_CHECKING:
+    from rockgarden.content.collection import Collection
 
 # Media file extensions that can be linked with [[filename]]
 MEDIA_EXTENSIONS = {
@@ -40,11 +46,13 @@ class ContentStore:
         clean_urls: bool = True,
         media_index: dict[str, list[str]] | None = None,
         base_path: str = "",
+        collections: dict[str, Collection] | None = None,
     ) -> None:
         self.pages = pages
         self.clean_urls = clean_urls
         self.media_index = media_index or {}
         self.base_path = base_path
+        self.collections: dict[str, Collection] = collections or {}
         self._by_slug: dict[str, Page] = {}
         self._by_name: dict[str, Page] = {}
 
@@ -76,6 +84,17 @@ class ContentStore:
         """Look up a page by name or alias (case-insensitive, Unicode-normalized)."""
         normalized_name = unicodedata.normalize("NFC", name).lower()
         return self._by_name.get(normalized_name)
+
+    def get_collection(self, name: str) -> Collection | None:
+        """Look up a collection by name."""
+        return self.collections.get(name)
+
+    def list_collection(self, name: str) -> list[Page | dict]:
+        """Return entries for a named collection, or empty list if not found."""
+        collection = self.collections.get(name)
+        if collection is None:
+            return []
+        return collection.entries
 
     def resolve_link(self, link_target: str) -> str | None:
         """Resolve a wiki-link target to a URL path.

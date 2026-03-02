@@ -250,13 +250,6 @@ Work in batches, one feature per PR.
 - [ ] Custom template and URL pattern per collection
 - [ ] Collection page generation controls (`pages = false`, `nav = true`)
 
-### Anytime: Code Quality & CI
-
-#### Lint / Format / Test Workflow
-- [ ] Run `just format` to auto-fix ruff-fixable issues (unused imports, f-strings, isort)
-- [ ] Manually fix remaining lint errors (E501 long lines, E731 lambda assignments, E741 ambiguous names)
-- [ ] Add GitHub Actions workflow: lint (`ruff check`), format check (`ruff format --check`), tests (`pytest`) — matrix over supported Python versions
-
 ### Anytime: N11 Config Validation
 
 #### Feature N11: Config Validation

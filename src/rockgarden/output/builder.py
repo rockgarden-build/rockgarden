@@ -18,8 +18,12 @@ from rockgarden.config import Config
 from rockgarden.content import (
     ContentStore,
     build_link_index,
+    load_collection_data_files,
     load_content,
+    partition_collections,
+    resolve_model,
     strip_content_title,
+    validate_entry,
 )
 from rockgarden.hooks import run_hooks
 from rockgarden.icons import configure_icons_dir
@@ -208,42 +212,66 @@ def _warn_gitignore(site_root: Path) -> None:
     )
 
 
+def _serialize_page(page, site_root: Path, clean_urls: bool, base_path: str) -> dict:
+    """Serialize a Page to a JSON-safe dict."""
+    from rockgarden.urls import get_url
+
+    return {
+        "slug": page.slug,
+        "title": page.title,
+        "url": get_url(page.slug, clean_urls, base_path),
+        "tags": page.frontmatter.get("tags", []),
+        "frontmatter": {
+            k: (
+                v
+                if isinstance(v, (str, int, float, bool, list, dict, type(None)))
+                else str(v)
+            )
+            for k, v in page.frontmatter.items()
+        },
+        "modified": page.modified.isoformat() if page.modified else None,
+        "created": page.created.isoformat() if page.created else None,
+        "source_path": str(
+            page.source_path.relative_to(site_root)
+            if page.source_path.is_absolute()
+            else page.source_path
+        ),
+    }
+
+
+def _serialize_entry(entry, site_root: Path, clean_urls: bool, base_path: str) -> dict:
+    """Serialize a collection entry (Page or dict) to a JSON-safe dict."""
+    from rockgarden.content.models import Page
+
+    if isinstance(entry, Page):
+        return _serialize_page(entry, site_root, clean_urls, base_path)
+    return entry
+
+
 def export_content_json(
-    pages: list, site_root: Path, clean_urls: bool, base_path: str
+    pages: list,
+    site_root: Path,
+    clean_urls: bool,
+    base_path: str,
+    collections: dict | None = None,
 ) -> Path:
     """Export collected content metadata to .rockgarden/content.json.
 
     Returns the path to the written JSON file.
     """
-    from rockgarden.urls import get_url
+    page_data = [
+        _serialize_page(page, site_root, clean_urls, base_path) for page in pages
+    ]
 
-    data = []
-    for page in pages:
-        data.append(
-            {
-                "slug": page.slug,
-                "title": page.title,
-                "url": get_url(page.slug, clean_urls, base_path),
-                "tags": page.frontmatter.get("tags", []),
-                "frontmatter": {
-                    k: (
-                        v
-                        if isinstance(
-                            v, (str, int, float, bool, list, dict, type(None))
-                        )
-                        else str(v)
-                    )
-                    for k, v in page.frontmatter.items()
-                },
-                "modified": page.modified.isoformat() if page.modified else None,
-                "created": page.created.isoformat() if page.created else None,
-                "source_path": str(
-                    page.source_path.relative_to(site_root)
-                    if page.source_path.is_absolute()
-                    else page.source_path
-                ),
-            }
-        )
+    collections_data = {}
+    if collections:
+        for name, collection in collections.items():
+            collections_data[name] = [
+                _serialize_entry(entry, site_root, clean_urls, base_path)
+                for entry in collection.entries
+            ]
+
+    data = {"pages": page_data, "collections": collections_data}
 
     out_dir = site_root / ".rockgarden"
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -285,15 +313,36 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     clean_urls = config.site.clean_urls
     base_path = get_base_path(config.site.base_url)
 
+    collections = partition_collections(pages, config.collections, source)
+
+    for col in collections.values():
+        data_entries = load_collection_data_files(source, col.config.source)
+        col.entries.extend(data_entries)
+
+    for col in collections.values():
+        if col.config.model:
+            model_class = resolve_model(
+                col.config.model, site_root, config.theme.name
+            )
+            if model_class is None:
+                raise ValueError(
+                    f"Collection '{col.name}' references model '{col.config.model}' "
+                    f"but no model file was found"
+                )
+            for entry in col.entries:
+                validate_entry(entry, model_class, col.name)
+
     # Build media index before creating store so it can resolve media file links
     media_index = build_media_index(source)
-    store = ContentStore(pages, clean_urls, media_index, base_path)
+    store = ContentStore(pages, clean_urls, media_index, base_path, collections)
 
     link_index = build_link_index(pages, store)
 
     has_post_hooks = config.hooks.post_collect or config.hooks.post_build
     if has_post_hooks:
-        content_json_path = export_content_json(pages, site_root, clean_urls, base_path)
+        content_json_path = export_content_json(
+            pages, site_root, clean_urls, base_path, collections
+        )
         hook_env["ROCKGARDEN_CONTENT_JSON"] = str(content_json_path.resolve())
         _warn_gitignore(site_root)
     run_hooks(
@@ -306,6 +355,9 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     nav_tree = build_nav_tree(pages, config.nav, clean_urls, base_path)
 
     env = create_engine(config, site_root=source.parent, base_path=base_path)
+    env.globals["collections"] = {
+        name: col.entries for name, col in collections.items()
+    }
 
     cache_hash = _static_hash(output)
 
