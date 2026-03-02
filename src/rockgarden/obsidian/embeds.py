@@ -136,7 +136,10 @@ def pdf_to_html(embed: ParsedEmbed, src: str) -> str:
     width = embed.width or 100
     height = embed.height or 600
     width_unit = "%" if not embed.width else "px"
-    return f'<iframe src="{escape(src)}" width="{width}{width_unit}" height="{height}px" style="border: none;"></iframe>'
+    return (
+        f'<iframe src="{escape(src)}" width="{width}{width_unit}"'
+        f' height="{height}px" style="border: none;"></iframe>'
+    )
 
 
 def embed_to_html(embed: ParsedEmbed, src: str) -> str:

@@ -65,7 +65,7 @@ class TestBuildSiteStripTitle:
         assert html.count("<h1") == 1
 
     def test_strips_h1_when_title_derived_from_filename(self, tmp_path):
-        """H1 should not appear twice when title is derived from filename (no frontmatter)."""
+        """H1 should not appear twice when title comes from filename."""
         source = tmp_path / "source"
         source.mkdir()
         (source / "my-page.md").write_text("# My Page\n\nSome content.")

@@ -24,6 +24,9 @@ alias fmt := format
 test *ARGS:
     uv run pytest {{ARGS}}
 
+# Run tests and lint/format check (CI equivalent)
+ci: check test
+
 # Build the demo site (./site)
 build *ARGS:
     uv run rockgarden build --clean {{ARGS}}

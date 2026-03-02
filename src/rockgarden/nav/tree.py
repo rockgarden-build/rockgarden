@@ -101,7 +101,7 @@ def build_nav_tree(
     for page in pages:
         slug_parts = page.slug.split("/")
         num_parts = len(slug_parts)
-        # Extract original path parts from source_path (last N parts, including filename)
+        # Extract original path parts from source_path (last N parts, incl. filename)
         source_parts = page.source_path.parts[-num_parts:]
         # Map each folder's slug path to its original name
         for i in range(len(slug_parts) - 1):

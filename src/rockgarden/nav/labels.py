@@ -13,7 +13,8 @@ def resolve_label(
 
     Resolution order:
     1. Config override (labels dict)
-    2. Folder's index page title (uses Page.title which checks frontmatter then filename)
+    2. Folder's index page title (uses Page.title which checks frontmatter then
+       filename)
     3. Name with underscores replaced by spaces (fallback when no index page)
     """
     normalized_path = f"/{path.strip('/')}" if path else "/"

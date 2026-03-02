@@ -73,7 +73,7 @@ class ContentStore:
         return self._by_slug.get(slug)
 
     def get_by_name(self, name: str) -> Page | None:
-        """Look up a page by its name or alias (case-insensitive, Unicode-normalized)."""
+        """Look up a page by name or alias (case-insensitive, Unicode-normalized)."""
         normalized_name = unicodedata.normalize("NFC", name).lower()
         return self._by_name.get(normalized_name)
 
