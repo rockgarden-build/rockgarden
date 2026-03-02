@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Explicit version to bump to (e.g., 0.4.0). Leave empty for automatic bump based on commits.'
+        description: 'Explicit version to bump to (e.g., 0.5.0). Leave empty for automatic bump based on commits.'
         required: false
         type: string
 
@@ -13,12 +13,13 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Full history needed for commitizen
+          fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up uv
@@ -39,17 +40,72 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Bump version (explicit)
-        if: ${{ inputs.version != '' }}
+      - name: Get current version
+        id: current
+        run: |
+          CURRENT=$(grep '^version' pyproject.toml | head -1 | sed 's/.*"\(.*\)"/\1/')
+          echo "version=$CURRENT" >> "$GITHUB_OUTPUT"
+
+      - name: Determine next version
+        id: next
         env:
           VERSION: ${{ inputs.version }}
-        run: uv run cz bump --yes --increment CUSTOM --version "$VERSION"
-
-      - name: Bump version (automatic)
-        if: ${{ inputs.version == '' }}
-        run: uv run cz bump --yes
-
-      - name: Push changes
         run: |
-          git push
-          git push --tags
+          if [ -n "$VERSION" ]; then
+            echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          else
+            NEXT=$(uv run cz bump --dry-run 2>&1 | grep -oP 'tag to create: v\K[0-9]+\.[0-9]+\.[0-9]+')
+            if [ -z "$NEXT" ]; then
+              echo "::error::Could not determine next version. Are there conventional commits since the last tag?"
+              exit 1
+            fi
+            echo "version=$NEXT" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create bump branch
+        env:
+          NEXT: ${{ steps.next.outputs.version }}
+        run: |
+          if git ls-remote --heads origin "refs/heads/bump/$NEXT" | grep -q "bump/$NEXT"; then
+            echo "::error::Branch bump/$NEXT already exists on remote. Delete it first."
+            exit 1
+          fi
+          git checkout -b "bump/$NEXT"
+
+      - name: Bump version in files
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          if [ -n "$VERSION" ]; then
+            uv run cz bump --files-only --yes "$VERSION"
+          else
+            uv run cz bump --files-only --yes
+          fi
+
+      - name: Update lockfile
+        run: uv lock
+
+      - name: Generate changelog
+        run: uv run cz changelog --incremental
+
+      - name: Commit changes
+        env:
+          CURRENT: ${{ steps.current.outputs.version }}
+          NEXT: ${{ steps.next.outputs.version }}
+        run: |
+          git add pyproject.toml src/rockgarden/__init__.py uv.lock CHANGELOG.md
+          git commit -m "bump: increment version $CURRENT -> $NEXT"
+
+      - name: Push branch and create PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CURRENT: ${{ steps.current.outputs.version }}
+          NEXT: ${{ steps.next.outputs.version }}
+        run: |
+          git push -u origin "bump/$NEXT"
+          gh pr create \
+            --title "bump: increment version $CURRENT -> $NEXT" \
+            --body "Automated version bump to $NEXT.
+
+          Merging will trigger automatic tagging of v$NEXT." \
+            --base main
