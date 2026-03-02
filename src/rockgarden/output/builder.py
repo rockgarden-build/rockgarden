@@ -458,37 +458,30 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
             folder_path = "/".join(parts[:-1])
             show_index = p.frontmatter.get("show_index", False)
             show_index_map[folder_path] = show_index
-    # Generate collection pages before the main render loop so nav nodes
-    # are present when templates reference site.nav.
-    collection_page_entries = build_collection_pages(
-        collections,
-        env,
-        site_config,
-        output,
-        clean_urls,
-        base_path,
-        config,
-    )
+    # Pre-compute collection nav nodes so they're visible to all templates
+    # (including collection page templates themselves).
+    from rockgarden.content.collection import entry_fields
+    from rockgarden.nav.tree import NavNode
 
     for col in collections.values():
         if not col.config.nav or not col.generates_pages:
             continue
-        col_entries = [
-            e for e in collection_page_entries if e["collection"] == col.name
-        ]
-        if not col_entries:
-            continue
-        from rockgarden.nav.tree import NavNode
-
-        children = [
-            NavNode(
-                name=e["slug"].rsplit("/", 1)[-1],
-                path=e["url"],
-                label=e["title"],
-                is_folder=False,
+        children = []
+        for entry in col.entries:
+            url = generate_collection_url(col.config.url_pattern, entry)
+            slug = url.strip("/")
+            fields = entry_fields(entry)
+            title = fields.get("title", fields.get("name", slug))
+            children.append(
+                NavNode(
+                    name=slug.rsplit("/", 1)[-1],
+                    path=f"{base_path}{url}",
+                    label=title,
+                    is_folder=False,
+                )
             )
-            for e in col_entries
-        ]
+        if not children:
+            continue
         children.sort(key=lambda n: n.label.lower())
         col_node = NavNode(
             name=col.name,
@@ -498,6 +491,17 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
             children=children,
         )
         nav_tree.children.append(col_node)
+
+    # Generate collection pages (nav tree is fully populated at this point).
+    collection_page_entries = build_collection_pages(
+        collections,
+        env,
+        site_config,
+        output,
+        clean_urls,
+        base_path,
+        config,
+    )
 
     all_media: set[str] = set()
     broken_links_by_page: dict[str, list[str]] = {}
