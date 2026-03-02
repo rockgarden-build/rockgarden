@@ -89,16 +89,17 @@ jobs:
           NEXT: ${{ steps.next.outputs.version }}
         run: |
           git add pyproject.toml src/rockgarden/__init__.py uv.lock CHANGELOG.md
-          git commit -m "bump: version $CURRENT → $NEXT"
+          git commit -m "bump: increment version $CURRENT -> $NEXT"
 
       - name: Push branch and create PR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CURRENT: ${{ steps.current.outputs.version }}
           NEXT: ${{ steps.next.outputs.version }}
         run: |
           git push -u origin "bump/$NEXT"
           gh pr create \
-            --title "bump: version $NEXT" \
+            --title "bump: increment version $CURRENT -> $NEXT" \
             --body "Automated version bump to $NEXT.
 
           Merging will trigger automatic tagging of v$NEXT." \
