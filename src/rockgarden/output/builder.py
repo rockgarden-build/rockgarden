@@ -65,6 +65,15 @@ def copy_static_files(output: Path) -> None:
         shutil.copytree(static_src, static_dst, dirs_exist_ok=True)
 
 
+def copy_theme_static_files(theme_name: str, site_root: Path, output: Path) -> None:
+    """Copy theme static files to output, overriding bundled statics."""
+    if not theme_name:
+        return
+    theme_static = site_root / "_themes" / theme_name / "static"
+    if theme_static.exists():
+        shutil.copytree(theme_static, output / "_static", dirs_exist_ok=True)
+
+
 def discover_user_assets(site_root: Path) -> tuple[list[str], list[str]]:
     """Discover user-provided CSS and JS files.
 
@@ -171,6 +180,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     copy_static_files(output)
 
     site_root = source.parent
+    copy_theme_static_files(config.theme.name, site_root, output)
     user_styles, user_scripts = discover_user_assets(site_root)
     copy_user_assets(site_root, output, user_styles, user_scripts)
 

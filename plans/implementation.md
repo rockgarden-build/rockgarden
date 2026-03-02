@@ -229,9 +229,9 @@ Work in batches, one feature per PR.
 - [x] Copy to `_site/styles/` and `_site/scripts/`
 - [x] Inject `<link>` and `<script>` tags in `base.html` / `layouts/default.html`
 
-#### Feature 10C: Theme Export CLI
-- [ ] Add `theme` command group to `cli.py`
-- [ ] Implement `rockgarden theme export` — copies bundled theme to `_themes/default/`
+#### Feature 10C: Theme Export CLI ✅
+- [x] Add `theme` command group to `cli.py`
+- [x] Implement `rockgarden theme export` — copies bundled theme to `_themes/default/`
 
 ### Batch 4 — Build Pipeline
 
