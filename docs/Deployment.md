@@ -34,6 +34,17 @@ ErrorDocument 404 /404.html
 error_page 404 /404.html;
 ```
 
+## Subdirectory Deployment
+
+To deploy to a subdirectory (e.g., `example.com/docs/`), set `base_url` in `rockgarden.toml`:
+
+```toml
+[site]
+base_url = "https://example.com/docs"
+```
+
+All generated URLs (assets, internal links, search index, sitemap) will include the base path prefix.
+
 ## Clean URLs
 
 By default, Rockgarden generates clean URLs (e.g., `/about/` rather than `/about.html`). Each page is written as `page/index.html`. This works on most hosts without configuration.
