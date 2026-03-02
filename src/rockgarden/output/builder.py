@@ -321,9 +321,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
 
     for col in collections.values():
         if col.config.model:
-            model_class = resolve_model(
-                col.config.model, site_root, config.theme.name
-            )
+            model_class = resolve_model(col.config.model, site_root, config.theme.name)
             if model_class is None:
                 raise ValueError(
                     f"Collection '{col.name}' references model '{col.config.model}' "

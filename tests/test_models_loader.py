@@ -40,7 +40,7 @@ class TestResolveModel:
         assert cls.__name__ == "Speaker"
 
     def test_site_takes_precedence_over_theme(self, tmp_path):
-        fields = 'name: str\n    level: int = 1'
+        fields = "name: str\n    level: int = 1"
         _write_model(
             tmp_path / "_models" / "speaker.py",
             "Speaker",
@@ -49,7 +49,7 @@ class TestResolveModel:
         _write_model(
             tmp_path / "_themes" / "mytheme" / "_models" / "speaker.py",
             "Speaker",
-            'name: str\n    level: int = 99',
+            "name: str\n    level: int = 99",
         )
         cls = resolve_model("speaker", tmp_path, theme_name="mytheme")
         instance = cls(name="test")
