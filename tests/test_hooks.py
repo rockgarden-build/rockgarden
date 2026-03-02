@@ -15,7 +15,9 @@ from rockgarden.output.builder import export_content_json
 
 def _py(script: str) -> str:
     """Build a python -c command string."""
-    return f'{sys.executable} -c "{script}"'
+    import shlex
+
+    return f'{shlex.quote(sys.executable)} -c "{script}"'
 
 
 class TestRunHooks:

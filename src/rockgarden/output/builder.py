@@ -3,6 +3,7 @@
 import hashlib
 import json
 import shutil
+import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -182,6 +183,22 @@ def _make_note_resolver(
     return resolve
 
 
+def _warn_gitignore(site_root: Path) -> None:
+    """Warn if .rockgarden/ is not in .gitignore for a git repo."""
+    if not (site_root / ".git").is_dir():
+        return
+    gitignore = site_root / ".gitignore"
+    if gitignore.exists():
+        lines = [line.strip() for line in gitignore.read_text().splitlines()]
+        if ".rockgarden" in lines or ".rockgarden/" in lines:
+            return
+    print(
+        "Warning: .rockgarden/ is not in .gitignore. "
+        "Consider adding it to avoid committing build artifacts.",
+        file=sys.stderr,
+    )
+
+
 def export_content_json(
     pages: list, site_root: Path, clean_urls: bool, base_path: str
 ) -> Path:
@@ -218,7 +235,7 @@ def export_content_json(
     out_dir = site_root / ".rockgarden"
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / "content.json"
-    out_path.write_text(json.dumps(data, indent=2))
+    out_path.write_text(json.dumps(data, indent=2, default=str))
     return out_path
 
 
@@ -261,8 +278,11 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
 
     link_index = build_link_index(pages, store)
 
-    content_json_path = export_content_json(pages, site_root, clean_urls, base_path)
-    hook_env["ROCKGARDEN_CONTENT_JSON"] = str(content_json_path.resolve())
+    has_post_hooks = config.hooks.post_collect or config.hooks.post_build
+    if has_post_hooks:
+        content_json_path = export_content_json(pages, site_root, clean_urls, base_path)
+        hook_env["ROCKGARDEN_CONTENT_JSON"] = str(content_json_path.resolve())
+        _warn_gitignore(site_root)
     run_hooks(
         config.hooks.post_collect,
         "post_collect",

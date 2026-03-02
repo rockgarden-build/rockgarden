@@ -102,11 +102,15 @@ ignore_patterns = [".obsidian", "Templates"]
     typer.echo(f"Created {config_path}")
 
     gitignore_path = directory / ".gitignore"
-    if not _is_in_gitignore(gitignore_path, output):
-        add_gitignore = typer.confirm(f"Add '{output}/' to .gitignore?", default=True)
+    gitignore_entries = [output, ".rockgarden"]
+    missing = [e for e in gitignore_entries if not _is_in_gitignore(gitignore_path, e)]
+    if missing:
+        labels = ", ".join(f"'{e}/'" for e in missing)
+        add_gitignore = typer.confirm(f"Add {labels} to .gitignore?", default=True)
         if add_gitignore:
-            _add_to_gitignore(gitignore_path, output)
-            typer.echo(f"Added '{output}/' to .gitignore")
+            for entry in missing:
+                _add_to_gitignore(gitignore_path, entry)
+            typer.echo(f"Added {labels} to .gitignore")
 
 
 @app.command()
