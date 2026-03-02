@@ -18,6 +18,8 @@ from rockgarden.config import Config
 from rockgarden.content import (
     ContentStore,
     build_link_index,
+    generate_collection_url,
+    get_collection_skip_slugs,
     load_collection_data_files,
     load_content,
     partition_collections,
@@ -280,6 +282,67 @@ def export_content_json(
     return out_path
 
 
+def build_collection_pages(
+    collections: dict,
+    env,
+    site_config: dict,
+    output: Path,
+    clean_urls: bool,
+    base_path: str,
+    config: Config,
+) -> list[dict]:
+    """Generate HTML pages for collections with page generation enabled.
+
+    Returns a list of search-index-ready dicts for the generated pages.
+    """
+    from rockgarden.content.collection import _entry_fields
+    from rockgarden.content.models import Page
+
+    generated = []
+
+    for col in collections.values():
+        if not col.generates_pages:
+            continue
+
+        template = env.get_template(col.config.template)
+        layout_template = resolve_layout({}, config.theme.default_layout)
+
+        for entry in col.entries:
+            url = generate_collection_url(col.config.url_pattern, entry)
+            slug = url.strip("/")
+
+            html_content = None
+            if isinstance(entry, Page) and entry.content:
+                html_content = render_markdown(entry.content)
+
+            rendered = template.render(
+                entry=_entry_fields(entry),
+                entry_obj=entry,
+                html_content=html_content,
+                collection=col,
+                site=site_config,
+                layout_template=layout_template,
+            )
+
+            output_file = output / get_output_path(slug, clean_urls)
+            output_file.parent.mkdir(parents=True, exist_ok=True)
+            output_file.write_text(rendered)
+
+            fields = _entry_fields(entry)
+            generated.append(
+                {
+                    "title": fields.get("title", fields.get("name", slug)),
+                    "url": f"{base_path}{url}"
+                    if not url.startswith(base_path)
+                    else url,
+                    "slug": slug,
+                    "collection": col.name,
+                }
+            )
+
+    return generated
+
+
 def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     """Build the static site.
 
@@ -394,9 +457,13 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
             show_index_map[folder_path] = show_index
     all_media: set[str] = set()
     broken_links_by_page: dict[str, list[str]] = {}
+    collection_skip_slugs = get_collection_skip_slugs(collections)
 
     count = 0
     for page in pages:
+        if page.slug in collection_skip_slugs:
+            continue
+
         parts = page.slug.split("/")
         if parts[-1] == "index":
             folder_path = "/".join(parts[:-1])
@@ -532,11 +599,60 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
 
     copy_assets(all_media, source, output)
 
+    # Generate collection pages
+    collection_page_entries = build_collection_pages(
+        collections,
+        env,
+        site_config,
+        output,
+        clean_urls,
+        base_path,
+        config,
+    )
+    count += len(collection_page_entries)
+
+    # Add collection nav nodes for nav=true collections
+    for col in collections.values():
+        if not col.config.nav or not col.generates_pages:
+            continue
+        col_entries = [
+            e for e in collection_page_entries if e["collection"] == col.name
+        ]
+        if not col_entries:
+            continue
+        from rockgarden.nav.tree import NavNode
+
+        children = [
+            NavNode(
+                name=e["slug"].rsplit("/", 1)[-1],
+                path=e["url"],
+                label=e["title"],
+                is_folder=False,
+            )
+            for e in col_entries
+        ]
+        children.sort(key=lambda n: n.label.lower())
+        col_node = NavNode(
+            name=col.name,
+            path=children[0].path if children else "",
+            label=col.name,
+            is_folder=True,
+            children=children,
+        )
+        nav_tree.children.append(col_node)
+
     # Generate search index if enabled
     if config.theme.search:
         search_index = build_search_index(
             pages, config.search.include_content, clean_urls, base_path
         )
+        for entry in collection_page_entries:
+            search_index.append(
+                {
+                    "title": entry["title"],
+                    "url": entry["url"],
+                }
+            )
         search_index_file = output / "search-index.json"
         search_index_file.write_text(json.dumps(search_index))
 

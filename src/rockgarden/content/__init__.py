@@ -1,6 +1,11 @@
 """Content loading and models."""
 
-from rockgarden.content.collection import Collection, partition_collections
+from rockgarden.content.collection import (
+    Collection,
+    generate_collection_url,
+    get_collection_skip_slugs,
+    partition_collections,
+)
 from rockgarden.content.format_loader import load_collection_data_files, load_data_file
 from rockgarden.content.link_index import LinkIndex, build_link_index
 from rockgarden.content.loader import load_content
@@ -15,6 +20,8 @@ __all__ = [
     "LinkIndex",
     "Page",
     "build_link_index",
+    "generate_collection_url",
+    "get_collection_skip_slugs",
     "load_collection_data_files",
     "load_content",
     "load_data_file",

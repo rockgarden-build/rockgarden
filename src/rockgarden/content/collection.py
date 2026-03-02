@@ -15,6 +15,13 @@ class Collection:
     config: CollectionConfig
     entries: list[Page | dict] = field(default_factory=list)
 
+    @property
+    def generates_pages(self) -> bool:
+        """Whether this collection generates its own pages."""
+        return bool(
+            self.config.pages and self.config.template and self.config.url_pattern
+        )
+
 
 def partition_collections(
     pages: list[Page],
@@ -56,3 +63,37 @@ def partition_collections(
         collections[cfg.name] = collection
 
     return collections
+
+
+def _entry_fields(entry: Page | dict) -> dict:
+    """Extract a flat dict of fields from an entry for URL substitution."""
+    if isinstance(entry, Page):
+        return {
+            "slug": entry.source_path.stem,
+            "title": entry.title,
+            **entry.frontmatter,
+        }
+    return dict(entry)
+
+
+def generate_collection_url(url_pattern: str, entry: Page | dict) -> str:
+    """Replace ``{field}`` placeholders in url_pattern with entry values."""
+    fields = _entry_fields(entry)
+    return url_pattern.format(**fields)
+
+
+def get_collection_skip_slugs(
+    collections: dict[str, "Collection"],
+) -> set[str]:
+    """Return slugs of Pages that should be skipped in the main render loop.
+
+    A page is skipped if its collection either generates its own pages
+    (custom template) or suppresses page output (``pages=false``).
+    """
+    skip: set[str] = set()
+    for col in collections.values():
+        if col.generates_pages or not col.config.pages:
+            for entry in col.entries:
+                if isinstance(entry, Page):
+                    skip.add(entry.slug)
+    return skip
