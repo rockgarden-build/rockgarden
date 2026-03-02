@@ -18,6 +18,9 @@ from rockgarden.config import Config
 from rockgarden.content import (
     ContentStore,
     build_link_index,
+    entry_fields,
+    generate_collection_url,
+    get_collection_skip_slugs,
     load_collection_data_files,
     load_content,
     partition_collections,
@@ -41,7 +44,7 @@ from rockgarden.obsidian import (
     process_wikilinks,
 )
 from rockgarden.output.build_info import get_build_info
-from rockgarden.output.search import build_search_index
+from rockgarden.output.search import build_search_index, strip_html
 from rockgarden.output.sitemap import build_sitemap
 from rockgarden.output.tags import build_tag_pages, collect_tags
 from rockgarden.render import (
@@ -280,6 +283,65 @@ def export_content_json(
     return out_path
 
 
+def build_collection_pages(
+    collections: dict,
+    env,
+    site_config: dict,
+    output: Path,
+    clean_urls: bool,
+    base_path: str,
+    config: Config,
+) -> list[dict]:
+    """Generate HTML pages for collections with page generation enabled.
+
+    Returns a list of search-index-ready dicts for the generated pages.
+    """
+    from rockgarden.content.models import Page
+
+    generated = []
+
+    for col in collections.values():
+        if not col.generates_pages:
+            continue
+
+        template = env.get_template(col.config.template)
+        layout_template = resolve_layout({}, config.theme.default_layout)
+
+        for entry in col.entries:
+            url = generate_collection_url(col.config.url_pattern, entry)
+            slug = url.strip("/")
+
+            html_content = None
+            if isinstance(entry, Page) and entry.content:
+                html_content = process_callouts(render_markdown(entry.content))
+
+            fields = entry_fields(entry)
+            rendered = template.render(
+                entry=fields,
+                entry_obj=entry,
+                html_content=html_content,
+                collection=col,
+                site=site_config,
+                layout_template=layout_template,
+            )
+
+            output_file = output / get_output_path(slug, clean_urls)
+            output_file.parent.mkdir(parents=True, exist_ok=True)
+            output_file.write_text(rendered)
+
+            generated.append(
+                {
+                    "title": fields.get("title", fields.get("name", slug)),
+                    "url": f"{base_path}{url}",
+                    "slug": slug,
+                    "collection": col.name,
+                    "rendered_html": rendered,
+                }
+            )
+
+    return generated
+
+
 def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     """Build the static site.
 
@@ -319,6 +381,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         data_entries = load_collection_data_files(source, col.config.source)
         col.entries.extend(data_entries)
 
+    validated_entries: set[tuple[int, type]] = set()
     for col in collections.values():
         if col.config.model:
             model_class = resolve_model(col.config.model, site_root, config.theme.name)
@@ -328,7 +391,11 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
                     f"but no model file was found"
                 )
             for entry in col.entries:
+                key = (id(entry), model_class)
+                if key in validated_entries:
+                    continue
                 validate_entry(entry, model_class, col.name)
+                validated_entries.add(key)
 
     # Build media index before creating store so it can resolve media file links
     media_index = build_media_index(source)
@@ -392,11 +459,59 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
             folder_path = "/".join(parts[:-1])
             show_index = p.frontmatter.get("show_index", False)
             show_index_map[folder_path] = show_index
+    # Pre-compute collection nav nodes so they're visible to all templates
+    # (including collection page templates themselves).
+    from rockgarden.nav.tree import NavNode
+
+    for col in collections.values():
+        if not col.config.nav or not col.generates_pages:
+            continue
+        children = []
+        for entry in col.entries:
+            url = generate_collection_url(col.config.url_pattern, entry)
+            slug = url.strip("/")
+            fields = entry_fields(entry)
+            title = fields.get("title", fields.get("name", slug))
+            children.append(
+                NavNode(
+                    name=slug.rsplit("/", 1)[-1],
+                    path=f"{base_path}{url}",
+                    label=title,
+                    is_folder=False,
+                )
+            )
+        if not children:
+            continue
+        children.sort(key=lambda n: n.label.lower())
+        col_node = NavNode(
+            name=col.name,
+            path=children[0].path,
+            label=col.name,
+            is_folder=True,
+            children=children,
+        )
+        nav_tree.children.append(col_node)
+
+    # Generate collection pages (nav tree is fully populated at this point).
+    collection_page_entries = build_collection_pages(
+        collections,
+        env,
+        site_config,
+        output,
+        clean_urls,
+        base_path,
+        config,
+    )
+
     all_media: set[str] = set()
     broken_links_by_page: dict[str, list[str]] = {}
+    collection_skip_slugs = get_collection_skip_slugs(collections)
 
-    count = 0
+    count = len(collection_page_entries)
     for page in pages:
+        if page.slug in collection_skip_slugs:
+            continue
+
         parts = page.slug.split("/")
         if parts[-1] == "index":
             folder_path = "/".join(parts[:-1])
@@ -534,9 +649,19 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
 
     # Generate search index if enabled
     if config.theme.search:
+        searchable_pages = [p for p in pages if p.slug not in collection_skip_slugs]
         search_index = build_search_index(
-            pages, config.search.include_content, clean_urls, base_path
+            searchable_pages, config.search.include_content, clean_urls, base_path
         )
+
+        for entry in collection_page_entries:
+            search_entry = {
+                "title": entry["title"],
+                "url": entry["url"],
+            }
+            if config.search.include_content and entry.get("rendered_html"):
+                search_entry["content"] = strip_html(entry["rendered_html"])
+            search_index.append(search_entry)
         search_index_file = output / "search-index.json"
         search_index_file.write_text(json.dumps(search_index))
 

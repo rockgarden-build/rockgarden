@@ -2,7 +2,7 @@
 
 Unified content model with progressive customization. Everything is a collection.
 
-## Status: Not Started
+## Status: Complete
 
 ## Goal
 

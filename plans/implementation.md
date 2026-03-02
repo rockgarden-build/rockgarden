@@ -240,15 +240,33 @@ Work in batches, one feature per PR.
 - [x] Export content store to `.rockgarden/content.json` after collection
 - [x] Execute hook shell commands at each stage with error handling
 
-#### Feature 14: Collections
-- [ ] Collection-aware `ContentStore` (`list_content("name")`, `get_content("name", slug=...)`)
-- [ ] Config: `[[collections]]` with `name` and `source` fields
-- [ ] Named collection carves its directory out of the default collection
-- [ ] Nested collection support (content in `a/b/` belongs to both `b` and `a`)
-- [ ] Optional model/schema (`[models.x]` with `fields`)
-- [ ] Non-markdown format loading (YAML/JSON/TOML) when collection config enables it
-- [ ] Custom template and URL pattern per collection
-- [ ] Collection page generation controls (`pages = false`, `nav = true`)
+#### Feature 14: Collections ✅
+
+##### 14A: Markdown Collections + Template Context
+- [x] `content/collection.py` with `Collection` dataclass and `partition_collections()`
+- [x] Collection-aware `ContentStore` (`get_collection()`, `list_collection()`)
+- [x] `collections.<name>` available as Jinja2 template global
+- [x] Nested collection support (content in `a/b/` belongs to both `b` and `a`)
+- [x] JSON export updated to structured `{pages, collections}` format
+
+##### 14B: Non-Markdown Format Loading
+- [x] `content/format_loader.py` — load YAML, JSON, TOML data files
+- [x] Slug from filename stem or explicit `slug` field
+- [x] Builder loads data files per collection and appends to entries
+- [x] `pyyaml` added as direct dependency
+
+##### 14C: Content Models
+- [x] `content/models_loader.py` — `resolve_model()` and `validate_entry()`
+- [x] Model cascade: `_models/<name>.py` → `_themes/<theme>/_models/<name>.py`
+- [x] Pydantic validation with coercion and defaults merged back
+- [x] Builder validates entries for collections with `model` config
+
+##### 14D: Collection Page Generation + Nav Integration
+- [x] `generate_collection_url()` — `{field}` placeholder substitution
+- [x] `build_collection_pages()` — generates HTML for collections with `pages=true` + `template` + `url_pattern`
+- [x] Main render loop skips pages in collections with custom templates or `pages=false`
+- [x] Nav integration: `nav=true` collections add folder nodes to nav tree
+- [x] Collection pages included in search index
 
 ### Anytime: N11 Config Validation
 
