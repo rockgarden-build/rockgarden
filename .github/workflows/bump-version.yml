@@ -88,9 +88,6 @@ jobs:
       - name: Update lockfile
         run: uv lock
 
-      - name: Generate changelog
-        run: uv run cz changelog --incremental
-
       - name: Commit changes
         env:
           CURRENT: ${{ steps.current.outputs.version }}
