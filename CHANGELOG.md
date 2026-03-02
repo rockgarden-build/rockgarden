@@ -3,20 +3,19 @@
 ### Features
 
 - add collections support (#35)
-- switch to pydantic for modeling (#26)
+- switch to Pydantic for modeling (#26)
 
 ### Minor / Bug Fixes
 
 - add collection page generation (#36)
-- correct media paths (#34)
+- fix media paths (#34)
 - add build hooks (#33)
-- add linting and testing workflows (#32)
-- implement theme export (#31)
+- implement theme export CLI (#31)
 - handle static assets
 - add default layout system (#30)
-- support base_url/base_path (#29)
+- support base URL/ base path (#29)
 - implement tag index pages (#28)
-- add seo / meta tags by front matter (#27)
+- add SEO / meta tags by frontmatter (#27)
 
 ## v0.4.11 (2026-03-01)
 
