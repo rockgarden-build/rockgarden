@@ -235,10 +235,10 @@ Work in batches, one feature per PR.
 
 ### Batch 4 — Build Pipeline
 
-#### Feature 15: Build Hooks
-- [ ] Add `[hooks]` section to config (`pre_build`, `post_collect`, `post_build`)
-- [ ] Export content store to `.rockgarden/content.json` after collection
-- [ ] Execute hook shell commands at each stage with error handling
+#### Feature 15: Build Hooks ✅
+- [x] Add `[hooks]` section to config (`pre_build`, `post_collect`, `post_build`)
+- [x] Export content store to `.rockgarden/content.json` after collection
+- [x] Execute hook shell commands at each stage with error handling
 
 #### Feature 14: Collections
 - [ ] Collection-aware `ContentStore` (`list_content("name")`, `get_content("name", slug=...)`)

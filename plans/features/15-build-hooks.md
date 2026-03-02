@@ -2,7 +2,7 @@
 
 Shell commands executed at build lifecycle stages.
 
-## Status: Not Started
+## Status: Complete
 
 ## Goal
 

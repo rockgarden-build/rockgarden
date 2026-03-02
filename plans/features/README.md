@@ -32,7 +32,7 @@ The [PyOhio static website](https://github.com/pyohio/static-website) (Astro + P
 | 12 | [Base Path Prefix](12-base-path-prefix.md) | ✅ | B | Deploy to subdirectories |
 | 13 | [Polish](13-polish.md) | ✅ | A | Sitemap, 404, TOC, build info, timing |
 | 14 | [Collections](14-collections.md) | ❌ | B | Unified content model, progressive collections |
-| 15 | [Build Hooks](15-build-hooks.md) | ❌ | B | Pre/post-build shell commands |
+| 15 | [Build Hooks](15-build-hooks.md) | ✅ | B | Pre/post-build shell commands |
 | 16 | [Static Assets](16-static-assets.md) | ✅ | B | Custom CSS & JS inclusion |
 | 17 | [SEO & Meta Tags](17-seo-meta.md) | ✅ | B | Frontmatter-driven meta, OG tags |
 | 18 | [Accessibility](18-accessibility.md) | ✅ | A | Skip links, ARIA, focus styles |

@@ -86,6 +86,14 @@ class DatesConfig(BaseModel):
     timezone: str = "UTC"
 
 
+class HooksConfig(BaseModel):
+    """Build hook commands executed at lifecycle stages."""
+
+    pre_build: list[str] = Field(default_factory=list)
+    post_collect: list[str] = Field(default_factory=list)
+    post_build: list[str] = Field(default_factory=list)
+
+
 class CollectionConfig(BaseModel):
     """Configuration for a named content collection."""
 
@@ -108,6 +116,7 @@ class Config(BaseModel):
     toc: TocConfig = Field(default_factory=TocConfig)
     search: SearchConfig = Field(default_factory=SearchConfig)
     dates: DatesConfig = Field(default_factory=DatesConfig)
+    hooks: HooksConfig = Field(default_factory=HooksConfig)
     collections: list[CollectionConfig] = Field(default_factory=list)
 
     @classmethod
