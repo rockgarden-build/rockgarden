@@ -18,6 +18,7 @@ from rockgarden.config import Config
 from rockgarden.content import (
     ContentStore,
     build_link_index,
+    entry_fields,
     generate_collection_url,
     get_collection_skip_slugs,
     load_collection_data_files,
@@ -295,7 +296,6 @@ def build_collection_pages(
 
     Returns a list of search-index-ready dicts for the generated pages.
     """
-    from rockgarden.content.collection import entry_fields
     from rockgarden.content.models import Page
 
     generated = []
@@ -335,6 +335,7 @@ def build_collection_pages(
                     "url": f"{base_path}{url}",
                     "slug": slug,
                     "collection": col.name,
+                    "rendered_html": rendered,
                 }
             )
 
@@ -460,7 +461,6 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
             show_index_map[folder_path] = show_index
     # Pre-compute collection nav nodes so they're visible to all templates
     # (including collection page templates themselves).
-    from rockgarden.content.collection import entry_fields
     from rockgarden.nav.tree import NavNode
 
     for col in collections.values():
@@ -653,13 +653,16 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         search_index = build_search_index(
             searchable_pages, config.search.include_content, clean_urls, base_path
         )
+        from rockgarden.output.search import strip_html
+
         for entry in collection_page_entries:
-            search_index.append(
-                {
-                    "title": entry["title"],
-                    "url": entry["url"],
-                }
-            )
+            search_entry = {
+                "title": entry["title"],
+                "url": entry["url"],
+            }
+            if config.search.include_content and entry.get("rendered_html"):
+                search_entry["content"] = strip_html(entry["rendered_html"])
+            search_index.append(search_entry)
         search_index_file = output / "search-index.json"
         search_index_file.write_text(json.dumps(search_index))
 
