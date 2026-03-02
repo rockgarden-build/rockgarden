@@ -313,7 +313,7 @@ def build_collection_pages(
 
             html_content = None
             if isinstance(entry, Page) and entry.content:
-                html_content = render_markdown(entry.content)
+                html_content = process_callouts(render_markdown(entry.content))
 
             fields = entry_fields(entry)
             rendered = template.render(
@@ -649,8 +649,9 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
 
     # Generate search index if enabled
     if config.theme.search:
+        searchable_pages = [p for p in pages if p.slug not in collection_skip_slugs]
         search_index = build_search_index(
-            pages, config.search.include_content, clean_urls, base_path
+            searchable_pages, config.search.include_content, clean_urls, base_path
         )
         for entry in collection_page_entries:
             search_index.append(
