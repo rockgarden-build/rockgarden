@@ -185,13 +185,18 @@ def _make_note_resolver(
 
 def _warn_gitignore(site_root: Path) -> None:
     """Warn if .rockgarden/ is not in .gitignore for a git repo."""
-    if not (site_root / ".git").is_dir():
+    git_path = site_root / ".git"
+    if not git_path.exists():
         return
     gitignore = site_root / ".gitignore"
     if gitignore.exists():
-        lines = [line.strip() for line in gitignore.read_text().splitlines()]
-        if ".rockgarden" in lines or ".rockgarden/" in lines:
-            return
+        for line in gitignore.read_text().splitlines():
+            stripped = line.strip()
+            if not stripped or stripped.startswith("#"):
+                continue
+            normalized = stripped.lstrip("/").rstrip("/")
+            if normalized == ".rockgarden":
+                return
     print(
         "Warning: .rockgarden/ is not in .gitignore. "
         "Consider adding it to avoid committing build artifacts.",
