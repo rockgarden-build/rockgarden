@@ -124,12 +124,13 @@ class TestContentJsonExport:
         assert result_path.exists()
 
         data = json.loads(result_path.read_text())
-        assert len(data) == 1
-        assert data[0]["slug"] == "hello"
-        assert data[0]["title"] == "Hello World"
-        assert data[0]["tags"] == ["test", "demo"]
-        assert data[0]["url"] == "/hello/"
-        assert data[0]["source_path"] == "content/hello.md"
+        assert len(data["pages"]) == 1
+        assert data["pages"][0]["slug"] == "hello"
+        assert data["pages"][0]["title"] == "Hello World"
+        assert data["pages"][0]["tags"] == ["test", "demo"]
+        assert data["pages"][0]["url"] == "/hello/"
+        assert data["pages"][0]["source_path"] == "content/hello.md"
+        assert data["collections"] == {}
 
     def test_content_json_in_rockgarden_dir(self, tmp_path):
         result_path = export_content_json([], tmp_path, clean_urls=True, base_path="")
@@ -150,5 +151,5 @@ class TestContentJsonExport:
             pages, tmp_path, clean_urls=True, base_path=""
         )
         data = json.loads(result_path.read_text())
-        assert data[0]["modified"] == "2026-01-15T12:00:00"
-        assert data[0]["created"] is None
+        assert data["pages"][0]["modified"] == "2026-01-15T12:00:00"
+        assert data["pages"][0]["created"] is None
