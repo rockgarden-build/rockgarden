@@ -1,0 +1,65 @@
+name: Tag Release
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Check for untagged version
+        id: check
+        run: |
+          VERSION=$(grep '^version' pyproject.toml | head -1 | sed 's/.*"\(.*\)"/\1/')
+          TAG="v$VERSION"
+          if git ls-remote --tags origin "refs/tags/$TAG" | grep -q "$TAG"; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+            echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create tag
+        if: steps.check.outputs.skip == 'false'
+        env:
+          TAG: ${{ steps.check.outputs.tag }}
+        run: |
+          git tag "$TAG"
+          git push origin "$TAG"
+
+      - name: Extract changelog section
+        if: steps.check.outputs.skip == 'false'
+        id: changelog
+        env:
+          TAG: ${{ steps.check.outputs.tag }}
+        run: |
+          BODY=$(sed -n "/^## $TAG/,/^## v/{/^## v[0-9]/!p;}" CHANGELOG.md | sed '1d')
+          if [ -z "$BODY" ]; then
+            BODY="Release $TAG"
+          fi
+          {
+            echo "body<<CHANGELOG_EOF"
+            echo "$BODY"
+            echo "CHANGELOG_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        if: steps.check.outputs.skip == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.check.outputs.tag }}
+          BODY: ${{ steps.changelog.outputs.body }}
+        run: |
+          gh release create "$TAG" \
+            --title "$TAG" \
+            --notes "$BODY"
