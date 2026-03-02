@@ -65,7 +65,12 @@ jobs:
       - name: Create bump branch
         env:
           NEXT: ${{ steps.next.outputs.version }}
-        run: git checkout -b "bump/$NEXT"
+        run: |
+          if git ls-remote --heads origin "refs/heads/bump/$NEXT" | grep -q "bump/$NEXT"; then
+            echo "::error::Branch bump/$NEXT already exists on remote. Delete it first."
+            exit 1
+          fi
+          git checkout -b "bump/$NEXT"
 
       - name: Bump version in files
         env:

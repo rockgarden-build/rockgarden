@@ -43,7 +43,8 @@ jobs:
         env:
           TAG: ${{ steps.check.outputs.tag }}
         run: |
-          BODY=$(sed -n "/^## $TAG/,/^## v/{/^## v[0-9]/!p;}" CHANGELOG.md | sed '1d')
+          ESC_TAG=$(printf '%s' "$TAG" | sed 's/[.]/\\./g')
+          BODY=$(sed -n "/^## $ESC_TAG/,/^## v/{/^## v[0-9]/!p;}" CHANGELOG.md | sed '1d')
           if [ -z "$BODY" ]; then
             BODY="Release $TAG"
           fi
