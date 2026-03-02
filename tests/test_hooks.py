@@ -3,7 +3,6 @@
 import json
 import sys
 from datetime import datetime
-from pathlib import Path
 
 import pytest
 
@@ -110,7 +109,7 @@ class TestContentJsonExport:
     def test_content_json_written(self, tmp_path):
         pages = [
             Page(
-                source_path=Path("content/hello.md"),
+                source_path=tmp_path / "content" / "hello.md",
                 slug="hello",
                 frontmatter={
                     "title": "Hello World",
@@ -130,6 +129,7 @@ class TestContentJsonExport:
         assert data[0]["title"] == "Hello World"
         assert data[0]["tags"] == ["test", "demo"]
         assert data[0]["url"] == "/hello/"
+        assert data[0]["source_path"] == "content/hello.md"
 
     def test_content_json_in_rockgarden_dir(self, tmp_path):
         result_path = export_content_json([], tmp_path, clean_urls=True, base_path="")
@@ -139,7 +139,7 @@ class TestContentJsonExport:
     def test_content_json_handles_dates(self, tmp_path):
         pages = [
             Page(
-                source_path=Path("content/dated.md"),
+                source_path=tmp_path / "content" / "dated.md",
                 slug="dated",
                 frontmatter={},
                 content="",

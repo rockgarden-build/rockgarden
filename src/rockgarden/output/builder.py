@@ -228,7 +228,11 @@ def export_content_json(
                 },
                 "modified": page.modified.isoformat() if page.modified else None,
                 "created": page.created.isoformat() if page.created else None,
-                "source_path": str(page.source_path),
+                "source_path": str(
+                    page.source_path.relative_to(site_root)
+                    if page.source_path.is_absolute()
+                    else page.source_path
+                ),
             }
         )
 
