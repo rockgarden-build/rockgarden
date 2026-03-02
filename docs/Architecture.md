@@ -14,12 +14,18 @@
 
 Each build is a full rebuild. The build pipeline is:
 
-1. Load content files → parse frontmatter, extract content
-2. Build content store → backlinks index, nav tree, media index
-3. For each page: process Obsidian syntax → render markdown → apply template
-4. Write HTML + copy assets → generate search index, sitemap, 404
+1. Run `pre_build` hooks (if configured)
+2. Load content files → parse frontmatter, extract content
+3. Build content store → backlinks index, nav tree, media index
+4. Export content metadata to `.rockgarden/content.json` (if post-stage hooks configured)
+5. Run `post_collect` hooks (if configured)
+6. For each page: process Obsidian syntax → render markdown → apply template
+7. Write HTML + copy assets → generate search index, tag pages, sitemap, 404
+8. Run `post_build` hooks (if configured)
 
-**Current implementation:** markdown files only; in-memory store; no hooks. The diagram reflects the target architecture — see [Collections (Feature 14)](../plans/features/14-collections.md) and [Build Hooks (Feature 15)](../plans/features/15-build-hooks.md) for the planned extensions.
+See [[Build Hooks]] for hook configuration and usage.
+
+**Current implementation:** Markdown files only; in-memory store. Collections ([Feature 14](../plans/features/14-collections.md)) are not yet implemented.
 
 ## Design Principles
 
@@ -33,8 +39,9 @@ Each build is a full rebuild. The build pipeline is:
 ```
 rockgarden/
 ├── src/rockgarden/
-│   ├── cli.py              # typer CLI (build, serve)
+│   ├── cli.py              # typer CLI (build, serve, theme, init)
 │   ├── config.py           # rockgarden.toml loading
+│   ├── hooks.py            # Build hook execution
 │   ├── assets.py           # Media index + asset copying
 │   ├── urls.py             # URL/slug generation
 │   ├── links.py            # Markdown link transformation
@@ -60,12 +67,24 @@ rockgarden/
 │   │   ├── builder.py      # Build orchestration
 │   │   ├── build_info.py   # Build timestamp + git info
 │   │   ├── search.py       # Search index generation
-│   │   └── sitemap.py      # Sitemap XML generation
+│   │   ├── sitemap.py      # Sitemap XML generation
+│   │   └── tags.py         # Tag index page generation
 │   ├── templates/          # Default theme templates
 │   └── static/             # Default theme CSS + JS (compiled)
 ├── static-src/input.css    # Tailwind + custom CSS source
 └── tailwind.config.js
 ```
+
+## Generated Output
+
+The build produces these pages and artifacts:
+
+- **Content pages** — one per markdown file
+- **Folder index pages** — directory listings
+- **Tag index pages** — `/tags/` root listing all tags, plus `/tags/<tag>/` per tag
+- **Search index** — `search-index.json` for client-side search
+- **Sitemap** — `sitemap.xml` (when `site.base_url` is set)
+- **404 page** — always generated; override via `_templates/404.html`
 
 ## Core vs. Default Theme
 
@@ -75,8 +94,9 @@ These are always present regardless of theme:
 
 - **Content ingestion** — markdown loading, frontmatter parsing, Obsidian syntax (wikilinks, embeds, transclusions, callouts)
 - **Content store** — in-memory store, navigation tree, backlinks index, TOC extraction, search index generation, sitemap
-- **Build pipeline** — template rendering, asset copying, 404 generation, CLI
-- **Template infrastructure** — Jinja2 environment, ChoiceLoader (3-tier resolution), template context
+- **Build pipeline** — template rendering, asset copying, tag pages, 404 generation, build hooks, CLI
+- **Template infrastructure** — Jinja2 environment, ChoiceLoader (3-tier resolution), layout system, template context
+- **SEO** — meta tags (description, Open Graph) driven by frontmatter and site config
 
 The core provides no visible output on its own — it depends on a theme to supply templates and styles.
 
@@ -85,19 +105,20 @@ The core provides no visible output on its own — it depends on a theme to supp
 Shipped bundled in the package, active with zero config:
 
 - **Templates** — `base.html`, `page.html`, `folder_index.html`, `404.html`, component templates
-- **Layout** — drawer/sidebar layout with mobile hamburger nav
+- **Layouts** — `layouts/docs.html` with drawer/sidebar layout and mobile hamburger nav
 - **CSS** — compiled Tailwind + DaisyUI + callout/link/search styles (`rockgarden.css`)
 - **Search UI** — lunr.js + search component + client-side JavaScript
 - **Theme switching** — DaisyUI color palette toggle
 
 ### Configuration boundary
 
-Config options in `[theme]` are display/rendering concerns — a custom theme may not honour all of them. Config options in `[site]`, `[build]`, `[nav]`, `[toc]`, `[search]`, and `[dates]` are core generator concerns that apply regardless of theme.
+Config options in `[theme]` are display/rendering concerns — a custom theme may not honour all of them. Config options in `[site]`, `[build]`, `[hooks]`, `[nav]`, `[toc]`, `[search]`, and `[dates]` are core generator concerns that apply regardless of theme.
 
 ```toml
 # Core: applies regardless of theme
-[site]          # title, source, output, clean_urls, base_url
+[site]          # title, description, og_image, source, output, clean_urls, base_url
 [build]         # ignore_patterns, icons_dir
+[hooks]         # pre_build, post_collect, post_build
 [nav]           # hide, labels, sort, link_auto_index
 [toc]           # max_depth
 [search]        # include_content
@@ -106,15 +127,41 @@ Config options in `[theme]` are display/rendering concerns — a custom theme ma
 # Theme: display/rendering concerns
 [theme]
 name = ""                      # theme name (empty = built-in default)
+default_layout = ""            # default layout template name
 toc = true                     # show TOC panel
 backlinks = true               # show backlinks panel
 search = true                  # show search UI
+tag_index = true               # generate tag index pages
 daisyui_default = "light"      # DaisyUI color palette (default theme)
 daisyui_themes = []            # available palettes for switcher (default theme)
 nav_default_state = "collapsed"  # sidebar nav state (default theme)
 show_build_info = true         # footer build timestamp (default theme)
 show_build_commit = false      # footer git commit info (default theme)
 ```
+
+## SEO & Meta Tags
+
+Rockgarden generates `<meta>` and Open Graph tags from frontmatter and site config.
+
+**Site-level defaults** (in `rockgarden.toml`):
+
+```toml
+[site]
+description = "My site description"
+og_image = "https://example.com/og.png"
+```
+
+**Per-page overrides** (in frontmatter):
+
+```yaml
+---
+description: Page-specific description
+og_image: https://example.com/page-og.png
+keywords: python, static-site
+---
+```
+
+Per-page values override site defaults. If neither is set, the tag is omitted.
 
 ## Customization
 
@@ -124,11 +171,16 @@ show_build_commit = false      # footer git commit info (default theme)
 |-------|------|-----|
 | 0 | Zero-config vault publishing | `rockgarden build` — default theme, no config |
 | 1 | Color scheme | `[theme] daisyui_default = "dark"` — swap DaisyUI palette |
-| 2 | Patch a component | `_templates/components/nav.html` — override one file |
-| 3 | Add content blocks | Extend `page.html` named blocks (`after_heading`, `after_body`, etc.) |
-| 4 | Custom page layouts | `_templates/layouts/speaker.html` + frontmatter `layout: speaker` |
-| 5 | Custom theme | `_themes/pyohio/` — own base, own CSS, own components |
-| 6 | Export default theme | `rockgarden theme export` → copy default theme as starting point |
+| 2 | Custom CSS/JS | Drop files in `_styles/` and `_scripts/` — auto-injected |
+| 3 | Patch a component | `_templates/components/nav.html` — override one file |
+| 4 | Add content blocks | Extend `page.html` named blocks (`after_heading`, `after_body`, etc.) |
+| 5 | Custom page layouts | `_templates/layouts/speaker.html` + frontmatter `layout: speaker` |
+| 6 | Custom theme | `_themes/pyohio/` — own base, own CSS, own components |
+| 7 | Export default theme | `rockgarden theme export` → copy default theme as starting point |
+
+### Custom CSS and JavaScript
+
+Drop files in `_styles/` and `_scripts/` at the site root. They are automatically copied to the output directory and injected as `<link>` / `<script>` tags in the base template.
 
 ### Template resolution (ChoiceLoader)
 
@@ -157,9 +209,11 @@ This allows overriding a single component without touching anything else, or rep
 
 Use `{{ super() }}` to extend a block rather than replace it.
 
-### Layout system (Phase B)
+### Layout system
 
-The current `base.html` hardcodes the drawer/sidebar layout. Phase B will extract this into a `layouts/` directory, enabling per-page layout selection:
+`base.html` provides minimal HTML scaffolding (head, body wrapper, script injection). Page structure is defined by layout templates in `layouts/`.
+
+Per-page layout selection via frontmatter:
 
 ```yaml
 ---
@@ -171,7 +225,7 @@ Resolution order: frontmatter `layout` → collection default → `[theme] defau
 
 ### Theme export
 
-`rockgarden theme export` (planned, Phase B) copies the bundled default theme templates and CSS source to `_themes/default/` in the site root, making it editable as a starting point for a custom theme.
+`rockgarden theme export` copies the bundled default theme templates and CSS source to `_themes/default/` in the site root and sets `theme.name = "default"` in `rockgarden.toml`. This provides an editable starting point for a custom theme.
 
 ## Template Context
 
@@ -188,6 +242,7 @@ Variables available in all templates:
 ## Dependencies
 
 - `typer` — CLI
+- `pydantic` — Config validation
 - `markdown-it-py` — Markdown parsing (CommonMark + GFM-like preset)
 - `jinja2` — Templates
 - `python-frontmatter` — YAML frontmatter

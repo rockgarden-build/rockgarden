@@ -55,7 +55,9 @@ def test_init_adds_gitignore():
         assert result.exit_code == 0
         gitignore_path = Path(tmpdir) / ".gitignore"
         assert gitignore_path.exists()
-        assert "_site/" in gitignore_path.read_text()
+        content = gitignore_path.read_text()
+        assert "_site/" in content
+        assert ".rockgarden/" in content
 
 
 def test_init_skips_gitignore_when_declined():
@@ -82,11 +84,11 @@ def test_init_fails_if_config_exists():
 def test_init_skips_gitignore_prompt_if_already_present():
     with tempfile.TemporaryDirectory() as tmpdir:
         gitignore_path = Path(tmpdir) / ".gitignore"
-        gitignore_path.write_text("_site/\n")
+        gitignore_path.write_text("_site/\n.rockgarden/\n")
         result = runner.invoke(
             app,
             ["init", tmpdir],
             input="Site\ncontent\n_site\n",
         )
         assert result.exit_code == 0
-        assert "Add '_site/' to .gitignore?" not in result.output
+        assert ".gitignore" not in result.output

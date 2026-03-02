@@ -15,7 +15,7 @@ All three should use the same tool. Complexity is additive — you opt into feat
 ## Progressive Customization Ladder
 
 1. **Zero config** — Markdown files become pages. Obsidian syntax just works.
-2. **Convention** — Drop files in `_styles/`, `_templates/`, `_macros/` and they're picked up automatically.
+2. **Convention** — Drop files in `_styles/`, `_scripts/`, `_templates/` and they're picked up automatically.
 3. **Configuration** — `rockgarden.toml` for collections, navigation, themes, build hooks.
 4. **Full control** — Custom templates, data pipelines, external data sources, build hooks for asset compilation.
 

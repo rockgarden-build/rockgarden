@@ -3,6 +3,7 @@
 import hashlib
 import json
 import shutil
+import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -20,6 +21,7 @@ from rockgarden.content import (
     load_content,
     strip_content_title,
 )
+from rockgarden.hooks import run_hooks
 from rockgarden.icons import configure_icons_dir
 from rockgarden.links import transform_md_links
 from rockgarden.nav import (
@@ -181,6 +183,66 @@ def _make_note_resolver(
     return resolve
 
 
+def _warn_gitignore(site_root: Path) -> None:
+    """Warn if .rockgarden/ is not in .gitignore for a git repo."""
+    if not (site_root / ".git").is_dir():
+        return
+    gitignore = site_root / ".gitignore"
+    if gitignore.exists():
+        lines = [line.strip() for line in gitignore.read_text().splitlines()]
+        if ".rockgarden" in lines or ".rockgarden/" in lines:
+            return
+    print(
+        "Warning: .rockgarden/ is not in .gitignore. "
+        "Consider adding it to avoid committing build artifacts.",
+        file=sys.stderr,
+    )
+
+
+def export_content_json(
+    pages: list, site_root: Path, clean_urls: bool, base_path: str
+) -> Path:
+    """Export collected content metadata to .rockgarden/content.json.
+
+    Returns the path to the written JSON file.
+    """
+    from rockgarden.urls import get_url
+
+    data = []
+    for page in pages:
+        data.append(
+            {
+                "slug": page.slug,
+                "title": page.title,
+                "url": get_url(page.slug, clean_urls, base_path),
+                "tags": page.frontmatter.get("tags", []),
+                "frontmatter": {
+                    k: (
+                        v
+                        if isinstance(
+                            v, (str, int, float, bool, list, dict, type(None))
+                        )
+                        else str(v)
+                    )
+                    for k, v in page.frontmatter.items()
+                },
+                "modified": page.modified.isoformat() if page.modified else None,
+                "created": page.created.isoformat() if page.created else None,
+                "source_path": str(
+                    page.source_path.relative_to(site_root)
+                    if page.source_path.is_absolute()
+                    else page.source_path
+                ),
+            }
+        )
+
+    out_dir = site_root / ".rockgarden"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_path = out_dir / "content.json"
+    out_path.write_text(json.dumps(data, indent=2, default=str))
+    return out_path
+
+
 def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     """Build the static site.
 
@@ -204,6 +266,12 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     if config.build.icons_dir:
         configure_icons_dir((source.parent / config.build.icons_dir).resolve())
 
+    hook_env = {
+        "ROCKGARDEN_SOURCE": str(source.resolve()),
+        "ROCKGARDEN_OUTPUT": str(output.resolve()),
+    }
+    run_hooks(config.hooks.pre_build, "pre_build", cwd=site_root, env_vars=hook_env)
+
     pages = load_content(source, config.build.ignore_patterns, config.dates)
     clean_urls = config.site.clean_urls
     base_path = get_base_path(config.site.base_url)
@@ -213,6 +281,18 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     store = ContentStore(pages, clean_urls, media_index, base_path)
 
     link_index = build_link_index(pages, store)
+
+    has_post_hooks = config.hooks.post_collect or config.hooks.post_build
+    if has_post_hooks:
+        content_json_path = export_content_json(pages, site_root, clean_urls, base_path)
+        hook_env["ROCKGARDEN_CONTENT_JSON"] = str(content_json_path.resolve())
+        _warn_gitignore(site_root)
+    run_hooks(
+        config.hooks.post_collect,
+        "post_collect",
+        cwd=site_root,
+        env_vars=hook_env,
+    )
 
     nav_tree = build_nav_tree(pages, config.nav, clean_urls, base_path)
 
@@ -411,6 +491,8 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     # Generate 404 page
     not_found_template = env.get_template("404.html")
     (output / "404.html").write_text(not_found_template.render(site=site_config))
+
+    run_hooks(config.hooks.post_build, "post_build", cwd=site_root, env_vars=hook_env)
 
     return BuildResult(
         page_count=count,
