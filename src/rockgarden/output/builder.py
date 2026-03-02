@@ -44,7 +44,7 @@ from rockgarden.obsidian import (
     process_wikilinks,
 )
 from rockgarden.output.build_info import get_build_info
-from rockgarden.output.search import build_search_index
+from rockgarden.output.search import build_search_index, strip_html
 from rockgarden.output.sitemap import build_sitemap
 from rockgarden.output.tags import build_tag_pages, collect_tags
 from rockgarden.render import (
@@ -485,7 +485,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         children.sort(key=lambda n: n.label.lower())
         col_node = NavNode(
             name=col.name,
-            path=children[0].path if children else "",
+            path=children[0].path,
             label=col.name,
             is_folder=True,
             children=children,
@@ -653,7 +653,6 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         search_index = build_search_index(
             searchable_pages, config.search.include_content, clean_urls, base_path
         )
-        from rockgarden.output.search import strip_html
 
         for entry in collection_page_entries:
             search_entry = {
