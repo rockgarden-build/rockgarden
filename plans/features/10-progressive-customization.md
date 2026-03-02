@@ -2,7 +2,7 @@
 
 Enable customization from zero-config to fully custom site generation.
 
-## Status: In Progress (Phase A complete, Phase B planned)
+## Status: Complete
 
 ## Customization Levels
 

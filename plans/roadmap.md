@@ -39,12 +39,12 @@ A multi-section conference website:
 
 | PyOhio Capability | Rockgarden Feature | Status |
 |---|---|---|
-| Multiple layouts | Feature 10 Phase B - Layout System | Not started |
-| Reusable components | Feature 09 - Macros | Not started |
-| Subpath deployment (`/2025/`) | Feature 12 - Base Path Prefix | Not started |
-| Sitemap, 404 page | Feature 13 - Polish | Not started |
-| Client-side search | Feature 08 - Search | Not started |
-| RSS/Atom feed | Feature 11 - RSS Feed | Not started |
+| Multiple layouts | Feature 10 Phase B - Layout System | ✅ |
+| Reusable components | Feature 09 - Macros | Phase C |
+| Subpath deployment (`/2025/`) | Feature 12 - Base Path Prefix | ✅ |
+| Sitemap, 404 page | Feature 13 - Polish | ✅ |
+| Client-side search | Feature 08 - Search | ✅ |
+| RSS/Atom feed | Feature 11 - RSS Feed | Phase C |
 
 ### New Capabilities Needed
 
@@ -201,7 +201,7 @@ PyOhio targets WCAG 2.1 AA. Rockgarden's default templates lack skip links, ARIA
 
 ## Proposed Roadmap
 
-Two-phase approach: ship the zero-config Obsidian vault experience first, then build toward general-purpose SSG (PyOhio benchmark) as the 0.9 prerelease target.
+Two-phase approach: ship the zero-config Obsidian vault experience first, then build toward general-purpose SSG (PyOhio benchmark).
 
 ### Phase A: Zero-Config Release ✅
 
@@ -219,19 +219,18 @@ Two-phase approach: ship the zero-config Obsidian vault experience first, then b
 | **N10** | Newline Handling | ✅ |
 | **10A** | Config separation (core vs. theme) | ✅ |
 
-### Phase B: General SSG / PyOhio (0.9 Prerelease)
+### Phase B: General SSG / PyOhio ✅
 
-Ordered by dependency. The layout system and static assets are prerequisites for a custom PyOhio theme.
-
-| ID | Feature | Complexity | Notes |
-|---|---|---|---|
-| **10B** | Layout System | Medium | Per-page layouts via frontmatter. Refactor `base.html` to skeleton + `layouts/docs.html`. Prerequisite for custom themes. |
-| **16** | Static Assets (CSS/JS) | Low | `_themes/<name>/static/` convention. Required for themes that bring their own CSS. |
-| **10C** | Theme Export CLI | Low | `rockgarden theme export` copies default theme to `_themes/default/`. |
-| **14** | Collections | High | Directory-scoped content namespaces, optional schemas, YAML/JSON formats, custom templates/URLs. |
-| **15** | Build Hooks | Low-Med | Shell commands at `pre_build`, `post_collect`, `post_build`. Enables data pipelines, derived assets. |
-| **12** | Base Path Prefix | Low | Required for subpath deployment (e.g., `/2025/`). |
-| **17** | SEO & Meta Tags | Medium | Frontmatter-driven `<meta>`, Open Graph tags. |
+| ID | Feature | Status |
+|---|---|---|
+| **10B** | Layout System | ✅ |
+| **16** | Static Assets (CSS/JS) | ✅ |
+| **10C** | Theme Export CLI | ✅ |
+| **14** | Collections | ✅ |
+| **15** | Build Hooks | ✅ |
+| **12** | Base Path Prefix | ✅ |
+| **17** | SEO & Meta Tags | ✅ |
+| **N8** | Tag Index Pages | ✅ |
 
 ### Phase C: Enhanced Features
 
@@ -239,7 +238,6 @@ Ordered by dependency. The layout system and static assets are prerequisites for
 |---|---|---|---|
 | **09** | Macros | Medium | User-defined Jinja2 macros/components. |
 | **11** | RSS Feed | Low | RSS/Atom feed generation. |
-| **N8** | Tag Index Pages | Medium | `/tags/<tag>/` listing pages. |
 
 ---
 

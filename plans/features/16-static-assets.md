@@ -2,7 +2,7 @@
 
 Convention-based custom CSS and JavaScript inclusion.
 
-## Status: Not Started
+## Status: Complete
 
 ## Goal
 

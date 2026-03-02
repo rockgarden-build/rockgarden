@@ -46,7 +46,7 @@ The [PyOhio static website](https://github.com/pyohio/static-website) (Astro + P
 ## Roadmap Phases
 
 - **Phase A — Zero-Config Release** ✅: Callouts (05), backlinks (07), broken link handling (N6), polish (13), accessibility (18), search (08), tag display (N7), template decomposition (N9), newline handling (N10), embeds incl. transclusions (04)
-- **Phase B — General SSG / PyOhio (0.9)**: Layout system (10B), static assets (16), theme export CLI (10C), collections (14), build hooks (15), base path (12), SEO (17), tag index pages (N8)
+- **Phase B — General SSG / PyOhio** ✅: Layout system (10B), static assets (16), theme export CLI (10C), collections (14), build hooks (15), base path (12), SEO (17), tag index pages (N8)
 - **Phase C — Enhanced Features**: Macros (09), RSS (11)
 
 ## Quartz Features Reference
