@@ -38,8 +38,13 @@ from rockgarden.output.build_info import get_build_info
 from rockgarden.output.search import build_search_index
 from rockgarden.output.sitemap import build_sitemap
 from rockgarden.output.tags import build_tag_pages, collect_tags
-from rockgarden.render import create_engine, render_markdown, render_page, resolve_layout
-from rockgarden.urls import get_base_path, get_folder_url, get_output_path, get_url
+from rockgarden.render import (
+    create_engine,
+    render_markdown,
+    render_page,
+    resolve_layout,
+)
+from rockgarden.urls import get_base_path, get_folder_url, get_output_path
 
 
 @dataclass
@@ -65,6 +70,15 @@ def copy_static_files(output: Path) -> None:
         shutil.copytree(static_src, static_dst, dirs_exist_ok=True)
 
 
+def copy_theme_static_files(theme_name: str, site_root: Path, output: Path) -> None:
+    """Copy theme static files to output, overriding bundled statics."""
+    if not theme_name:
+        return
+    theme_static = site_root / "_themes" / theme_name / "static"
+    if theme_static.exists():
+        shutil.copytree(theme_static, output / "_static", dirs_exist_ok=True)
+
+
 def discover_user_assets(site_root: Path) -> tuple[list[str], list[str]]:
     """Discover user-provided CSS and JS files.
 
@@ -76,12 +90,18 @@ def discover_user_assets(site_root: Path) -> tuple[list[str], list[str]]:
     """
     styles_dir = site_root / "_styles"
     scripts_dir = site_root / "_scripts"
-    styles = sorted(p.name for p in styles_dir.glob("*.css")) if styles_dir.exists() else []
-    scripts = sorted(p.name for p in scripts_dir.glob("*.js")) if scripts_dir.exists() else []
+    styles = (
+        sorted(p.name for p in styles_dir.glob("*.css")) if styles_dir.exists() else []
+    )
+    scripts = (
+        sorted(p.name for p in scripts_dir.glob("*.js")) if scripts_dir.exists() else []
+    )
     return styles, scripts
 
 
-def copy_user_assets(site_root: Path, output: Path, styles: list[str], scripts: list[str]) -> None:
+def copy_user_assets(
+    site_root: Path, output: Path, styles: list[str], scripts: list[str]
+) -> None:
     """Copy user-provided CSS and JS files to the output directory."""
     if styles:
         out_styles = output / "styles"
@@ -141,7 +161,13 @@ def _make_note_resolver(
         sub_content = process_note_transclusions(
             sub_content,
             _make_note_resolver(
-                store, source, media_index, clean_urls, new_visited, all_media, broken_links
+                store,
+                source,
+                media_index,
+                clean_urls,
+                new_visited,
+                all_media,
+                broken_links,
             ),
         )
         sub_content, sub_broken = process_wikilinks(sub_content, store.resolve_link)
@@ -171,6 +197,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     copy_static_files(output)
 
     site_root = source.parent
+    copy_theme_static_files(config.theme.name, site_root, output)
     user_styles, user_scripts = discover_user_assets(site_root)
     copy_user_assets(site_root, output, user_styles, user_scripts)
 
@@ -249,7 +276,13 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         content = process_note_transclusions(
             content,
             _make_note_resolver(
-                store, source, media_index, clean_urls, frozenset({page.slug}), all_media, broken_links_by_page
+                store,
+                source,
+                media_index,
+                clean_urls,
+                frozenset({page.slug}),
+                all_media,
+                broken_links_by_page,
             ),
         )
         content, broken = process_wikilinks(content, store.resolve_link)
@@ -277,11 +310,19 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
                 if store.get_by_slug(slug)
             ]
             if backlink_pages:
-                backlinks_tree = build_nav_tree(backlink_pages, config.nav, clean_urls, base_path)
+                backlinks_tree = build_nav_tree(
+                    backlink_pages, config.nav, clean_urls, base_path
+                )
 
         layout_template = resolve_layout(page.frontmatter, config.theme.default_layout)
         html = render_page(
-            env, page, site_config, breadcrumbs, backlinks_tree, toc_entries, layout_template
+            env,
+            page,
+            site_config,
+            breadcrumbs,
+            backlinks_tree,
+            toc_entries,
+            layout_template,
         )
 
         output_file = output / get_output_path(page.slug, clean_urls)
@@ -310,7 +351,13 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
             processed = process_note_transclusions(
                 processed,
                 _make_note_resolver(
-                    store, source, media_index, clean_urls, frozenset({folder.slug}), all_media, broken_links_by_page
+                    store,
+                    source,
+                    media_index,
+                    clean_urls,
+                    frozenset({folder.slug}),
+                    all_media,
+                    broken_links_by_page,
                 ),
             )
             processed, broken = process_wikilinks(processed, store.resolve_link)
@@ -319,7 +366,9 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
             processed = transform_md_links(processed, clean_urls)
             folder.custom_content = process_callouts(render_markdown(processed))
 
-        breadcrumbs = _build_folder_breadcrumbs(folder, pages, config.nav, clean_urls, base_path)
+        breadcrumbs = _build_folder_breadcrumbs(
+            folder, pages, config.nav, clean_urls, base_path
+        )
 
         folder_layout = resolve_layout(folder.frontmatter, config.theme.default_layout)
         html = folder_template.render(

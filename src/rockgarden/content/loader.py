@@ -95,15 +95,11 @@ def load_page(
     else:
         slug = path_to_slug(path, source)
 
-    modified = _resolve_frontmatter_date(
-        metadata, dates_config.modified_date_fields
-    )
+    modified = _resolve_frontmatter_date(metadata, dates_config.modified_date_fields)
     if modified is None and dates_config.modified_date_fallback:
         modified = datetime.fromtimestamp(path.stat().st_mtime)
 
-    created = _resolve_frontmatter_date(
-        metadata, dates_config.created_date_fields
-    )
+    created = _resolve_frontmatter_date(metadata, dates_config.created_date_fields)
 
     return Page(
         source_path=path,

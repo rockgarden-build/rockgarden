@@ -1,6 +1,7 @@
 """Search index generation for client-side search."""
 
 import re
+
 from rockgarden.content.models import Page
 from rockgarden.urls import get_url
 
@@ -35,7 +36,10 @@ def strip_html(html: str) -> str:
 
 
 def build_search_index(
-    pages: list[Page], include_content: bool = True, clean_urls: bool = True, base_path: str = ""
+    pages: list[Page],
+    include_content: bool = True,
+    clean_urls: bool = True,
+    base_path: str = "",
 ) -> list[dict]:
     """Generate search index from pages.
 

@@ -1,7 +1,6 @@
 """Jinja2 template engine setup."""
 
-from datetime import datetime
-from datetime import timezone as dt_timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -20,7 +19,7 @@ def _make_format_datetime(tz_name: str):
         if dt is None:
             return ""
         if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=dt_timezone.utc)
+            dt = dt.replace(tzinfo=UTC)
         return dt.astimezone(tz).strftime(fmt)
 
     return format_datetime

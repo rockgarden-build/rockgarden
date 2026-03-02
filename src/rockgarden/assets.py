@@ -31,6 +31,7 @@ def build_media_index(source_dir: Path) -> dict[str, list[str]]:
             index[path.name.lower()].append(rel_path)
     return dict(index)
 
+
 MD_IMAGE_PATTERN = re.compile(
     r"!\[([^\]]*)\]"  # Alt text (can be empty)
     r"\(([^)\s]+)"  # URL/path (required, no spaces)

@@ -12,6 +12,7 @@ import typer
 from rockgarden import __version__
 from rockgarden.config import Config
 from rockgarden.output import build_site
+from rockgarden.theme import export_theme, set_theme_name_in_config, validate_theme_name
 
 
 def version_callback(value: bool) -> None:
@@ -166,7 +167,9 @@ def build(
 
     result = build_site(config, source_dir, output_dir)
 
-    typer.echo(f"Built {result.page_count} pages in {result.duration_seconds:.2f}s → {output_dir}")
+    typer.echo(
+        f"Built {result.page_count} pages in {result.duration_seconds:.2f}s → {output_dir}"
+    )
 
     if result.broken_links:
         total = sum(len(targets) for targets in result.broken_links.values())
@@ -287,6 +290,59 @@ def icons_update(
 
     typer.echo(f"Wrote {icon_count} icons to {dest}")
     typer.echo(f'Add icons_dir = "{output}" to your [build] config to use these icons.')
+
+
+theme_app = typer.Typer(no_args_is_help=True, help="Manage themes.")
+app.add_typer(theme_app, name="theme")
+
+
+@theme_app.command("export")
+def theme_export(
+    dir_name: Annotated[
+        str,
+        typer.Option("--dir", "-d", help="Theme name (created under _themes/)"),
+    ] = "default",
+) -> None:
+    """Export the bundled default theme as a starting point for customization."""
+    dest = Path("_themes") / dir_name
+
+    try:
+        validate_theme_name(dir_name)
+    except ValueError as e:
+        typer.echo(f"Error: {e}", err=True)
+        raise typer.Exit(1) from None
+
+    if dest.exists():
+        typer.echo(
+            f"Error: {dest} already exists. Use --dir for a different name.", err=True
+        )
+        raise typer.Exit(1)
+
+    try:
+        counts = export_theme(dest)
+    except Exception as e:
+        typer.echo(f"Error exporting theme: {e}", err=True)
+        raise typer.Exit(1) from None
+
+    typer.echo(f"Exported default theme to {dest}/")
+    typer.echo(f"  {counts['templates']} templates")
+    typer.echo(f"  CSS source: {dest}/static-src/input.css")
+    typer.echo(f"  Compiled CSS: {dest}/static/rockgarden.css")
+    typer.echo("  Build tooling: tailwind.config.js, package.json")
+
+    config_path = Path("rockgarden.toml")
+    if config_path.exists():
+        try:
+            set_theme_name_in_config(config_path, dir_name)
+            typer.echo(f'  Updated rockgarden.toml: [theme] name = "{dir_name}"')
+        except Exception as e:
+            typer.echo(f"  Warning: could not update rockgarden.toml: {e}", err=True)
+    else:
+        typer.echo("\nNo rockgarden.toml found. To activate the theme, add:")
+        typer.echo(f'  [theme]\n  name = "{dir_name}"')
+
+    typer.echo("\nTo rebuild CSS after editing templates:")
+    typer.echo(f"  cd {dest} && npm install && npm run build:css")
 
 
 def main() -> None:

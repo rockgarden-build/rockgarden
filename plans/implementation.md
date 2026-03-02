@@ -207,12 +207,12 @@ Work in batches, one feature per PR.
 
 ### Batch 2 — Base Path Prefix
 
-#### Feature 12: Base Path Prefix
-- [ ] Confirm `base_url` handling in `SiteConfig` (already used for sitemap)
-- [ ] Update URL generation helpers to include base path
-- [ ] Update all templates to use `base_url` for asset and internal link references
-- [ ] Update search index URL generation
-- [ ] Verify wiki-link resolution is unaffected
+#### Feature 12: Base Path Prefix ✅
+- [x] Confirm `base_url` handling in `SiteConfig` (already used for sitemap)
+- [x] Update URL generation helpers to include base path
+- [x] Update all templates to use `base_url` for asset and internal link references
+- [x] Update search index URL generation
+- [x] Verify wiki-link resolution is unaffected
 
 ### Batch 3 — Theming Foundation
 
@@ -229,9 +229,9 @@ Work in batches, one feature per PR.
 - [x] Copy to `_site/styles/` and `_site/scripts/`
 - [x] Inject `<link>` and `<script>` tags in `base.html` / `layouts/default.html`
 
-#### Feature 10C: Theme Export CLI
-- [ ] Add `theme` command group to `cli.py`
-- [ ] Implement `rockgarden theme export` — copies bundled theme to `_themes/default/`
+#### Feature 10C: Theme Export CLI ✅
+- [x] Add `theme` command group to `cli.py`
+- [x] Implement `rockgarden theme export` — copies bundled theme to `_themes/default/`
 
 ### Batch 4 — Build Pipeline
 
@@ -249,6 +249,13 @@ Work in batches, one feature per PR.
 - [ ] Non-markdown format loading (YAML/JSON/TOML) when collection config enables it
 - [ ] Custom template and URL pattern per collection
 - [ ] Collection page generation controls (`pages = false`, `nav = true`)
+
+### Anytime: Code Quality & CI
+
+#### Lint / Format / Test Workflow
+- [ ] Run `just format` to auto-fix ruff-fixable issues (unused imports, f-strings, isort)
+- [ ] Manually fix remaining lint errors (E501 long lines, E731 lambda assignments, E741 ambiguous names)
+- [ ] Add GitHub Actions workflow: lint (`ruff check`), format check (`ruff format --check`), tests (`pytest`) — matrix over supported Python versions
 
 ### Anytime: N11 Config Validation
 

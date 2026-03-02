@@ -120,17 +120,13 @@ class TestLevelFiltering:
         assert entries[0].text == "Section"
 
     def test_custom_max_depth(self):
-        _, entries = extract_toc(
-            "<h2>A</h2><h3>B</h3><h4>C</h4>", max_level=3
-        )
+        _, entries = extract_toc("<h2>A</h2><h3>B</h3><h4>C</h4>", max_level=3)
         assert len(entries) == 1
         assert len(entries[0].children) == 1
         assert entries[0].children[0].children == []
 
     def test_h5_h6_with_max_6(self):
-        _, entries = extract_toc(
-            "<h2>A</h2><h5>B</h5><h6>C</h6>", max_level=6
-        )
+        _, entries = extract_toc("<h2>A</h2><h5>B</h5><h6>C</h6>", max_level=6)
         assert len(entries) == 1
         assert entries[0].text == "A"
 
