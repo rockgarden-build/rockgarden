@@ -1,5 +1,6 @@
 """Resolve and validate Pydantic content models for collections."""
 
+import hashlib
 import importlib.util
 import sys
 from pathlib import Path
@@ -51,7 +52,8 @@ def resolve_model(
         if not path.exists():
             continue
 
-        module_name = f"_rockgarden_models_{model_name}"
+        path_hash = hashlib.md5(str(path).encode()).hexdigest()[:8]
+        module_name = f"_rockgarden_model_{model_name}_{path_hash}"
         spec = importlib.util.spec_from_file_location(module_name, path)
         if spec is None or spec.loader is None:
             continue

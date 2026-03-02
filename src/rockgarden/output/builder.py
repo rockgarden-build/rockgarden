@@ -382,6 +382,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         data_entries = load_collection_data_files(source, col.config.source)
         col.entries.extend(data_entries)
 
+    validated_entries: set[int] = set()
     for col in collections.values():
         if col.config.model:
             model_class = resolve_model(col.config.model, site_root, config.theme.name)
@@ -391,7 +392,11 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
                     f"but no model file was found"
                 )
             for entry in col.entries:
+                entry_id = id(entry)
+                if entry_id in validated_entries:
+                    continue
                 validate_entry(entry, model_class, col.name)
+                validated_entries.add(entry_id)
 
     # Build media index before creating store so it can resolve media file links
     media_index = build_media_index(source)
