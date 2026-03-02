@@ -128,7 +128,9 @@ def get_tags_root_url(clean_urls: bool = True, base_path: str = "") -> str:
     return f"{base_path}/tags/" if clean_urls else f"{base_path}/tags/index.html"
 
 
-def get_folder_url(folder_path: str, clean_urls: bool = True, base_path: str = "") -> str:
+def get_folder_url(
+    folder_path: str, clean_urls: bool = True, base_path: str = ""
+) -> str:
     """Get URL for a folder.
 
     Args:

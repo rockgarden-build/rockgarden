@@ -167,7 +167,9 @@ def build(
 
     result = build_site(config, source_dir, output_dir)
 
-    typer.echo(f"Built {result.page_count} pages in {result.duration_seconds:.2f}s → {output_dir}")
+    typer.echo(
+        f"Built {result.page_count} pages in {result.duration_seconds:.2f}s → {output_dir}"
+    )
 
     if result.broken_links:
         total = sum(len(targets) for targets in result.broken_links.values())

@@ -30,7 +30,7 @@ class TestUnicodeNormalization:
     def test_nfd_filename_found_with_nfc_lookup(self):
         """Should find page with NFD filename using NFC lookup."""
         # Create NFD (decomposed) version - 'ó' = 'o' + combining accent
-        nfd_name = unicodedata.normalize('NFD', "Orontinórë")
+        nfd_name = unicodedata.normalize("NFD", "Orontinórë")
         page = Page(
             source_path=Path(f"{nfd_name}.md"),
             slug="orotinore",
@@ -40,7 +40,7 @@ class TestUnicodeNormalization:
         store = ContentStore([page])
 
         # Lookup with NFC (composed) version
-        nfc_name = unicodedata.normalize('NFC', "Orontinórë")
+        nfc_name = unicodedata.normalize("NFC", "Orontinórë")
         result = store.get_by_name(nfc_name)
 
         assert result is not None
@@ -49,7 +49,7 @@ class TestUnicodeNormalization:
     def test_nfc_filename_found_with_nfd_lookup(self):
         """Should find page with NFC filename using NFD lookup."""
         # Create page with NFC (composed) characters
-        nfc_name = unicodedata.normalize('NFC', "Orontinórë")
+        nfc_name = unicodedata.normalize("NFC", "Orontinórë")
         page = Page(
             source_path=Path(f"{nfc_name}.md"),
             slug="orotinore",
@@ -59,7 +59,7 @@ class TestUnicodeNormalization:
         store = ContentStore([page])
 
         # Lookup with NFD (decomposed) version
-        nfd_name = unicodedata.normalize('NFD', "Orontinórë")
+        nfd_name = unicodedata.normalize("NFD", "Orontinórë")
         result = store.get_by_name(nfd_name)
 
         assert result is not None
@@ -67,7 +67,7 @@ class TestUnicodeNormalization:
 
     def test_unicode_alias_nfc_vs_nfd(self):
         """Should match Unicode aliases regardless of NFC/NFD normalization."""
-        nfc_alias = unicodedata.normalize('NFC', "Café")
+        nfc_alias = unicodedata.normalize("NFC", "Café")
         page = Page(
             source_path=Path("coffee-shop.md"),
             slug="coffee-shop",
@@ -77,7 +77,7 @@ class TestUnicodeNormalization:
         store = ContentStore([page])
 
         # Lookup with NFD version of the alias
-        nfd_alias = unicodedata.normalize('NFD', "Café")
+        nfd_alias = unicodedata.normalize("NFD", "Café")
         result = store.get_by_name(nfd_alias)
 
         assert result is not None
@@ -94,12 +94,12 @@ class TestUnicodeNormalization:
         store = ContentStore([page])
 
         # Lookup with NFC
-        nfc_name = unicodedata.normalize('NFC', "Orontinórë")
+        nfc_name = unicodedata.normalize("NFC", "Orontinórë")
         result = store.get_by_name(nfc_name)
         assert result is not None
 
         # Lookup with NFD
-        nfd_name = unicodedata.normalize('NFD', "Orontinórë")
+        nfd_name = unicodedata.normalize("NFD", "Orontinórë")
         result = store.get_by_name(nfd_name)
         assert result is not None
 
@@ -113,7 +113,7 @@ class TestUnicodeNormalization:
         )
         store = ContentStore([page])
 
-        nfc_name = unicodedata.normalize('NFC', "Orontinórë")
+        nfc_name = unicodedata.normalize("NFC", "Orontinórë")
         url = store.resolve_link(nfc_name)
 
         assert url is not None
@@ -129,7 +129,7 @@ class TestUnicodeNormalization:
         )
         store = ContentStore([page])
 
-        nfd_name = unicodedata.normalize('NFD', "Orontinórë")
+        nfd_name = unicodedata.normalize("NFD", "Orontinórë")
         url = store.resolve_link(nfd_name)
 
         assert url is not None

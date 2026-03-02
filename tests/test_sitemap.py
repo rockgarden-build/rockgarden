@@ -54,7 +54,5 @@ class TestBuildSitemap:
 
     def test_non_clean_urls(self):
         pages = [self._make_page("page")]
-        result = build_sitemap(
-            pages, [], "https://example.com", clean_urls=False
-        )
+        result = build_sitemap(pages, [], "https://example.com", clean_urls=False)
         assert "https://example.com/page.html" in result

@@ -68,25 +68,43 @@ class TestProcessCallouts:
             "> [!warning]\n> A warning.\n"
         )
         result = _render_and_process(content)
-        assert result.count('callout callout-note') == 1
-        assert result.count('callout callout-warning') == 1
+        assert result.count("callout callout-note") == 1
+        assert result.count("callout callout-warning") == 1
         assert "First note." in result
         assert "A warning." in result
 
     def test_all_standard_types(self):
         types = [
-            "note", "abstract", "summary", "tldr", "info",
-            "tip", "hint", "important",
-            "success", "check", "done",
-            "question", "help", "faq",
-            "warning", "caution", "attention",
-            "failure", "fail", "missing",
-            "danger", "error", "bug",
-            "example", "quote", "cite",
+            "note",
+            "abstract",
+            "summary",
+            "tldr",
+            "info",
+            "tip",
+            "hint",
+            "important",
+            "success",
+            "check",
+            "done",
+            "question",
+            "help",
+            "faq",
+            "warning",
+            "caution",
+            "attention",
+            "failure",
+            "fail",
+            "missing",
+            "danger",
+            "error",
+            "bug",
+            "example",
+            "quote",
+            "cite",
         ]
         for callout_type in types:
             result = _render_and_process(f"> [!{callout_type}]\n> Content.")
-            assert f'callout callout-{callout_type}' in result
+            assert f"callout callout-{callout_type}" in result
 
     def test_empty_content(self):
         result = _render_and_process("> [!note] Just a title\n")
@@ -160,14 +178,32 @@ class TestGetCalloutIcon:
 
     def test_all_types_have_icons(self):
         types = [
-            "note", "abstract", "summary", "tldr", "info",
-            "tip", "hint", "important",
-            "success", "check", "done",
-            "question", "help", "faq",
-            "warning", "caution", "attention",
-            "failure", "fail", "missing",
-            "danger", "error", "bug",
-            "example", "quote", "cite",
+            "note",
+            "abstract",
+            "summary",
+            "tldr",
+            "info",
+            "tip",
+            "hint",
+            "important",
+            "success",
+            "check",
+            "done",
+            "question",
+            "help",
+            "faq",
+            "warning",
+            "caution",
+            "attention",
+            "failure",
+            "fail",
+            "missing",
+            "danger",
+            "error",
+            "bug",
+            "example",
+            "quote",
+            "cite",
         ]
         for callout_type in types:
             icon = get_callout_icon(callout_type)

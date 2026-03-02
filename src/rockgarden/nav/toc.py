@@ -4,9 +4,7 @@ import re
 from dataclasses import dataclass, field
 from html import unescape
 
-HEADING_RE = re.compile(
-    r"<(h[2-6])(\s[^>]*)?>(.+?)</\1>", re.DOTALL
-)
+HEADING_RE = re.compile(r"<(h[2-6])(\s[^>]*)?>(.+?)</\1>", re.DOTALL)
 TAG_RE = re.compile(r"<[^>]+>")
 
 
@@ -90,7 +88,7 @@ def extract_toc(
                 seen_ids[slug] = 0
             if "id=" in attrs:
                 return match.group(0)
-            return f"<{tag}{attrs} id=\"{slug}\">{inner_html}</{tag}>"
+            return f'<{tag}{attrs} id="{slug}">{inner_html}</{tag}>'
 
         text = _strip_tags(inner_html)
         slug = _slugify(text)
@@ -107,7 +105,7 @@ def extract_toc(
 
         if "id=" in attrs:
             return match.group(0)
-        return f"<{tag}{attrs} id=\"{slug}\">{inner_html}</{tag}>"
+        return f'<{tag}{attrs} id="{slug}">{inner_html}</{tag}>'
 
     modified_html = HEADING_RE.sub(_replace_heading, html)
     toc_tree = _build_tree(flat_entries)

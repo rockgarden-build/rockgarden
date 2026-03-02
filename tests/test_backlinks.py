@@ -260,7 +260,9 @@ class TestBacklinksNavTree:
         # Get backlink pages
         backlink_slugs = link_index.get_backlinks("target")
         backlink_pages = [
-            store.get_by_slug(slug) for slug in backlink_slugs if store.get_by_slug(slug)
+            store.get_by_slug(slug)
+            for slug in backlink_slugs
+            if store.get_by_slug(slug)
         ]
 
         # Build tree
@@ -300,7 +302,9 @@ class TestBacklinksNavTree:
         # Get backlink pages
         backlink_slugs = link_index.get_backlinks("target")
         backlink_pages = [
-            store.get_by_slug(slug) for slug in backlink_slugs if store.get_by_slug(slug)
+            store.get_by_slug(slug)
+            for slug in backlink_slugs
+            if store.get_by_slug(slug)
         ]
 
         # Build tree
@@ -346,7 +350,9 @@ class TestBacklinksNavTree:
         # Get backlink pages
         backlink_slugs = link_index.get_backlinks("target")
         backlink_pages = [
-            store.get_by_slug(slug) for slug in backlink_slugs if store.get_by_slug(slug)
+            store.get_by_slug(slug)
+            for slug in backlink_slugs
+            if store.get_by_slug(slug)
         ]
 
         # Build tree
@@ -392,11 +398,15 @@ class TestBacklinksNavTree:
         # Get backlink pages
         backlink_slugs = link_index.get_backlinks("target")
         backlink_pages = [
-            store.get_by_slug(slug) for slug in backlink_slugs if store.get_by_slug(slug)
+            store.get_by_slug(slug)
+            for slug in backlink_slugs
+            if store.get_by_slug(slug)
         ]
 
         # Build tree with alphabetical sorting
-        tree = build_nav_tree(backlink_pages, NavConfig(sort="alphabetical"), clean_urls=True)
+        tree = build_nav_tree(
+            backlink_pages, NavConfig(sort="alphabetical"), clean_urls=True
+        )
 
         # Should be alphabetically sorted
         assert len(tree.children) == 2

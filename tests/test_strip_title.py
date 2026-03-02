@@ -54,7 +54,9 @@ class TestBuildSiteStripTitle:
         """H1 should not appear twice when title is set in frontmatter."""
         source = tmp_path / "source"
         source.mkdir()
-        (source / "page.md").write_text("---\ntitle: My Page\n---\n\n# My Page\n\nSome content.")
+        (source / "page.md").write_text(
+            "---\ntitle: My Page\n---\n\n# My Page\n\nSome content."
+        )
 
         output = tmp_path / "output"
         build_site(Config.load(None), source, output)

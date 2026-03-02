@@ -1,6 +1,5 @@
 """Tests for broken link handling."""
 
-
 from rockgarden.config import Config
 from rockgarden.obsidian.wikilinks import process_wikilinks
 from rockgarden.output.builder import BuildResult, build_site
@@ -111,7 +110,7 @@ class TestRenderMarkdownBrokenLinks:
         html = render_markdown(markdown)
 
         assert 'data-target="Target&quot;onclick=&quot;alert()' in html
-        assert 'onclick=' not in html or '&quot;onclick=' in html
+        assert "onclick=" not in html or "&quot;onclick=" in html
 
     def test_handles_broken_link_with_spaces(self):
         """Should handle broken links with spaces in target."""
@@ -130,7 +129,7 @@ class TestRenderMarkdownBrokenLinks:
 
         # Should have class but no href
         assert '<a class="internal-link broken"' in html
-        assert 'href=' not in html
+        assert "href=" not in html
 
     def test_preserves_normal_links(self):
         """Should not affect normal markdown links."""
@@ -139,7 +138,7 @@ class TestRenderMarkdownBrokenLinks:
         html = render_markdown(markdown)
 
         assert 'href="/path/to/page/"' in html
-        assert 'broken' not in html
+        assert "broken" not in html
 
 
 class TestBuildSiteBrokenLinks:

@@ -82,7 +82,9 @@ def generate_folder_indexes(
         if _should_hide(folder_path, config.hide):
             continue
 
-        children = _get_folder_children(folder_path, pages, config, clean_urls, base_path)
+        children = _get_folder_children(
+            folder_path, pages, config, clean_urls, base_path
+        )
 
         if folder_path in existing_indexes:
             index_page = existing_indexes[folder_path]

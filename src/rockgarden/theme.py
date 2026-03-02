@@ -110,7 +110,7 @@ def export_theme(dest: Path) -> dict:
         # Theme manifest
         theme_name = dest.name
         theme_toml = (
-            f'[theme]\n'
+            f"[theme]\n"
             f'name = "{theme_name}"\n'
             f'description = "Rockgarden default theme — Tailwind CSS + DaisyUI"\n'
             f'rockgarden_version = "{__version__}"\n'
