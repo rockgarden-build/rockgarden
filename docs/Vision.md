@@ -1,3 +1,7 @@
+---
+tags: [design, philosophy]
+---
+
 # Vision
 
 Rockgarden is a Python static site generator built around progressive customization. It works with Obsidian vaults and plain markdown folders out of the box, then scales up to a general-purpose SSG through incremental configuration.

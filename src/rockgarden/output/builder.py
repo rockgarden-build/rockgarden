@@ -669,7 +669,10 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     if config.theme.tag_index:
         tags = collect_tags(pages)
         if tags:
-            build_tag_pages(tags, env, site_config, output, clean_urls, base_path)
+            tag_layout = resolve_layout({}, config.theme.default_layout)
+            build_tag_pages(
+                tags, env, site_config, output, clean_urls, base_path, tag_layout
+            )
 
     # Generate sitemap if base_url is configured
     if config.site.base_url:
@@ -680,7 +683,10 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
 
     # Generate 404 page
     not_found_template = env.get_template("404.html")
-    (output / "404.html").write_text(not_found_template.render(site=site_config))
+    not_found_layout = resolve_layout({}, config.theme.default_layout)
+    (output / "404.html").write_text(
+        not_found_template.render(site=site_config, layout_template=not_found_layout)
+    )
 
     run_hooks(config.hooks.post_build, "post_build", cwd=site_root, env_vars=hook_env)
 

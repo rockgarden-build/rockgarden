@@ -1,3 +1,7 @@
+---
+tags: [deployment, hosting]
+---
+
 # Deployment
 
 Rockgarden builds a static site into a single output directory (default: `_site/`). Any static hosting provider can serve it.

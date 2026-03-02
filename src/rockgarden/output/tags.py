@@ -33,6 +33,7 @@ def build_tag_pages(
     output: Path,
     clean_urls: bool = True,
     base_path: str = "",
+    layout_template: str = "layouts/default.html",
 ) -> None:
     """Generate /tags/<slug>/ and /tags/ pages in the output directory."""
     tag_index_template = env.get_template("tag_index.html")
@@ -47,6 +48,7 @@ def build_tag_pages(
             tag=tag_slug,
             pages=page_entries,
             site=site_config,
+            layout_template=layout_template,
         )
         if clean_urls:
             out_file = output / "tags" / tag_slug / "index.html"
@@ -59,6 +61,7 @@ def build_tag_pages(
     html = tags_root_template.render(
         tags=tag_counts,
         site=site_config,
+        layout_template=layout_template,
     )
     out_file = output / "tags" / "index.html"
     out_file.parent.mkdir(parents=True, exist_ok=True)
