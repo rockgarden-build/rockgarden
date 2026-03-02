@@ -1,0 +1,198 @@
+## Unreleased
+
+### Features
+
+- add collections support (#35)
+- switch to Pydantic for content modeling (#26)
+
+### Minor / Bug Fixes
+
+- add collection page generation (#36)
+- fix media paths (#34)
+- add build hooks (#33)
+- add linting and testing workflows (#32)
+- implement theme export CLI (#31)
+- add static asset handling (custom CSS/JS)
+- add default layout system (#30)
+- support base URL / base path for subdirectory deploys (#29)
+- implement tag index pages (#28)
+- add SEO / meta tags from frontmatter (#27)
+
+## v0.4.11 (2026-03-01)
+
+### Minor / Bug Fixes
+
+- move build info to footer (#25)
+
+## v0.4.10 (2026-03-01)
+
+### Minor / Bug Fixes
+
+- add timezone support (#24)
+
+## v0.4.9 (2026-02-28)
+
+### Minor / Bug Fixes
+
+- add note transclusions and Phase A polish (#21)
+- fix HTML escaping in ToC (#20)
+
+## v0.4.8 (2026-02-24)
+
+### Minor / Bug Fixes
+
+- add CSS/JS cache busting
+
+## v0.4.7 (2026-02-24)
+
+### Minor / Bug Fixes
+
+- add build info (#19)
+- fix skip-to-content link
+
+## v0.4.6 (2026-02-24)
+
+### Minor / Bug Fixes
+
+- implement remaining Phase A features (#18)
+
+## v0.4.5 (2026-02-11)
+
+### Minor / Bug Fixes
+
+- add callout icons (#17)
+- implement table of contents (#16)
+- fix callout rendering (#15)
+- render single newlines as line breaks (#14)
+
+## v0.4.4 (2026-02-09)
+
+### Minor / Bug Fixes
+
+- bundle JS/CSS (#12)
+
+## v0.4.3 (2026-02-08)
+
+### Minor / Bug Fixes
+
+- fix section/anchor and media link handling (#10)
+- re-implement search (#9)
+- fix duplicate heading IDs
+
+## v0.4.2 (2026-02-08)
+
+### Minor / Bug Fixes
+
+- add search (#8)
+- handle unicode titles (#7)
+- show filename in broken link warnings
+
+## v0.4.1 (2026-02-08)
+
+### Minor / Bug Fixes
+
+- add broken link handling (#6)
+
+## v0.4.0 (2026-02-08)
+
+### Minor / Bug Fixes
+
+- sort backlinks (#5)
+
+## v0.3.0 (2026-02-07)
+
+### Features
+
+- implement backlinks
+
+## v0.2.11 (2026-01-25)
+
+### Minor / Bug Fixes
+
+- add theme switching support
+
+## v0.2.10 (2026-01-25)
+
+### Minor / Bug Fixes
+
+- fix site config variable loading
+- add DaisyUI theme support
+
+## v0.2.9 (2026-01-21)
+
+### Minor / Bug Fixes
+
+- fix nav labels
+
+## v0.2.8 (2026-01-21)
+
+### Minor / Bug Fixes
+
+- fix build directory from config
+
+## v0.2.7 (2026-01-21)
+
+### Minor / Bug Fixes
+
+- simplify page title calculation
+
+## v0.2.6 (2026-01-21)
+
+- maintenance release
+
+## v0.2.5 (2026-01-21)
+
+### Minor / Bug Fixes
+
+- add init command
+- add version to CLI
+
+## v0.2.4 (2026-01-21)
+
+### Minor / Bug Fixes
+
+- add support for other media types
+- make nav link to auto indexes configurable
+- update nav linking to folders
+
+## v0.2.3 (2026-01-21)
+
+### Minor / Bug Fixes
+
+- allow serve port reuse
+- add markdown image handling
+- add image embed support
+- use DaisyUI nav and update styling
+- persist nav expand status
+- fix output path
+- add clean step
+- load site config from source directory
+- disable auto_index by default
+
+## v0.2.2 (2026-01-20)
+
+### Minor / Bug Fixes
+
+- use slugs for page URLs
+- support clean URLs
+- add auto-index override
+- add nav sorting
+- use frontmatter title
+- add support for standard markdown links
+- add index pages
+- add breadcrumbs
+
+## v0.2.1 (2026-01-20)
+
+### Minor / Bug Fixes
+
+- add serve command
+- fix link resolution
+
+## v0.2.0 (2026-01-20)
+
+### Features
+
+- initial rendering implementation
+
+## v0.1.0 (2026-01-18)
