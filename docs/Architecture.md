@@ -1,5 +1,5 @@
 ---
-tags: [architecture, internals]
+tags: [architecture]
 ---
 
 # Architecture
@@ -171,16 +171,16 @@ Per-page values override site defaults. If neither is set, the tag is omitted.
 
 ### Customization levels
 
-| Level | What | How |
-|-------|------|-----|
-| 0 | Zero-config vault publishing | `rockgarden build` — default theme, no config |
-| 1 | Color scheme | `[theme] daisyui_default = "dark"` — swap DaisyUI palette |
-| 2 | Custom CSS/JS | Drop files in `_styles/` and `_scripts/` — auto-injected |
-| 3 | Patch a component | `_templates/components/nav.html` — override one file |
-| 4 | Add content blocks | Extend `page.html` named blocks (`after_heading`, `after_body`, etc.) |
-| 5 | Custom page layouts | `_templates/layouts/speaker.html` + frontmatter `layout: speaker` |
-| 6 | Custom theme | `_themes/pyohio/` — own base, own CSS, own components |
-| 7 | Export default theme | `rockgarden theme export` → copy default theme as starting point |
+| Level | What                         | How                                                                   |
+| ----- | ---------------------------- | --------------------------------------------------------------------- |
+| 0     | Zero-config vault publishing | `rockgarden build` — default theme, no config                         |
+| 1     | Color scheme                 | `[theme] daisyui_default = "dark"` — swap DaisyUI palette             |
+| 2     | Custom CSS/JS                | Drop files in `_styles/` and `_scripts/` — auto-injected              |
+| 3     | Patch a component            | `_templates/components/nav.html` — override one file                  |
+| 4     | Add content blocks           | Extend `page.html` named blocks (`after_heading`, `after_body`, etc.) |
+| 5     | Custom page layouts          | `_templates/layouts/speaker.html` + frontmatter `layout: speaker`     |
+| 6     | Custom theme                 | `_themes/pyohio/` — own base, own CSS, own components                 |
+| 7     | Export default theme         | `rockgarden theme export` → copy default theme as starting point      |
 
 ### Custom CSS and JavaScript
 
@@ -200,16 +200,16 @@ This allows overriding a single component without touching anything else, or rep
 
 `page.html` exposes Jinja2 blocks as extension points. Empty blocks are hooks with no default output:
 
-| Block | Default content |
-|-------|----------------|
-| `before_heading` | *(empty hook)* |
-| `heading` | `<h1>{{ page.title }}</h1>` |
-| `after_heading` | Created/modified dates, tags |
-| `body` | `{{ page.html \| safe }}` |
-| `after_body` | *(empty hook)* |
-| `right_sidebar` | TOC + backlinks |
-| `toc` | Table of contents |
-| `backlinks` | Backlinks panel |
+| Block            | Default content              |
+| ---------------- | ---------------------------- |
+| `before_heading` | _(empty hook)_               |
+| `heading`        | `<h1>{{ page.title }}</h1>`  |
+| `after_heading`  | Created/modified dates, tags |
+| `body`           | `{{ page.html \| safe }}`    |
+| `after_body`     | _(empty hook)_               |
+| `right_sidebar`  | TOC + backlinks              |
+| `toc`            | Table of contents            |
+| `backlinks`      | Backlinks panel              |
 
 Use `{{ super() }}` to extend a block rather than replace it.
 
@@ -221,7 +221,7 @@ Per-page layout selection via frontmatter:
 
 ```yaml
 ---
-layout: talk   # resolves to layouts/talk.html
+layout: talk # resolves to layouts/talk.html
 ---
 ```
 
@@ -235,13 +235,13 @@ Resolution order: frontmatter `layout` → collection default → `[theme] defau
 
 Variables available in all templates:
 
-| Variable | Type | Description |
-|----------|------|-------------|
-| `page` | `Page` | Current page (source_path, slug, title, content, html, frontmatter, modified, created, tags) |
-| `site` | `dict` | Site config (title, nav, search_enabled, build_info, cache_hash, daisyui_theme, …) |
-| `breadcrumbs` | `list[Breadcrumb]` | Navigation trail |
-| `toc` | `list[TocEntry] \| None` | Table of contents entries |
-| `backlinks` | `NavNode \| None` | Pages that link to the current page |
+| Variable      | Type                     | Description                                                                                  |
+| ------------- | ------------------------ | -------------------------------------------------------------------------------------------- |
+| `page`        | `Page`                   | Current page (source_path, slug, title, content, html, frontmatter, modified, created, tags) |
+| `site`        | `dict`                   | Site config (title, nav, search_enabled, build_info, cache_hash, daisyui_theme, …)           |
+| `breadcrumbs` | `list[Breadcrumb]`       | Navigation trail                                                                             |
+| `toc`         | `list[TocEntry] \| None` | Table of contents entries                                                                    |
+| `backlinks`   | `NavNode \| None`        | Pages that link to the current page                                                          |
 
 ## Dependencies
 

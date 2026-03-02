@@ -1,5 +1,5 @@
 ---
-tags: [deployment, hosting]
+tags: [operation]
 ---
 
 # Deployment
