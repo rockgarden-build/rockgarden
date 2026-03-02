@@ -12,7 +12,7 @@ import typer
 from rockgarden import __version__
 from rockgarden.config import Config
 from rockgarden.output import build_site
-from rockgarden.theme import export_theme, set_theme_name_in_config
+from rockgarden.theme import export_theme, set_theme_name_in_config, validate_theme_name
 
 
 def version_callback(value: bool) -> None:
@@ -303,6 +303,12 @@ def theme_export(
 ) -> None:
     """Export the bundled default theme as a starting point for customization."""
     dest = Path("_themes") / dir_name
+
+    try:
+        validate_theme_name(dir_name)
+    except ValueError as e:
+        typer.echo(f"Error: {e}", err=True)
+        raise typer.Exit(1) from None
 
     if dest.exists():
         typer.echo(f"Error: {dest} already exists. Choose a different name with --dir.", err=True)

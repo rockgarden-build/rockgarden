@@ -8,6 +8,8 @@ from rockgarden import __version__
 
 _PACKAGE_DIR = Path(__file__).resolve().parent
 
+_THEME_NAME_RE = re.compile(r"^[a-zA-Z0-9_-]+$")
+
 _TAILWIND_CONFIG = """\
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -46,6 +48,15 @@ _PACKAGE_JSON = """\
 """
 
 
+def validate_theme_name(name: str) -> None:
+    """Raise ValueError if name contains characters unsafe for TOML or filesystem."""
+    if not _THEME_NAME_RE.match(name):
+        raise ValueError(
+            f"Invalid theme name {name!r}. "
+            "Use only letters, numbers, hyphens, and underscores."
+        )
+
+
 def export_theme(dest: Path) -> dict:
     """Export the bundled default theme to a directory.
 
@@ -61,35 +72,44 @@ def export_theme(dest: Path) -> dict:
     if dest.exists():
         raise FileExistsError(dest)
 
-    dest.mkdir(parents=True)
+    try:
+        dest.mkdir(parents=True)
 
-    # Templates
-    templates_src = _PACKAGE_DIR / "templates"
-    shutil.copytree(templates_src, dest, dirs_exist_ok=True)
-    template_count = sum(1 for _ in dest.rglob("*.html"))
+        # Templates
+        templates_src = _PACKAGE_DIR / "templates"
+        shutil.copytree(templates_src, dest, dirs_exist_ok=True)
+        template_count = sum(1 for _ in dest.rglob("*.html"))
 
-    # Compiled CSS
-    css_src = _PACKAGE_DIR / "static" / "rockgarden.css"
-    static_dest = dest / "static"
-    static_dest.mkdir()
-    shutil.copy2(css_src, static_dest / "rockgarden.css")
+        # Compiled CSS
+        css_src = _PACKAGE_DIR / "static" / "rockgarden.css"
+        static_dest = dest / "static"
+        static_dest.mkdir()
+        shutil.copy2(css_src, static_dest / "rockgarden.css")
 
-    # CSS source
-    input_css_src = _PACKAGE_DIR / "theme_src" / "input.css"
-    static_src_dest = dest / "static-src"
-    static_src_dest.mkdir()
-    shutil.copy2(input_css_src, static_src_dest / "input.css")
+        # CSS source
+        input_css_src = _PACKAGE_DIR / "theme_src" / "input.css"
+        static_src_dest = dest / "static-src"
+        static_src_dest.mkdir()
+        shutil.copy2(input_css_src, static_src_dest / "input.css")
 
-    # Build tooling
-    (dest / "tailwind.config.js").write_text(_TAILWIND_CONFIG)
-    (dest / "package.json").write_text(_PACKAGE_JSON)
+        # Build tooling
+        (dest / "tailwind.config.js").write_text(_TAILWIND_CONFIG)
+        (dest / "package.json").write_text(_PACKAGE_JSON)
 
-    # Theme manifest
-    theme_name = dest.name
-    theme_toml = f'[theme]\nname = "{theme_name}"\ndescription = "Rockgarden default theme — Tailwind CSS + DaisyUI"\nrockgarden_version = "{__version__}"\n'
-    (dest / "theme.toml").write_text(theme_toml)
+        # Theme manifest
+        theme_name = dest.name
+        theme_toml = (
+            f'[theme]\n'
+            f'name = "{theme_name}"\n'
+            f'description = "Rockgarden default theme — Tailwind CSS + DaisyUI"\n'
+            f'rockgarden_version = "{__version__}"\n'
+        )
+        (dest / "theme.toml").write_text(theme_toml)
 
-    return {"templates": template_count, "static_files": 2}
+        return {"templates": template_count, "static_files": 2}
+    except Exception:
+        shutil.rmtree(dest, ignore_errors=True)
+        raise
 
 
 def set_theme_name_in_config(config_path: Path, theme_name: str) -> None:
@@ -107,7 +127,7 @@ def set_theme_name_in_config(config_path: Path, theme_name: str) -> None:
             in_theme = stripped == "[theme]"
             if in_theme:
                 theme_section_start = i
-        elif in_theme and re.match(r"^\s*name\s*=", stripped):
+        elif in_theme and re.match(r"^name\s*=", stripped):
             name_line_idx = i
 
     if name_line_idx is not None:
@@ -118,4 +138,4 @@ def set_theme_name_in_config(config_path: Path, theme_name: str) -> None:
         config_path.write_text("".join(lines))
     else:
         suffix = "\n" if content.endswith("\n") else "\n\n"
-        config_path.write_text(content + f"{suffix}[theme]\nname = \"{theme_name}\"\n")
+        config_path.write_text(content + f'{suffix}[theme]\nname = "{theme_name}"\n')
