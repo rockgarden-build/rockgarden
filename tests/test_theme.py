@@ -59,6 +59,16 @@ class TestSetThemeNameInConfig:
         assert "[theme]" in content
         assert 'name = "mytheme"' in content
 
+    def test_ignores_name_key_in_array_of_tables(self, tmp_path):
+        config = tmp_path / "rockgarden.toml"
+        config.write_text(
+            '[theme]\ntoc = true\n\n[[collections]]\nname = "characters"\n'
+        )
+        set_theme_name_in_config(config, "mytheme")
+        parsed = tomllib.loads(config.read_text())
+        assert parsed["theme"]["name"] == "mytheme"
+        assert parsed["collections"][0]["name"] == "characters"
+
     def test_inserts_with_no_trailing_newline_on_section(self, tmp_path):
         config = tmp_path / "rockgarden.toml"
         config.write_text("[theme]")  # no trailing newline

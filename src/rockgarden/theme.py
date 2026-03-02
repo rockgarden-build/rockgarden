@@ -134,10 +134,13 @@ def set_theme_name_in_config(config_path: Path, theme_name: str) -> None:
 
     for i, line in enumerate(lines):
         stripped = line.strip()
-        if stripped.startswith("[") and not stripped.startswith("[["):
-            in_theme = stripped == "[theme]"
-            if in_theme:
-                theme_section_start = i
+        if stripped.startswith("["):
+            if stripped.startswith("[["):
+                in_theme = False  # array-of-tables header exits any section
+            else:
+                in_theme = stripped == "[theme]"
+                if in_theme:
+                    theme_section_start = i
         elif in_theme and re.match(r"^name\s*=", stripped):
             name_line_idx = i
 
