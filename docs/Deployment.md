@@ -43,7 +43,7 @@ To deploy to a subdirectory (e.g., `example.com/docs/`), set `base_url` in `rock
 base_url = "https://example.com/docs"
 ```
 
-All generated URLs (assets, internal links, search index, sitemap) will include the base path prefix.
+All generated URLs (internal links, media embeds, search index, sitemap) will include the base path prefix.
 
 ## Clean URLs
 

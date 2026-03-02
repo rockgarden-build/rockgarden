@@ -2,6 +2,7 @@
 
 from rockgarden.assets import (
     collect_markdown_images,
+    create_media_resolver,
     is_external_url,
 )
 
@@ -107,3 +108,38 @@ class TestCollectMarkdownImages:
         content = "```\ncode\n```\n\n![real](real.png)"
         result = collect_markdown_images(content, self._mock_resolver)
         assert result == {"real.png"}
+
+
+class TestMediaResolverBasePath:
+    """Tests for base_path support in create_media_resolver."""
+
+    def test_no_base_path(self, tmp_path):
+        source = tmp_path / "content"
+        source.mkdir()
+        (source / "image.png").write_bytes(b"img")
+        resolver = create_media_resolver(source, "page.md")
+        result = resolver("image.png")
+        assert result is not None
+        src_url, _ = result
+        assert src_url == "/image.png"
+
+    def test_with_base_path(self, tmp_path):
+        source = tmp_path / "content"
+        source.mkdir()
+        (source / "image.png").write_bytes(b"img")
+        resolver = create_media_resolver(source, "page.md", base_path="/docs")
+        result = resolver("image.png")
+        assert result is not None
+        src_url, _ = result
+        assert src_url == "/docs/image.png"
+
+    def test_base_path_in_subdirectory(self, tmp_path):
+        source = tmp_path / "content"
+        (source / "notes").mkdir(parents=True)
+        (source / "notes" / "photo.jpg").write_bytes(b"img")
+        resolver = create_media_resolver(source, "notes/page.md", base_path="/site")
+        result = resolver("photo.jpg")
+        assert result is not None
+        src_url, actual_path = result
+        assert src_url == "/site/notes/photo.jpg"
+        assert actual_path == "notes/photo.jpg"

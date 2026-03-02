@@ -102,7 +102,7 @@ ignore_patterns = [".obsidian", "Templates"]
     typer.echo(f"Created {config_path}")
 
     gitignore_path = directory / ".gitignore"
-    gitignore_entries = [output, ".rockgarden"]
+    gitignore_entries = [output.rstrip("/"), ".rockgarden"]
     missing = [e for e in gitignore_entries if not _is_in_gitignore(gitignore_path, e)]
     if missing:
         labels = ", ".join(f"'{e}/'" for e in missing)
