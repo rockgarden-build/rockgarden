@@ -3,8 +3,6 @@
 import unicodedata
 from pathlib import Path
 
-import pytest
-
 from rockgarden.content.models import Page
 from rockgarden.content.store import ContentStore
 

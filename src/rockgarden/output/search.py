@@ -1,6 +1,7 @@
 """Search index generation for client-side search."""
 
 import re
+
 from rockgarden.content.models import Page
 from rockgarden.urls import get_url
 

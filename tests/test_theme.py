@@ -1,5 +1,7 @@
 """Tests for theme export functionality."""
 
+import tomllib
+
 import pytest
 from typer.testing import CliRunner
 
@@ -46,7 +48,7 @@ class TestSetThemeNameInConfig:
         assert 'name = "mytheme"' in content
         lines = content.splitlines()
         theme_idx = lines.index("[theme]")
-        name_idx = next(i for i, l in enumerate(lines) if 'name = "mytheme"' in l)
+        name_idx = next(i for i, line in enumerate(lines) if 'name = "mytheme"' in line)
         assert name_idx == theme_idx + 1
 
     def test_appends_new_theme_section(self, tmp_path):
@@ -56,6 +58,13 @@ class TestSetThemeNameInConfig:
         content = config.read_text()
         assert "[theme]" in content
         assert 'name = "mytheme"' in content
+
+    def test_inserts_with_no_trailing_newline_on_section(self, tmp_path):
+        config = tmp_path / "rockgarden.toml"
+        config.write_text("[theme]")  # no trailing newline
+        set_theme_name_in_config(config, "mytheme")
+        parsed = tomllib.loads(config.read_text())
+        assert parsed["theme"]["name"] == "mytheme"
 
 
 class TestThemeExport:

@@ -1,5 +1,6 @@
 """Theme export utilities."""
 
+import json
 import re
 import shutil
 from pathlib import Path
@@ -32,20 +33,30 @@ module.exports = {
 };
 """
 
-_PACKAGE_JSON = """\
-{
-  "private": true,
-  "scripts": {
-    "build:css": "npx tailwindcss -i static-src/input.css -o static/rockgarden.css --minify",
-    "watch:css": "npx tailwindcss -i static-src/input.css -o static/rockgarden.css --watch"
-  },
-  "devDependencies": {
-    "@tailwindcss/typography": "^0.5.16",
-    "daisyui": "^4.12.14",
-    "tailwindcss": "^3.4.17"
-  }
-}
-"""
+_PACKAGE_JSON = (
+    json.dumps(
+        {
+            "private": True,
+            "scripts": {
+                "build:css": (
+                    "npx tailwindcss -i static-src/input.css"
+                    " -o static/rockgarden.css --minify"
+                ),
+                "watch:css": (
+                    "npx tailwindcss -i static-src/input.css"
+                    " -o static/rockgarden.css --watch"
+                ),
+            },
+            "devDependencies": {
+                "@tailwindcss/typography": "^0.5.16",
+                "daisyui": "^4.12.14",
+                "tailwindcss": "^3.4.17",
+            },
+        },
+        indent=2,
+    )
+    + "\n"
+)
 
 
 def validate_theme_name(name: str) -> None:
@@ -134,6 +145,8 @@ def set_theme_name_in_config(config_path: Path, theme_name: str) -> None:
         lines[name_line_idx] = f'name = "{theme_name}"\n'
         config_path.write_text("".join(lines))
     elif theme_section_start is not None:
+        if not lines[theme_section_start].endswith("\n"):
+            lines[theme_section_start] += "\n"
         lines.insert(theme_section_start + 1, f'name = "{theme_name}"\n')
         config_path.write_text("".join(lines))
     else:

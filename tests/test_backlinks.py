@@ -3,7 +3,11 @@
 from pathlib import Path
 
 from rockgarden.config import NavConfig
-from rockgarden.content.link_index import LinkIndex, build_link_index, extract_wikilink_targets
+from rockgarden.content.link_index import (
+    LinkIndex,
+    build_link_index,
+    extract_wikilink_targets,
+)
 from rockgarden.content.models import Page
 from rockgarden.content.store import ContentStore
 from rockgarden.nav.tree import build_nav_tree

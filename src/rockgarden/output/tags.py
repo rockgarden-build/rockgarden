@@ -5,7 +5,7 @@ from pathlib import Path
 from jinja2 import Environment
 
 from rockgarden.content.models import Page
-from rockgarden.urls import get_tag_url, get_tags_root_url, get_url, normalize_tag
+from rockgarden.urls import get_url, normalize_tag
 
 
 def collect_tags(pages: list[Page]) -> dict[str, list[Page]]:

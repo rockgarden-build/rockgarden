@@ -1,8 +1,8 @@
 """Tests for stripping H1 from content."""
 
+from rockgarden.config import Config
 from rockgarden.content import strip_content_title
 from rockgarden.output.builder import build_site
-from rockgarden.config import Config
 
 
 class TestStripContentTitle:

@@ -1,11 +1,10 @@
 """Tests for broken link handling."""
 
-import pytest
 
-from rockgarden.obsidian.wikilinks import process_wikilinks
-from rockgarden.render.markdown import render_markdown
-from rockgarden.output.builder import build_site, BuildResult
 from rockgarden.config import Config
+from rockgarden.obsidian.wikilinks import process_wikilinks
+from rockgarden.output.builder import BuildResult, build_site
+from rockgarden.render.markdown import render_markdown
 
 
 class TestProcessWikilinks:

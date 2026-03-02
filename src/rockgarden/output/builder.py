@@ -38,8 +38,13 @@ from rockgarden.output.build_info import get_build_info
 from rockgarden.output.search import build_search_index
 from rockgarden.output.sitemap import build_sitemap
 from rockgarden.output.tags import build_tag_pages, collect_tags
-from rockgarden.render import create_engine, render_markdown, render_page, resolve_layout
-from rockgarden.urls import get_base_path, get_folder_url, get_output_path, get_url
+from rockgarden.render import (
+    create_engine,
+    render_markdown,
+    render_page,
+    resolve_layout,
+)
+from rockgarden.urls import get_base_path, get_folder_url, get_output_path
 
 
 @dataclass

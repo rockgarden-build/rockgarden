@@ -298,7 +298,7 @@ app.add_typer(theme_app, name="theme")
 def theme_export(
     dir_name: Annotated[
         str,
-        typer.Option("--dir", "-d", help="Theme directory name (created under _themes/)"),
+        typer.Option("--dir", "-d", help="Theme name (created under _themes/)"),
     ] = "default",
 ) -> None:
     """Export the bundled default theme as a starting point for customization."""
@@ -311,7 +311,9 @@ def theme_export(
         raise typer.Exit(1) from None
 
     if dest.exists():
-        typer.echo(f"Error: {dest} already exists. Choose a different name with --dir.", err=True)
+        typer.echo(
+            f"Error: {dest} already exists. Use --dir for a different name.", err=True
+        )
         raise typer.Exit(1)
 
     try:
@@ -324,17 +326,20 @@ def theme_export(
     typer.echo(f"  {counts['templates']} templates")
     typer.echo(f"  CSS source: {dest}/static-src/input.css")
     typer.echo(f"  Compiled CSS: {dest}/static/rockgarden.css")
-    typer.echo(f"  Build tooling: tailwind.config.js, package.json")
+    typer.echo("  Build tooling: tailwind.config.js, package.json")
 
     config_path = Path("rockgarden.toml")
     if config_path.exists():
-        set_theme_name_in_config(config_path, dir_name)
-        typer.echo(f"  Updated rockgarden.toml: [theme] name = \"{dir_name}\"")
+        try:
+            set_theme_name_in_config(config_path, dir_name)
+            typer.echo(f'  Updated rockgarden.toml: [theme] name = "{dir_name}"')
+        except Exception as e:
+            typer.echo(f"  Warning: could not update rockgarden.toml: {e}", err=True)
     else:
-        typer.echo(f"\nNo rockgarden.toml found. To activate the theme, add:")
+        typer.echo("\nNo rockgarden.toml found. To activate the theme, add:")
         typer.echo(f'  [theme]\n  name = "{dir_name}"')
 
-    typer.echo(f"\nTo rebuild CSS after editing templates:")
+    typer.echo("\nTo rebuild CSS after editing templates:")
     typer.echo(f"  cd {dest} && npm install && npm run build:css")
 
 
