@@ -86,7 +86,10 @@ def collect_markdown_images(
 
 
 def create_media_resolver(
-    source_dir: Path, page_path: str, media_index: dict[str, list[str]] | None = None
+    source_dir: Path,
+    page_path: str,
+    media_index: dict[str, list[str]] | None = None,
+    base_path: str = "",
 ):
     """Create a media resolver function for a specific page.
 
@@ -99,26 +102,28 @@ def create_media_resolver(
         source_dir: The root source directory.
         page_path: The path of the current page relative to source_dir.
         media_index: Optional pre-built index of media files by filename.
+        base_path: URL base path prefix for subdirectory deployments.
 
     Returns:
         A resolver function that takes a media target and returns
         (src_url, actual_path) or None if not found.
     """
     page_dir = (source_dir / page_path).parent
+    prefix = base_path + "/" if base_path else "/"
 
     def resolve_media(target: str) -> tuple[str, str] | None:
         # Try relative to current page first
         relative_path = page_dir / target
         if relative_path.exists():
             actual_path = str(relative_path.relative_to(source_dir))
-            src_url = "/" + actual_path
+            src_url = prefix + actual_path
             return src_url, actual_path
 
         # Try relative to source root
         root_path = source_dir / target
         if root_path.exists():
             actual_path = target
-            src_url = "/" + target
+            src_url = prefix + target
             return src_url, actual_path
 
         # Fallback: search by filename (Obsidian shortest-path resolution)
@@ -127,7 +132,7 @@ def create_media_resolver(
             matches = media_index.get(filename)
             if matches:
                 actual_path = matches[0]
-                src_url = "/" + actual_path
+                src_url = prefix + actual_path
                 return src_url, actual_path
 
         return None

@@ -134,6 +134,7 @@ def _make_note_resolver(
     visited: frozenset[str],
     all_media: set[str],
     broken_links: dict[str, list[str]],
+    base_path: str = "",
 ):
     """Return a transclusion resolver that renders a note's content as HTML.
 
@@ -154,7 +155,9 @@ def _make_note_resolver(
 
         new_visited = visited | {page.slug}
         page_rel_path = str(page.source_path.relative_to(source))
-        media_resolver = create_media_resolver(source, page_rel_path, media_index)
+        media_resolver = create_media_resolver(
+            source, page_rel_path, media_index, base_path
+        )
 
         sub_content = page.content
         sub_content, media = process_media_embeds(sub_content, media_resolver)
@@ -170,6 +173,7 @@ def _make_note_resolver(
                 new_visited,
                 all_media,
                 broken_links,
+                base_path,
             ),
         )
         sub_content, sub_broken = process_wikilinks(sub_content, store.resolve_link)
@@ -354,7 +358,9 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         content = strip_content_title(content)
 
         page_rel_path = str(page.source_path.relative_to(source))
-        media_resolver = create_media_resolver(source, page_rel_path, media_index)
+        media_resolver = create_media_resolver(
+            source, page_rel_path, media_index, base_path
+        )
         content, media = process_media_embeds(content, media_resolver)
         all_media.update(media)
         all_media.update(collect_markdown_images(content, media_resolver))
@@ -368,6 +374,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
                 frozenset({page.slug}),
                 all_media,
                 broken_links_by_page,
+                base_path,
             ),
         )
         content, broken = process_wikilinks(content, store.resolve_link)
@@ -429,7 +436,9 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
             processed = folder.custom_content
             processed = strip_content_title(processed)
             folder_src = folder_path + "/index.md" if folder_path else "index.md"
-            media_resolver = create_media_resolver(source, folder_src, media_index)
+            media_resolver = create_media_resolver(
+                source, folder_src, media_index, base_path
+            )
             processed, media = process_media_embeds(processed, media_resolver)
             all_media.update(media)
             all_media.update(collect_markdown_images(processed, media_resolver))
@@ -443,6 +452,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
                     frozenset({folder.slug}),
                     all_media,
                     broken_links_by_page,
+                    base_path,
                 ),
             )
             processed, broken = process_wikilinks(processed, store.resolve_link)

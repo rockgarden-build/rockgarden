@@ -43,7 +43,7 @@ To deploy to a subdirectory (e.g., `example.com/docs/`), set `base_url` in `rock
 base_url = "https://example.com/docs"
 ```
 
-Most generated URLs (internal links, search index, sitemap) will include the base path prefix. Media embed URLs built via Obsidian `![[image]]` syntax may still be rooted at `/` — this is a known limitation tracked for a future fix.
+All generated URLs (internal links, media embeds, search index, sitemap) will include the base path prefix.
 
 ## Clean URLs
 
