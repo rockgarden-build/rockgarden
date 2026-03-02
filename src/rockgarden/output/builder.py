@@ -458,11 +458,52 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
             folder_path = "/".join(parts[:-1])
             show_index = p.frontmatter.get("show_index", False)
             show_index_map[folder_path] = show_index
+    # Generate collection pages before the main render loop so nav nodes
+    # are present when templates reference site.nav.
+    collection_page_entries = build_collection_pages(
+        collections,
+        env,
+        site_config,
+        output,
+        clean_urls,
+        base_path,
+        config,
+    )
+
+    for col in collections.values():
+        if not col.config.nav or not col.generates_pages:
+            continue
+        col_entries = [
+            e for e in collection_page_entries if e["collection"] == col.name
+        ]
+        if not col_entries:
+            continue
+        from rockgarden.nav.tree import NavNode
+
+        children = [
+            NavNode(
+                name=e["slug"].rsplit("/", 1)[-1],
+                path=e["url"],
+                label=e["title"],
+                is_folder=False,
+            )
+            for e in col_entries
+        ]
+        children.sort(key=lambda n: n.label.lower())
+        col_node = NavNode(
+            name=col.name,
+            path=children[0].path if children else "",
+            label=col.name,
+            is_folder=True,
+            children=children,
+        )
+        nav_tree.children.append(col_node)
+
     all_media: set[str] = set()
     broken_links_by_page: dict[str, list[str]] = {}
     collection_skip_slugs = get_collection_skip_slugs(collections)
 
-    count = 0
+    count = len(collection_page_entries)
     for page in pages:
         if page.slug in collection_skip_slugs:
             continue
@@ -601,48 +642,6 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         count += 1
 
     copy_assets(all_media, source, output)
-
-    # Generate collection pages
-    collection_page_entries = build_collection_pages(
-        collections,
-        env,
-        site_config,
-        output,
-        clean_urls,
-        base_path,
-        config,
-    )
-    count += len(collection_page_entries)
-
-    # Add collection nav nodes for nav=true collections
-    for col in collections.values():
-        if not col.config.nav or not col.generates_pages:
-            continue
-        col_entries = [
-            e for e in collection_page_entries if e["collection"] == col.name
-        ]
-        if not col_entries:
-            continue
-        from rockgarden.nav.tree import NavNode
-
-        children = [
-            NavNode(
-                name=e["slug"].rsplit("/", 1)[-1],
-                path=e["url"],
-                label=e["title"],
-                is_folder=False,
-            )
-            for e in col_entries
-        ]
-        children.sort(key=lambda n: n.label.lower())
-        col_node = NavNode(
-            name=col.name,
-            path=children[0].path if children else "",
-            label=col.name,
-            is_folder=True,
-            children=children,
-        )
-        nav_tree.children.append(col_node)
 
     # Generate search index if enabled
     if config.theme.search:
