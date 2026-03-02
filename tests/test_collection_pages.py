@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+import pytest
 from jinja2 import DictLoader, Environment
 
 from rockgarden.config import CollectionConfig, Config
@@ -53,6 +54,11 @@ class TestGenerateCollectionUrl:
         )
         url = generate_collection_url("/talks/{year}/{slug}/", page)
         assert url == "/talks/2026/keynote/"
+
+    def test_missing_field_raises(self):
+        entry = {"slug": "dave", "name": "Dave"}
+        with pytest.raises(ValueError, match="missing field.*'year'"):
+            generate_collection_url("/talks/{year}/{slug}/", entry)
 
 
 class TestGetCollectionSkipSlugs:

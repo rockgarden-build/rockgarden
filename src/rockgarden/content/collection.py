@@ -65,7 +65,7 @@ def partition_collections(
     return collections
 
 
-def _entry_fields(entry: Page | dict) -> dict:
+def entry_fields(entry: Page | dict) -> dict:
     """Extract a flat dict of fields from an entry for URL substitution."""
     if isinstance(entry, Page):
         return {
@@ -78,8 +78,18 @@ def _entry_fields(entry: Page | dict) -> dict:
 
 def generate_collection_url(url_pattern: str, entry: Page | dict) -> str:
     """Replace ``{field}`` placeholders in url_pattern with entry values."""
-    fields = _entry_fields(entry)
-    return url_pattern.format(**fields)
+    fields = entry_fields(entry)
+    try:
+        return url_pattern.format(**fields)
+    except KeyError as exc:
+        if isinstance(entry, Page):
+            entry_id = entry.slug
+        else:
+            entry_id = entry.get("slug", "<unknown>")
+        raise ValueError(
+            f"url_pattern '{url_pattern}' references missing "
+            f"field {exc} in entry '{entry_id}'"
+        ) from exc
 
 
 def get_collection_skip_slugs(

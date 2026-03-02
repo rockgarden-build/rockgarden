@@ -2,6 +2,7 @@
 
 from rockgarden.content.collection import (
     Collection,
+    entry_fields,
     generate_collection_url,
     get_collection_skip_slugs,
     partition_collections,
@@ -20,6 +21,7 @@ __all__ = [
     "LinkIndex",
     "Page",
     "build_link_index",
+    "entry_fields",
     "generate_collection_url",
     "get_collection_skip_slugs",
     "load_collection_data_files",

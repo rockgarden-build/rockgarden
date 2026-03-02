@@ -295,7 +295,7 @@ def build_collection_pages(
 
     Returns a list of search-index-ready dicts for the generated pages.
     """
-    from rockgarden.content.collection import _entry_fields
+    from rockgarden.content.collection import entry_fields
     from rockgarden.content.models import Page
 
     generated = []
@@ -315,8 +315,9 @@ def build_collection_pages(
             if isinstance(entry, Page) and entry.content:
                 html_content = render_markdown(entry.content)
 
+            fields = entry_fields(entry)
             rendered = template.render(
-                entry=_entry_fields(entry),
+                entry=fields,
                 entry_obj=entry,
                 html_content=html_content,
                 collection=col,
@@ -328,13 +329,10 @@ def build_collection_pages(
             output_file.parent.mkdir(parents=True, exist_ok=True)
             output_file.write_text(rendered)
 
-            fields = _entry_fields(entry)
             generated.append(
                 {
                     "title": fields.get("title", fields.get("name", slug)),
-                    "url": f"{base_path}{url}"
-                    if not url.startswith(base_path)
-                    else url,
+                    "url": f"{base_path}{url}",
                     "slug": slug,
                     "collection": col.name,
                 }
@@ -382,7 +380,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         data_entries = load_collection_data_files(source, col.config.source)
         col.entries.extend(data_entries)
 
-    validated_entries: set[int] = set()
+    validated_entries: set[tuple[int, type]] = set()
     for col in collections.values():
         if col.config.model:
             model_class = resolve_model(col.config.model, site_root, config.theme.name)
@@ -392,11 +390,11 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
                     f"but no model file was found"
                 )
             for entry in col.entries:
-                entry_id = id(entry)
-                if entry_id in validated_entries:
+                key = (id(entry), model_class)
+                if key in validated_entries:
                     continue
                 validate_entry(entry, model_class, col.name)
-                validated_entries.add(entry_id)
+                validated_entries.add(key)
 
     # Build media index before creating store so it can resolve media file links
     media_index = build_media_index(source)
