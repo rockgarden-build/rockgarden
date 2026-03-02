@@ -1,3 +1,7 @@
+---
+tags: [hooks, configuration]
+---
+
 # Build Hooks
 
 Shell commands executed at build lifecycle stages. Hooks keep the core unopinionated while enabling custom processing like data fetching, asset generation, and CSS compilation.

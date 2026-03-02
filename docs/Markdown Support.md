@@ -1,3 +1,7 @@
+---
+tags: [markdown, syntax]
+---
+
 # Markdown Syntax Support
 
 Rockgarden supports the superset of CommonMark, GFM (GitHub Flavored Markdown), and Obsidian markdown. No configuration needed — all syntax is handled gracefully.
