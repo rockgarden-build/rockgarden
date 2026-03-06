@@ -1,8 +1,36 @@
 """User-defined Jinja2 macro support."""
 
+import re
 from pathlib import Path
 
 from jinja2 import Environment, StrictUndefined
+
+# Matches fenced code blocks (``` or ~~~) and inline code spans.
+# Fenced blocks are matched first (longer match) to avoid partial matches.
+_CODE_RE = re.compile(
+    r"(`{3,}[\s\S]*?`{3,}|~{3,}[\s\S]*?~{3,}|`[^`\n]+`)",
+    re.DOTALL,
+)
+_PLACEHOLDER_PREFIX = "\x00RGCODE"
+_PLACEHOLDER_SUFFIX = "\x00"
+
+
+def _protect_code(content: str) -> tuple[str, dict[str, str]]:
+    """Replace code blocks/spans with placeholders safe from Jinja2 evaluation."""
+    protected: dict[str, str] = {}
+
+    def replace(m: re.Match) -> str:
+        key = f"{_PLACEHOLDER_PREFIX}{len(protected)}{_PLACEHOLDER_SUFFIX}"
+        protected[key] = m.group(0)
+        return key
+
+    return _CODE_RE.sub(replace, content), protected
+
+
+def _restore_code(content: str, protected: dict[str, str]) -> str:
+    for key, value in protected.items():
+        content = content.replace(key, value)
+    return content
 
 
 def load_macros(macros_dir: Path) -> dict[str, str]:
@@ -23,7 +51,8 @@ def build_macro_renderer(macros: dict[str, str]):
     content string, or ``None`` if macros is empty.
 
     Building the environment and preamble once per build avoids redundant
-    compilation on every page.
+    compilation on every page.  Code blocks and inline code spans are
+    protected from Jinja2 evaluation before rendering and restored after.
     """
     if not macros:
         return None
@@ -32,13 +61,12 @@ def build_macro_renderer(macros: dict[str, str]):
     env = Environment(autoescape=False, undefined=StrictUndefined)
 
     def render(content: str, page) -> str:
-        full_template = preamble + "\n" + content
+        protected_content, code_blocks = _protect_code(content)
+        full_template = preamble + "\n" + protected_content
         template = env.from_string(full_template)
         result = template.render(page=page)
-        # The preamble (macro definitions) renders to empty/whitespace; strip
-        # the leading newlines it introduces so downstream markdown sees clean
-        # content.
-        return result.lstrip("\n")
+        result = result.lstrip("\n")
+        return _restore_code(result, code_blocks)
 
     return render
 
