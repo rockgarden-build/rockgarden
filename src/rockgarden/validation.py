@@ -165,6 +165,6 @@ def validate_config(
                                 f'[theme] required key "{k}"'
                                 " declared in theme manifest is missing"
                             )
-                            issues.append(ValidationIssue("warning", msg))
+                            issues.append(ValidationIssue("error", msg))
 
     return issues

@@ -21,7 +21,7 @@ Provide a `validate` CLI command that checks a `rockgarden.toml` for problems: u
 - Unknown key in any config section (probable typo)
 - Source directory does not exist
 - `theme.name` set but `_themes/<name>/` directory not found
-- Theme manifest declares a required key but it's absent from `[theme]`
+- Theme manifest declares a required key but it's absent from `[theme]` → **error**
 
 ### Known-Key Validation
 
@@ -144,5 +144,5 @@ Built-in `ThemeConfig` fields are always valid. Theme manifest declared keys are
 - Introduce a typo (`titl = "foo"`) → warning reported
 - Set `timezone = "Bad/Zone"` → error reported, exit 1
 - Set `theme.name` to nonexistent dir → warning reported
-- Create a theme manifest with a required key, omit it from TOML → warning reported
+- Create a theme manifest with a required key, omit it from TOML → error reported, exit 1
 - `uv run pytest` still passes (no regressions)

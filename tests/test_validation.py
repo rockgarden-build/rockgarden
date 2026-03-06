@@ -105,7 +105,7 @@ def test_theme_manifest_required_key_missing(tmp_path):
         {"theme": {"name": "mytheme"}},
         config_file_dir=tmp_path,
     )
-    assert any(i.level == "warning" and "show_sponsors" in i.message for i in issues)
+    assert any(i.level == "error" and "show_sponsors" in i.message for i in issues)
 
 
 def test_theme_manifest_required_key_present_no_warning(tmp_path):
