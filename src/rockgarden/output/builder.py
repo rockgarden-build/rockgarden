@@ -31,6 +31,7 @@ from rockgarden.content import (
 from rockgarden.hooks import run_hooks
 from rockgarden.icons import configure_icons_dir
 from rockgarden.links import transform_md_links
+from rockgarden.macros import build_macro_renderer, load_macros
 from rockgarden.nav import (
     build_breadcrumbs,
     build_nav_tree,
@@ -358,6 +359,8 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     copy_static_files(output)
 
     site_root = source.parent
+    macros = load_macros(site_root / "_macros")
+    apply_macros = build_macro_renderer(macros)
     copy_theme_static_files(config.theme.name, site_root, output)
     user_styles, user_scripts = discover_user_assets(site_root)
     copy_user_assets(site_root, output, user_styles, user_scripts)
@@ -521,6 +524,8 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         content = page.content
 
         content = strip_content_title(content)
+        if apply_macros:
+            content = apply_macros(content, page)
 
         page_rel_path = str(page.source_path.relative_to(source))
         media_resolver = create_media_resolver(
@@ -600,6 +605,8 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         if folder.custom_content:
             processed = folder.custom_content
             processed = strip_content_title(processed)
+            if apply_macros:
+                processed = apply_macros(processed, folder)
             folder_src = folder_path + "/index.md" if folder_path else "index.md"
             media_resolver = create_media_resolver(
                 source, folder_src, media_index, base_path

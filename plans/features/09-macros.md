@@ -2,7 +2,7 @@
 
 User-defined Jinja2 macros in `_macros/` directory.
 
-## Status: Not Started
+## Status: Complete
 
 ## Goal
 
