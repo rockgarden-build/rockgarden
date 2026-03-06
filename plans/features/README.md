@@ -41,7 +41,7 @@ The [PyOhio static website](https://github.com/pyohio/static-website) (Astro + P
 | N8 | [Tag Index Pages](N8-tag-index-pages.md) | ✅ | B | Generate `/tags/<tag>/` listing pages |
 | N9 | Template Decomposition | ✅ | A | Named blocks as customization hooks in page templates |
 | N10 | Newline Handling | ✅ | A | Obsidian-style single newline → `<br>` |
-| N11 | [Config Validation](N11-config-validation.md) | ❌ | B | `validate` command, unknown-key warnings, theme manifest |
+| N11 | [Config Validation](N11-config-validation.md) | ✅ | B | `validate` command, unknown-key warnings, theme manifest |
 
 ## Roadmap Phases
 

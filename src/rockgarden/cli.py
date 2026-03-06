@@ -3,6 +3,7 @@
 import http.server
 import shutil
 import socketserver
+import tomllib
 from functools import partial
 from pathlib import Path
 from typing import Annotated
@@ -13,6 +14,7 @@ from rockgarden import __version__
 from rockgarden.config import Config
 from rockgarden.output import build_site
 from rockgarden.theme import export_theme, set_theme_name_in_config, validate_theme_name
+from rockgarden.validation import validate_config
 
 
 def version_callback(value: bool) -> None:
@@ -348,6 +350,59 @@ def theme_export(
 
     typer.echo("\nTo rebuild CSS after editing templates:")
     typer.echo(f"  cd {dest} && npm install && npm run build:css")
+
+
+@app.command()
+def validate(
+    source: Annotated[
+        Path | None,
+        typer.Option("--source", "-s", help="Source directory (to resolve paths)"),
+    ] = None,
+    config_file: Annotated[
+        Path | None,
+        typer.Option("--config", "-c", help="Path to config file"),
+    ] = None,
+) -> None:
+    """Validate rockgarden configuration."""
+    if config_file is None and source is not None:
+        candidate = source / "rockgarden.toml"
+        if candidate.exists():
+            config_file = candidate
+
+    if config_file is None:
+        config_file = Path("rockgarden.toml")
+
+    if not config_file.exists():
+        typer.echo(f"Error: config file not found: {config_file}", err=True)
+        raise typer.Exit(1)
+
+    try:
+        with open(config_file, "rb") as f:
+            config_dict = tomllib.load(f)
+    except tomllib.TOMLDecodeError as e:
+        typer.echo(f"Error: TOML syntax error in {config_file}: {e}", err=True)
+        raise typer.Exit(1) from None
+
+    config_file_dir = config_file.resolve().parent
+    resolved_source = source.resolve() if source else None
+
+    issues = validate_config(
+        config_dict, source_dir=resolved_source, config_file_dir=config_file_dir
+    )
+
+    if not issues:
+        typer.echo("✓ No issues found.")
+        return
+
+    has_errors = False
+    for issue in issues:
+        label = "Error" if issue.level == "error" else "Warning"
+        typer.echo(f"{label}: {issue.message}", err=True)
+        if issue.level == "error":
+            has_errors = True
+
+    if has_errors:
+        raise typer.Exit(1)
 
 
 def main() -> None:
