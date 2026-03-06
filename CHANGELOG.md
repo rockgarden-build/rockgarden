@@ -1,3 +1,10 @@
+## v0.5.2 (2026-03-06)
+
+### Minor / Bug Fixes
+
+- add macros support (#43)
+- add config validation (#42)
+
 ## v0.5.1 (2026-03-02)
 
 ### Minor / Bug Fixes
