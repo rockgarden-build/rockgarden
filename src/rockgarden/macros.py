@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from jinja2 import Environment
+from jinja2 import Environment, StrictUndefined
 
 
 def load_macros(macros_dir: Path) -> dict[str, str]:
@@ -29,7 +29,7 @@ def build_macro_renderer(macros: dict[str, str]):
         return None
 
     preamble = "\n".join(macros.values())
-    env = Environment(autoescape=False)
+    env = Environment(autoescape=False, undefined=StrictUndefined)
 
     def render(content: str, page) -> str:
         full_template = preamble + "\n" + content

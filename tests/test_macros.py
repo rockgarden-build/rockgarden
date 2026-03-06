@@ -95,6 +95,12 @@ def test_preprocess_macros_syntax_error_raises():
         preprocess_macros("{{ broken() }}", macros, None)
 
 
+def test_preprocess_macros_undefined_variable_raises():
+    macros = {"m": "{% macro foo() %}bar{% endmacro %}"}
+    with pytest.raises(TemplateError):
+        preprocess_macros("{{ undefined_var }}", macros, None)
+
+
 def test_preprocess_macros_content_without_calls_unchanged():
     macros = {"m": "{% macro foo() %}bar{% endmacro %}"}
     content = "Just plain markdown content."
