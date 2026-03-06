@@ -118,11 +118,11 @@ One feature per PR. All items complete.
 
 ### Anytime: N11 Config Validation
 
-#### Feature N11: Config Validation
-- [ ] New `validation.py` with `validate_config()` and `load_theme_manifest()`
-- [ ] `rockgarden validate` CLI command (exits 1 on errors, 0 on warnings)
-- [ ] Known-key validation derived from dataclass field names
-- [ ] Theme manifest (`_themes/<name>/theme.toml`) loading and required-key check
+#### Feature N11: Config Validation ✅
+- [x] New `validation.py` with `validate_config()` and `load_theme_manifest()`
+- [x] `rockgarden validate` CLI command (exits 1 on errors, 0 on warnings)
+- [x] Known-key validation derived from Pydantic model fields
+- [x] Theme manifest (`_themes/<name>/theme.toml`) loading and required-key check
 
 ---
 
