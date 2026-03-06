@@ -26,7 +26,7 @@ The [PyOhio static website](https://github.com/pyohio/static-website) (Astro + P
 | 06 | [Navigation](06-navigation.md) | ✅ | — | Sidebar, breadcrumbs, folder pages |
 | 07 | [Backlinks](07-backlinks.md) | ✅ | A | Pages that link to current page |
 | 08 | [Search](08-search.md) | ✅ | A | Client-side search |
-| 09 | [Macros](09-macros.md) | ❌ | C | User-defined Jinja2 macros |
+| 09 | [Macros](09-macros.md) | ✅ | C | User-defined Jinja2 macros |
 | 10 | [Progressive Customization](10-progressive-customization.md) | ✅ | B | Config separation, layout system, theme export |
 | 11 | [RSS Feed](11-rss-feed.md) | ❌ | C | RSS/Atom feed generation |
 | 12 | [Base Path Prefix](12-base-path-prefix.md) | ✅ | B | Deploy to subdirectories |
