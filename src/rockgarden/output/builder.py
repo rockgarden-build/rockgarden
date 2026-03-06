@@ -606,7 +606,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
             processed = folder.custom_content
             processed = strip_content_title(processed)
             if apply_macros:
-                processed = apply_macros(processed, None)
+                processed = apply_macros(processed, folder)
             folder_src = folder_path + "/index.md" if folder_path else "index.md"
             media_resolver = create_media_resolver(
                 source, folder_src, media_index, base_path
