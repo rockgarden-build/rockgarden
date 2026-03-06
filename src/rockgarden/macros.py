@@ -5,11 +5,17 @@ from pathlib import Path
 
 from jinja2 import Environment, StrictUndefined
 
-# Matches fenced code blocks (``` or ~~~) and inline code spans.
-# Fenced blocks are matched first (longer match) to avoid partial matches.
+# Matches CommonMark code forms that must be protected from Jinja2 evaluation:
+#   - Backtick fenced blocks (```) and multi-backtick spans (``) — {2,} covers both
+#   - Tilde fenced blocks (~~~)
+#   - Single-backtick inline spans
+#   - Indented code block lines (4 spaces or tab at start of line)
 _CODE_RE = re.compile(
-    r"(`{3,}[\s\S]*?`{3,}|~{3,}[\s\S]*?~{3,}|`[^`\n]+`)",
-    re.DOTALL,
+    r"`{2,}[\s\S]*?`{2,}"
+    r"|~{3,}[\s\S]*?~{3,}"
+    r"|`[^`\n]+`"
+    r"|^(?:    |\t)[^\n]*",
+    re.DOTALL | re.MULTILINE,
 )
 _PLACEHOLDER_PREFIX = "\x00RGCODE"
 _PLACEHOLDER_SUFFIX = "\x00"

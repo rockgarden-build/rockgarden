@@ -123,6 +123,20 @@ def test_preprocess_macros_macro_call_outside_fence_still_works():
     assert "{{ greet('ignored') }}" in result
 
 
+def test_preprocess_macros_multi_backtick_span_preserved():
+    macros = {"m": "{% macro foo() %}bar{% endmacro %}"}
+    content = "Use ``{{ undefined_var }}`` here"
+    result = preprocess_macros(content, macros, None)
+    assert "``{{ undefined_var }}``" in result
+
+
+def test_preprocess_macros_indented_code_block_preserved():
+    macros = {"m": "{% macro foo() %}bar{% endmacro %}"}
+    content = "paragraph\n\n    {{ undefined_var }}\n\nend"
+    result = preprocess_macros(content, macros, None)
+    assert "{{ undefined_var }}" in result
+
+
 def test_preprocess_macros_content_without_calls_unchanged():
     macros = {"m": "{% macro foo() %}bar{% endmacro %}"}
     content = "Just plain markdown content."
