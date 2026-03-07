@@ -1,5 +1,5 @@
 ---
-tags: [architecture]
+tags: [architecture, design]
 ---
 
 # Architecture

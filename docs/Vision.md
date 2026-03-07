@@ -1,5 +1,5 @@
 ---
-tags: [philosophy]
+tags: [design, philosophy]
 ---
 
 # Vision

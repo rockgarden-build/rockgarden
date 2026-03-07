@@ -1,5 +1,5 @@
 ---
-tags: [configuration]
+tags: [build, configuration, extensibility]
 ---
 
 # Build Hooks

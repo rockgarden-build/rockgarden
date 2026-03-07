@@ -1,5 +1,5 @@
 ---
-tags: [operation]
+tags: [deployment, build]
 ---
 
 # Deployment
