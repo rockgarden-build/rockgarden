@@ -1,6 +1,6 @@
 # rockgarden
 
-A Python static site generator that works with Obsidian vaults and plain markdown folders out of the box. Point it at a directory of markdown files and get a navigable HTML site — no config required.
+A Python static site generator that works with Obsidian vaults and plain markdown folders out of the box. Point it at a directory of markdown files and get a navigable HTML site: no config required.
 
 Rockgarden handles Obsidian-specific syntax (wiki-links, embeds, callouts) so you can publish your vault without changing how you write. For plain markdown, it just works.
 
@@ -8,10 +8,10 @@ Rockgarden handles Obsidian-specific syntax (wiki-links, embeds, callouts) so yo
 
 **Progressive customization.** Start with zero config and add complexity only when you need it:
 
-- **Zero config** — Point at a folder, get a site
-- **Convention** — Drop CSS in `_styles/`, templates in `_templates/`
-- **Configuration** — Define collections, navigation, themes in `rockgarden.toml`
-- **Full control** — Custom templates, build hooks, data pipelines
+- **Zero config**: Point at a folder, get a site
+- **Convention**: Drop CSS in `_styles/`, templates in `_templates/`
+- **Configuration**: Define collections, navigation, themes in `rockgarden.toml`
+- **Full control**: Custom templates, build hooks, data pipelines
 
 The goal is to scale from a personal wiki to a full-featured site without switching tools.
 
@@ -147,6 +147,10 @@ Rockgarden was inspired by [Quartz](https://quartz.jzhao.xyz/), a static site ge
 ## Contributing
 
 Contributions may be welcome if they fit the vision of this project. Please open an issue before submitting PRs. See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+
+## Security
+
+To report a vulnerability, please use [GitHub's private security reporting](https://github.com/rockgarden-build/rockgarden/security/advisories/new). See [SECURITY.md](SECURITY.md) for details.
 
 ## License
 
