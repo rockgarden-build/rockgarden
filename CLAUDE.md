@@ -70,25 +70,10 @@ CSS is built separately from Python via Tailwind CLI. The compiled output is com
 
 Page templates use named Jinja2 blocks as override points. When adding new features that render content on pages, place them in the appropriate block rather than adding inline to `page.html`. Empty blocks serve as hooks for user customization — preserve them even when adding default content.
 
-Current block zones in `page.html` (see Feature 10 spec for full details):
+Current block zones in `page.html`:
 - `before_heading` / `after_heading` — metadata, tags, custom frontmatter rendering
 - `body` — the rendered markdown
 - `after_body` — supplementary content (prev/next, etc.)
 - `right_sidebar` — TOC, backlinks
 
 When decomposing or extending templates, maintain these blocks so user template overrides continue to work.
-
-## Feature Implementation Workflow
-
-Phase B work is one feature per PR. Implement → open PR → get reviewed → merge → move to next feature.
-
-**REQUIRED** — every feature implementation MUST follow these steps:
-
-1. **Before starting**: Check `plans/features/README.md` and the feature's spec doc (`plans/features/NN-*.md`)
-2. **When starting**: Update `plans/implementation.md` to mark the feature as in progress
-3. **After completing**: Update all of these before considering the feature done:
-   - `plans/implementation.md` — mark checklist items as complete
-   - `plans/features/README.md` — update feature status and Quartz reference checklist
-   - Feature spec doc (if one exists) — update status to reflect completion
-4. **Before opening a PR**: Run `just ci` — all lint and tests must pass
-5. **Open a PR** and wait for review before starting the next feature

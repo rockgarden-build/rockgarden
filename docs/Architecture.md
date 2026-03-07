@@ -29,7 +29,11 @@ Each build is a full rebuild. The build pipeline is:
 
 See [[Build Hooks]] for hook configuration and usage.
 
-**Current implementation:** Markdown files only; in-memory store. Collections ([Feature 14](../plans/features/14-collections.md)) are not yet implemented.
+The content store supports markdown, YAML, JSON, and TOML files. Collections partition content into named subsets with optional Pydantic schema validation, custom templates, URL patterns, and page generation.
+
+### Future: Plugins
+
+The architecture is designed to support a future plugin system. Plugins would be project-local behavioral extensions in `_plugins/<name>/`, able to register build hooks, Jinja2 template filters, markdown-it-py extensions, and CLI subcommands. Themes and plugins are separate concepts — a theme handles presentation while a plugin handles behavior. This is not yet implemented.
 
 ## Design Principles
 

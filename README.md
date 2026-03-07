@@ -135,3 +135,11 @@ just css       # compile Tailwind CSS
 ## Requirements
 
 Python 3.13+
+
+## Contributing
+
+Contributions welcome — please open an issue before submitting PRs. See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
