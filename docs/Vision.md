@@ -43,4 +43,4 @@ This model supports the simple case (a folder of markdown) to the complex case (
 
 ## Acknowledgements
 
-Rockgarden was inspired by [Quartz](https://quartz.jzhao.xyz/), a static site generator for Obsidian vaults. When I found myself increasingly customizing my installation I decided to start building my own implementation, with the features I always wanted in a static site generator.
+Rockgarden was inspired by [Quartz](https://quartz.jzhao.xyz/), a static site generator for Obsidian vaults. Check it out as it might be more appropriate for your use case. When I found myself increasingly customizing my installation I decided to start building my own implementation, with the features I always wanted in a static site generator.
