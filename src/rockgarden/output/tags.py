@@ -40,14 +40,13 @@ def build_tag_pages(
     tags_root_template = env.get_template("tags_root.html")
 
     def _page_entry(p: Page) -> dict:
+        raw_tags = p.frontmatter.get("tags", [])
+        if isinstance(raw_tags, str):
+            raw_tags = [raw_tags]
         return {
             "title": p.title,
             "url": get_url(p.slug, clean_urls, base_path),
-            "tags": [
-                normalize_tag(t)
-                for t in p.frontmatter.get("tags", [])
-                if normalize_tag(t)
-            ],
+            "tags": [normalize_tag(t) for t in raw_tags if normalize_tag(t)],
         }
 
     def _sorted_entries(pages: list[Page]) -> list[dict]:
