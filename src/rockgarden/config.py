@@ -86,6 +86,15 @@ class DatesConfig(BaseModel):
     timezone: str = "UTC"
 
 
+class FeedConfig(BaseModel):
+    """Atom feed configuration."""
+
+    enabled: bool = True
+    path: str = "/feed.xml"
+    limit: int = 20
+    include_paths: list[str] = Field(default_factory=list)
+
+
 class HooksConfig(BaseModel):
     """Build hook commands executed at lifecycle stages."""
 
@@ -116,6 +125,7 @@ class Config(BaseModel):
     toc: TocConfig = Field(default_factory=TocConfig)
     search: SearchConfig = Field(default_factory=SearchConfig)
     dates: DatesConfig = Field(default_factory=DatesConfig)
+    feed: FeedConfig = Field(default_factory=FeedConfig)
     hooks: HooksConfig = Field(default_factory=HooksConfig)
     collections: list[CollectionConfig] = Field(default_factory=list)
 

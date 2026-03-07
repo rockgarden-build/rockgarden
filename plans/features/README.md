@@ -28,7 +28,7 @@ The [PyOhio static website](https://github.com/pyohio/static-website) (Astro + P
 | 08 | [Search](08-search.md) | ✅ | A | Client-side search |
 | 09 | [Macros](09-macros.md) | ✅ | C | User-defined Jinja2 macros |
 | 10 | [Progressive Customization](10-progressive-customization.md) | ✅ | B | Config separation, layout system, theme export |
-| 11 | [RSS Feed](11-rss-feed.md) | ❌ | C | RSS/Atom feed generation |
+| 11 | [RSS Feed](11-rss-feed.md) | ✅ | C | Atom feed generation |
 | 12 | [Base Path Prefix](12-base-path-prefix.md) | ✅ | B | Deploy to subdirectories |
 | 13 | [Polish](13-polish.md) | ✅ | A | Sitemap, 404, TOC, build info, timing |
 | 14 | [Collections](14-collections.md) | ✅ | B | Unified content model, progressive collections |
@@ -73,7 +73,7 @@ From test vaults' Quartz configs:
 - [x] Folder pages
 - [ ] Tag pages
 - [x] Sitemap
-- [ ] RSS feed
+- [x] RSS feed
 
 **Customizations found:**
 - [ ] `BeyondLink` component (frontmatter-driven D&D Beyond links)
