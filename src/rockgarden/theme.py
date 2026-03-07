@@ -11,46 +11,25 @@ _PACKAGE_DIR = Path(__file__).resolve().parent
 
 _THEME_NAME_RE = re.compile(r"^[a-zA-Z0-9_-]+$")
 
-_TAILWIND_CONFIG = """\
-/** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: ["./**/*.html"],
-  theme: {
-    extend: {
-      typography: {
-        DEFAULT: {
-          css: {
-            maxWidth: "none",
-          },
-        },
-      },
-    },
-  },
-  plugins: [require("@tailwindcss/typography"), require("daisyui")],
-  daisyui: {
-    themes: true,
-  },
-};
-"""
-
 _PACKAGE_JSON = (
     json.dumps(
         {
             "private": True,
             "scripts": {
                 "build:css": (
-                    "npx tailwindcss -i static-src/input.css"
+                    "npx @tailwindcss/cli -i static-src/input.css"
                     " -o static/rockgarden.css --minify"
                 ),
                 "watch:css": (
-                    "npx tailwindcss -i static-src/input.css"
+                    "npx @tailwindcss/cli -i static-src/input.css"
                     " -o static/rockgarden.css --watch"
                 ),
             },
             "devDependencies": {
+                "@tailwindcss/cli": "^4.1.0",
                 "@tailwindcss/typography": "^0.5.16",
-                "daisyui": "^4.12.14",
-                "tailwindcss": "^3.4.17",
+                "daisyui": "^5.5.19",
+                "tailwindcss": "^4.1.0",
             },
         },
         indent=2,
@@ -104,7 +83,6 @@ def export_theme(dest: Path) -> dict:
         shutil.copy2(input_css_src, static_src_dest / "input.css")
 
         # Build tooling
-        (dest / "tailwind.config.js").write_text(_TAILWIND_CONFIG)
         (dest / "package.json").write_text(_PACKAGE_JSON)
 
         # Theme manifest

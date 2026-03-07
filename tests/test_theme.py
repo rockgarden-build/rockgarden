@@ -89,7 +89,6 @@ class TestThemeExport:
         assert (dest / "components").is_dir()
         assert (dest / "static" / "rockgarden.css").exists()
         assert (dest / "static-src" / "input.css").exists()
-        assert (dest / "tailwind.config.js").exists()
         assert (dest / "package.json").exists()
         assert (dest / "theme.toml").exists()
 

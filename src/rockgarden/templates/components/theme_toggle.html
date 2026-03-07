@@ -10,7 +10,7 @@
         {% for theme in site.daisyui_themes %}
         <li>
             <button class="theme-option" data-theme="{{ theme }}">
-                <span class="theme-preview rounded-sm w-4 h-4" data-theme="{{ theme }}" style="background: linear-gradient(135deg, oklch(var(--p)) 50%, oklch(var(--s)) 50%);"></span>
+                <span class="theme-preview rounded-sm w-4 h-4" data-theme="{{ theme }}" style="background: linear-gradient(135deg, var(--color-primary) 50%, var(--color-secondary) 50%);"></span>
                 {{ theme }}
             </button>
         </li>
