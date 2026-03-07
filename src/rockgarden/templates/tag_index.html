@@ -16,13 +16,11 @@
             <h1 class="text-3xl font-bold mb-6">#{{ tag }}</h1>
             <p class="text-base-content/60 mb-6">{{ pages | length }} {{ "page" if pages | length == 1 else "pages" }}</p>
             {% if pages %}
-            <ul class="space-y-2">
+            <div class="divide-y divide-base-content/10">
                 {% for entry in pages %}
-                <li>
-                    <a href="{{ entry.url }}" class="link link-hover link-primary text-lg">{{ entry.title }}</a>
-                </li>
+                {% include "components/page_list_item.html" %}
                 {% endfor %}
-            </ul>
+            </div>
             {% endif %}
         </article>
     </div>

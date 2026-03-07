@@ -1,0 +1,9 @@
+<div class="flex items-baseline gap-4 py-2">
+  <time class="text-sm text-base-content/50 shrink-0 w-28">{{ entry.date | format_datetime }}</time>
+  <a href="{{ entry.url }}" class="font-bold link link-hover link-primary flex-1 min-w-0">{{ entry.title }}</a>
+  <div class="flex flex-wrap gap-1 justify-end">
+    {% for tag_slug in entry.tags %}
+    <a href="{{ tag_url(tag_slug) }}" class="badge badge-sm badge-ghost hover:badge-primary">#{{ tag_slug }}</a>
+    {% endfor %}
+  </div>
+</div>

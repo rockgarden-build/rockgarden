@@ -13,16 +13,20 @@
         </nav>
         <article>
             <h1 class="text-3xl font-bold mb-6">Tags</h1>
-            {% if tags %}
-            <div class="flex flex-wrap gap-3">
-                {% for tag_slug, count in tags.items() %}
-                <a href="{{ tag_url(tag_slug) }}" class="badge badge-lg badge-ghost hover:badge-primary gap-1">
-                    #{{ tag_slug }}
-                    <span class="text-base-content/50 text-xs">{{ count }}</span>
-                </a>
-                {% endfor %}
-            </div>
-            {% endif %}
+            <p class="text-base-content/60 mb-8">{{ tags | length }} {{ "tag" if tags | length == 1 else "tags" }}</p>
+            {% for tag_slug, entries in tags.items() %}
+            <section class="mb-10" id="{{ tag_slug }}">
+                <h2 class="text-xl font-bold mb-1">
+                    <a href="{{ tag_url(tag_slug) }}" class="badge badge-lg badge-ghost hover:badge-primary">#{{ tag_slug }}</a>
+                </h2>
+                <p class="text-base-content/50 text-sm mb-3">{{ entries | length }} {{ "page" if entries | length == 1 else "pages" }}</p>
+                <div class="divide-y divide-base-content/10">
+                    {% for entry in entries %}
+                    {% include "components/page_list_item.html" %}
+                    {% endfor %}
+                </div>
+            </section>
+            {% endfor %}
         </article>
     </div>
 </div>
