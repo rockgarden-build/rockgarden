@@ -12,3 +12,7 @@ nav_default_state = "expanded"
 
 [nav]
 sort = "files-first"
+
+[[nav.links]]
+label = "Tags"
+url = "/tags/"

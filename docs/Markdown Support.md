@@ -1,5 +1,5 @@
 ---
-tags: [markdown]
+tags: [markdown, reference]
 ---
 
 # Markdown Syntax Support

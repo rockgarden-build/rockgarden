@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from fnmatch import fnmatch
 
-from rockgarden.config import NavConfig
+from rockgarden.config import NavConfig, NavLinkConfig
 from rockgarden.content import Page
 from rockgarden.nav.labels import resolve_label
 from rockgarden.urls import get_folder_url, get_url
@@ -22,6 +22,7 @@ class NavNode:
     children: list[NavNode] = field(default_factory=list)
     nav_order: int | None = None
     index_path: str | None = None
+    is_external: bool = False
 
 
 def _should_hide(path: str, hide_patterns: list[str]) -> bool:
@@ -205,3 +206,45 @@ def build_nav_tree(
         is_folder=True,
         children=root_children,
     )
+
+
+def _is_external_url(url: str) -> bool:
+    return url.startswith("http://") or url.startswith("https://")
+
+
+def convert_nav_links(links: list[NavLinkConfig]) -> list[NavNode]:
+    """Convert NavLinkConfig entries into NavNode objects."""
+    nodes = []
+    for link in links:
+        children = convert_nav_links(link.children) if link.children else []
+        is_external = _is_external_url(link.url)
+        nodes.append(
+            NavNode(
+                name=link.label,
+                path=link.url,
+                label=link.label,
+                is_folder=bool(children),
+                children=children,
+                is_external=is_external,
+                index_path=link.url if children and link.url else None,
+            ),
+        )
+    return nodes
+
+
+def inject_nav_links(
+    root: NavNode,
+    links: list[NavLinkConfig],
+    position: str,
+    sort_strategy: str = "files-first",
+) -> None:
+    """Insert custom nav link nodes into the root's children."""
+    if not links:
+        return
+    link_nodes = convert_nav_links(links)
+    if position == "before":
+        root.children = link_nodes + root.children
+    elif position == "mixed":
+        root.children = _sort_nav_nodes(root.children + link_nodes, sort_strategy)
+    else:  # "after"
+        root.children = root.children + link_nodes
