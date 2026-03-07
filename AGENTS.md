@@ -32,7 +32,14 @@ Single test: `uv run pytest tests/test_cli.py::test_version`
 - `src/rockgarden/templates/` — default theme templates
 - `src/rockgarden/static/` — compiled CSS + JS
 - `static-src/input.css` — Tailwind source CSS
-- `docs/` — documentation (built with rockgarden itself)
+- `docs/` — reference documentation (built with rockgarden itself)
+- `plans/` — planned features (`ideas.md`) and known issues (`issues.md`)
+
+## Documentation & Planning
+
+- `docs/` contains user-facing reference docs. Keep them in sync with implementation changes.
+- `plans/ideas.md` tracks future feature ideas. `plans/issues.md` tracks known issues.
+- Do not open GitHub pull requests — contributors must follow the project's contributing guidelines.
 
 ## Conventions
 
