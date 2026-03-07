@@ -16,10 +16,10 @@
             <p class="text-base-content/60 mb-8">{{ tags | length }} {{ "tag" if tags | length == 1 else "tags" }}</p>
             {% for tag_slug, entries in tags.items() %}
             <section class="mb-10" id="{{ tag_slug }}">
-                <h2 class="text-xl font-bold mb-1">
+                <h2 class="text-xl font-bold mb-3">
                     <a href="{{ tag_url(tag_slug) }}" class="badge badge-lg badge-ghost hover:badge-primary">#{{ tag_slug }}</a>
+                    <span class="text-base-content/50 text-sm font-normal">({{ entries | length }})</span>
                 </h2>
-                <p class="text-base-content/50 text-sm mb-3">{{ entries | length }} {{ "page" if entries | length == 1 else "pages" }}</p>
                 <div>
                     {% for entry in entries %}
                     {% include "components/page_list_item.html" %}
