@@ -37,3 +37,7 @@ This model unifies the simple case (a folder of markdown) with the complex case 
 - **Custom behavior is additive.** The core handles the common case. Customizations layer on top without modifying source content.
 - **Build stays fast.** External data fetching is separate from the build pipeline. Watch mode rebuilds from local files only.
 - **No lock-in.** Content is plain files on disk. There is no proprietary format or database.
+
+## Acknowledgements
+
+Rockgarden was inspired by [Quartz](https://quartz.jzhao.xyz/), a static site generator for Obsidian vaults. When I found myself increasingly customizing my installation I decided to start building my own implementation, with the features I always wanted in a static site generator.
