@@ -38,6 +38,7 @@ from rockgarden.nav import (
     build_nav_tree,
     extract_toc,
     generate_folder_indexes,
+    inject_nav_links,
 )
 from rockgarden.obsidian import (
     process_callouts,
@@ -498,6 +499,10 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
             children=children,
         )
         nav_tree.children.append(col_node)
+
+    inject_nav_links(
+        nav_tree, config.nav.links, config.nav.links_position, config.nav.sort
+    )
 
     # Generate collection pages (nav tree is fully populated at this point).
     collection_page_entries = build_collection_pages(

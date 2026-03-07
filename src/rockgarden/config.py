@@ -56,6 +56,17 @@ class ThemeConfig(BaseModel):
     show_build_commit: bool = False
 
 
+class NavLinkConfig(BaseModel):
+    """A custom navigation link entry (supports nesting)."""
+
+    label: str
+    url: str = ""
+    children: list["NavLinkConfig"] = Field(default_factory=list)
+
+
+NavLinkConfig.model_rebuild()
+
+
 class NavConfig(BaseModel):
     """Navigation structure configuration."""
 
@@ -63,6 +74,8 @@ class NavConfig(BaseModel):
     labels: dict[str, str] = Field(default_factory=dict)
     sort: str = "files-first"
     link_auto_index: bool = False
+    links: list[NavLinkConfig] = Field(default_factory=list)
+    links_position: str = "after"
 
 
 class TocConfig(BaseModel):

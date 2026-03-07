@@ -2,9 +2,10 @@
 
 from pathlib import Path
 
-from rockgarden.config import NavConfig
+from rockgarden.config import NavConfig, NavLinkConfig
 from rockgarden.content import Page
 from rockgarden.nav import build_nav_tree
+from rockgarden.nav.tree import convert_nav_links, inject_nav_links
 
 
 def make_page(
@@ -299,3 +300,92 @@ class TestSortConfig:
         assert tree.children[0].label == "Alpha"
         assert tree.children[1].is_folder is True
         assert tree.children[2].label == "Zebra"
+
+
+class TestConvertNavLinks:
+    def test_simple_link(self):
+        links = [NavLinkConfig(label="Tags", url="/tags/")]
+        nodes = convert_nav_links(links)
+        assert len(nodes) == 1
+        assert nodes[0].label == "Tags"
+        assert nodes[0].path == "/tags/"
+        assert nodes[0].is_external is False
+        assert nodes[0].is_folder is False
+
+    def test_external_link(self):
+        links = [NavLinkConfig(label="GitHub", url="https://github.com/example")]
+        nodes = convert_nav_links(links)
+        assert nodes[0].is_external is True
+
+    def test_http_external(self):
+        links = [NavLinkConfig(label="Old Site", url="http://example.com")]
+        nodes = convert_nav_links(links)
+        assert nodes[0].is_external is True
+
+    def test_nested_links(self):
+        links = [
+            NavLinkConfig(
+                label="Resources",
+                children=[
+                    NavLinkConfig(label="GitHub", url="https://github.com/example"),
+                    NavLinkConfig(label="Docs", url="/docs/"),
+                ],
+            )
+        ]
+        nodes = convert_nav_links(links)
+        assert len(nodes) == 1
+        assert nodes[0].is_folder is True
+        assert nodes[0].index_path is None
+        assert len(nodes[0].children) == 2
+        assert nodes[0].children[0].label == "GitHub"
+        assert nodes[0].children[0].is_external is True
+        assert nodes[0].children[1].label == "Docs"
+        assert nodes[0].children[1].is_external is False
+
+    def test_nested_with_url(self):
+        links = [
+            NavLinkConfig(
+                label="Resources",
+                url="/resources/",
+                children=[NavLinkConfig(label="Sub", url="/sub/")],
+            )
+        ]
+        nodes = convert_nav_links(links)
+        assert nodes[0].index_path == "/resources/"
+
+
+class TestInjectNavLinks:
+    def _make_tree(self):
+        pages = [
+            make_page("alpha", "Alpha"),
+            make_page("beta", "Beta"),
+        ]
+        return build_nav_tree(pages)
+
+    def test_after_position(self):
+        tree = self._make_tree()
+        links = [NavLinkConfig(label="Tags", url="/tags/")]
+        inject_nav_links(tree, links, "after")
+        assert tree.children[-1].label == "Tags"
+        assert tree.children[0].label == "Alpha"
+
+    def test_before_position(self):
+        tree = self._make_tree()
+        links = [NavLinkConfig(label="Tags", url="/tags/")]
+        inject_nav_links(tree, links, "before")
+        assert tree.children[0].label == "Tags"
+        assert tree.children[1].label == "Alpha"
+
+    def test_mixed_position(self):
+        tree = self._make_tree()
+        links = [NavLinkConfig(label="AAA Link", url="/aaa/")]
+        inject_nav_links(tree, links, "mixed")
+        assert tree.children[0].label == "AAA Link"
+        assert tree.children[1].label == "Alpha"
+        assert tree.children[2].label == "Beta"
+
+    def test_empty_links_noop(self):
+        tree = self._make_tree()
+        original_children = list(tree.children)
+        inject_nav_links(tree, [], "after")
+        assert tree.children == original_children

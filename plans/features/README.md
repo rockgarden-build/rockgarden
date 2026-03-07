@@ -71,7 +71,7 @@ From test vaults' Quartz configs:
 **Output:**
 - [x] Content pages
 - [x] Folder pages
-- [ ] Tag pages
+- [x] Tag pages
 - [x] Sitemap
 - [x] RSS feed
 
