@@ -24,6 +24,7 @@ Future ideas and research notes. Not currently planned.
 - **Hover previews** — popover preview of linked page on hover
 - **Graph visualization** — interactive graph view of page links (see `features/graph-view.md`)
 - **Reading time** — estimated reading time per page (word count / ~230 WPM)
+- **Social links** — configurable list of social/external links with icons (e.g. GitHub, Mastodon, Bluesky) displayed in nav or footer. Could use bundled Lucide icons or allow custom SVGs.
 
 ## Extensibility
 
