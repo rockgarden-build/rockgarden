@@ -60,6 +60,6 @@ rockgarden init
 
 ## Next Steps
 
-- [[Customization]]:custom CSS, templates, themes, and more
-- [[Configuration]]:full configuration reference
-- [[Markdown Support]]:supported syntax reference
+- [[Customization]]: custom CSS, templates, themes, and more
+- [[Configuration]]: full configuration reference
+- [[Markdown Support]]: supported syntax reference
