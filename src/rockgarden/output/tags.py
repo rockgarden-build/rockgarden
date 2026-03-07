@@ -53,8 +53,10 @@ def build_tag_pages(
         entries = [_page_entry(p) for p in pages]
         return sorted(entries, key=lambda e: e["title"])
 
+    tags_data: dict[str, list[dict]] = {}
     for tag_slug, tagged_pages in tags.items():
         page_entries = _sorted_entries(tagged_pages)
+        tags_data[tag_slug] = page_entries
         html = tag_index_template.render(
             tag=tag_slug,
             pages=page_entries,
@@ -67,8 +69,6 @@ def build_tag_pages(
             out_file = output / "tags" / f"{tag_slug}.html"
         out_file.parent.mkdir(parents=True, exist_ok=True)
         out_file.write_text(html)
-
-    tags_data = {slug: _sorted_entries(pages) for slug, pages in tags.items()}
     html = tags_root_template.render(
         tags=tags_data,
         site=site_config,
