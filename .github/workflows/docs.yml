@@ -33,6 +33,7 @@ jobs:
         run: rockgarden build --source docs/ --output _site/ --clean
 
       - name: Deploy to Cloudflare Pages
+        if: github.actor != 'dependabot[bot]'
         id: deploy
         uses: cloudflare/wrangler-action@v3
         with:
@@ -42,7 +43,7 @@ jobs:
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Comment preview URL on PR
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           URL: ${{ steps.deploy.outputs.deployment-url }}
