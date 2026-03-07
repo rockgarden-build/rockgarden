@@ -30,4 +30,4 @@ Add custom CSS, override templates, create themes, and more — progressively, o
 
 ## Contributing
 
-Contributions may be welcome if they fit the vision of this project. Please open an issue before submitting PRs. See [CONTRIBUTING.md](https://github.com/tylerdave/rockgarden/blob/main/CONTRIBUTING.md) for details.
+Contributions may be welcome if they fit the vision of this project. Please open an issue before submitting PRs. See [CONTRIBUTING.md](https://github.com/rockgarden-build/rockgarden/blob/main/CONTRIBUTING.md) for details.
