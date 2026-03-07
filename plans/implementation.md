@@ -129,7 +129,7 @@ One feature per PR. All items complete.
 ## Phase C: Enhanced Features
 
 - [x] **Feature 09: Macros** — User-defined Jinja2 macros
-- [ ] **Feature 11: RSS Feed** — RSS/Atom feed generation
+- [x] **Feature 11: Atom Feed** — Atom feed generation
 
 ## Future / Deferred
 

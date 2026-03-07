@@ -2,7 +2,7 @@
 
 Generate RSS/Atom feed for content updates.
 
-## Status: Not Started
+## Status: Complete
 
 ## Goal
 

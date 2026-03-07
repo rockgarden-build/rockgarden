@@ -17,6 +17,7 @@ from rockgarden.assets import (
 from rockgarden.config import Config
 from rockgarden.content import (
     ContentStore,
+    Page,
     build_link_index,
     entry_fields,
     generate_collection_url,
@@ -45,6 +46,7 @@ from rockgarden.obsidian import (
     process_wikilinks,
 )
 from rockgarden.output.build_info import get_build_info
+from rockgarden.output.feed import build_atom_feed
 from rockgarden.output.search import build_search_index, strip_html
 from rockgarden.output.sitemap import build_sitemap
 from rockgarden.output.tags import build_tag_pages, collect_tags
@@ -453,6 +455,8 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         "cache_hash": cache_hash,
         "user_styles": user_styles,
         "user_scripts": user_scripts,
+        "feed_enabled": config.feed.enabled and bool(config.site.base_url),
+        "feed_path": config.feed.path,
     }
 
     show_index_map = {}
@@ -687,6 +691,34 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
             pages, rendered_folder_indexes, config.site.base_url, clean_urls
         )
         (output / "sitemap.xml").write_text(sitemap_xml)
+
+    # Generate Atom feed if base_url is configured and feed enabled
+    if config.site.base_url and config.feed.enabled:
+        feed_pages = pages
+        if config.feed.collections:
+            feed_pages = [
+                entry
+                for col_name in config.feed.collections
+                if col_name in collections
+                for entry in collections[col_name].entries
+                if isinstance(entry, Page)
+            ]
+        feed_xml = build_atom_feed(
+            feed_pages,
+            config.site.title,
+            config.site.description,
+            config.site.base_url,
+            clean_urls,
+            base_path,
+            config.feed.path,
+            config.feed.limit,
+            config.feed.author,
+            config.feed.include_paths or None,
+        )
+        feed_path = config.feed.path.lstrip("/")
+        feed_file = output / feed_path
+        feed_file.parent.mkdir(parents=True, exist_ok=True)
+        feed_file.write_text(feed_xml)
 
     # Generate 404 page
     not_found_template = env.get_template("404.html")
