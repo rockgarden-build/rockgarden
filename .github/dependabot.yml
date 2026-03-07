@@ -4,17 +4,26 @@ updates:
     directory: /
     schedule:
       interval: weekly
+      day: friday
+      time: "12:00"
+      timezone: America/New_York
     commit-message:
       prefix: "build"
   - package-ecosystem: npm
     directory: /
     schedule:
       interval: weekly
+      day: friday
+      time: "12:00"
+      timezone: America/New_York
     commit-message:
       prefix: "build"
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
+      day: friday
+      time: "12:00"
+      timezone: America/New_York
     commit-message:
       prefix: "build"
