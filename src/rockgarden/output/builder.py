@@ -17,6 +17,7 @@ from rockgarden.assets import (
 from rockgarden.config import Config
 from rockgarden.content import (
     ContentStore,
+    Page,
     build_link_index,
     entry_fields,
     generate_collection_url,
@@ -693,8 +694,17 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
 
     # Generate Atom feed if base_url is configured and feed enabled
     if config.site.base_url and config.feed.enabled:
+        feed_pages = pages
+        if config.feed.collections:
+            feed_pages = [
+                entry
+                for col_name in config.feed.collections
+                if col_name in collections
+                for entry in collections[col_name].entries
+                if isinstance(entry, Page)
+            ]
         feed_xml = build_atom_feed(
-            pages,
+            feed_pages,
             config.site.title,
             config.site.description,
             config.site.base_url,

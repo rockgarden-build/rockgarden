@@ -89,10 +89,11 @@ class DatesConfig(BaseModel):
 class FeedConfig(BaseModel):
     """Atom feed configuration."""
 
-    enabled: bool = True
+    enabled: bool = False
     path: str = "/feed.xml"
     limit: int = 20
     include_paths: list[str] = Field(default_factory=list)
+    collections: list[str] = Field(default_factory=list)
 
 
 class HooksConfig(BaseModel):
