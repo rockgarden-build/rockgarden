@@ -132,6 +132,6 @@ This ensures:
 
 ### Not Planned
 
-- Canvas files (`.canvas`) — binary format, not markdown
-- Dataview queries — requires runtime evaluation
-- Plugin-specific syntax — too varied to support generically
+- Canvas files (`.canvas`): binary format, not markdown
+- Dataview queries: requires runtime evaluation
+- Plugin-specific syntax: too varied to support generically
