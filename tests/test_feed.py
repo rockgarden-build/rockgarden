@@ -103,12 +103,13 @@ class TestBuildAtomFeed:
         entry = root.find(_ns("entry"))
         assert "2026-02-15" in entry.find(_ns("updated")).text
 
-    def test_entry_no_updated_when_no_date(self):
+    def test_entry_updated_fallback_when_no_date(self):
         pages = [self._make_page("p")]
         result = build_atom_feed(pages, "Site", "", "https://example.com")
         root = fromstring(result)
         entry = root.find(_ns("entry"))
-        assert entry.find(_ns("updated")) is None
+        assert entry.find(_ns("updated")) is not None
+        assert entry.find(_ns("updated")).text == root.find(_ns("updated")).text
 
     def test_entry_content(self):
         pages = [self._make_page("p", html="<p>Hello</p>")]

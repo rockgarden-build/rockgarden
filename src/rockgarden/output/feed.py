@@ -100,8 +100,9 @@ def build_atom_feed(
         if dt:
             most_recent = dt
             break
+    feed_updated = most_recent or datetime.now(tz=UTC)
     updated_el = SubElement(feed, "updated")
-    updated_el.text = _format_rfc3339(most_recent or datetime.now(tz=UTC))
+    updated_el.text = _format_rfc3339(feed_updated)
 
     for page in entries:
         entry_el = SubElement(feed, "entry")
@@ -115,10 +116,9 @@ def build_atom_feed(
         entry_id = SubElement(entry_el, "id")
         entry_id.text = page_url
 
-        dt = _get_date(page)
-        if dt:
-            entry_updated = SubElement(entry_el, "updated")
-            entry_updated.text = _format_rfc3339(dt)
+        # atom:updated is required per RFC 4287 §4.1.2
+        entry_updated = SubElement(entry_el, "updated")
+        entry_updated.text = _format_rfc3339(_get_date(page) or feed_updated)
 
         if page.html:
             content_el = SubElement(entry_el, "content", type="html")

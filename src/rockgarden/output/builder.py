@@ -715,7 +715,9 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
             config.feed.include_paths or None,
         )
         feed_path = config.feed.path.lstrip("/")
-        (output / feed_path).write_text(feed_xml)
+        feed_file = output / feed_path
+        feed_file.parent.mkdir(parents=True, exist_ok=True)
+        feed_file.write_text(feed_xml)
 
     # Generate 404 page
     not_found_template = env.get_template("404.html")
