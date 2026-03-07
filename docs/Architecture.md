@@ -53,7 +53,10 @@ rockgarden/
 │   ├── assets.py           # Media index + asset copying
 │   ├── urls.py             # URL/slug generation
 │   ├── links.py            # Markdown link transformation
-│   ├── icons.py            # Icon resolution
+│   ├── icons/              # Icon resolution
+│   ├── macros.py           # User-defined Jinja2 macros
+│   ├── theme.py            # Theme export utilities
+│   ├── validation.py       # Config validation
 │   ├── content/
 │   │   ├── store.py        # ContentStore (in-memory)
 │   │   ├── loader.py       # File discovery + frontmatter parsing
@@ -75,6 +78,7 @@ rockgarden/
 │   │   ├── builder.py      # Build orchestration
 │   │   ├── build_info.py   # Build timestamp + git info
 │   │   ├── search.py       # Search index generation
+│   │   ├── feed.py         # Atom feed generation
 │   │   ├── sitemap.py      # Sitemap XML generation
 │   │   └── tags.py         # Tag index page generation
 │   ├── templates/          # Default theme templates
@@ -92,6 +96,7 @@ The build produces these pages and artifacts:
 - **Tag index pages:** `/tags/` root listing all tags, plus `/tags/<tag>/` per tag
 - **Search index:** `search-index.json` for client-side search
 - **Sitemap:** `sitemap.xml` (when `site.base_url` is set)
+- **Atom feed:** `feed.xml` (when `feed.enabled` is set and `site.base_url` is configured)
 - **404 page:** always generated; override via `_templates/404.html`
 
 ## Core vs. Default Theme
@@ -113,7 +118,7 @@ The core provides no visible output on its own — it depends on a theme to supp
 Shipped bundled in the package, active with zero config:
 
 - **Templates:** `base.html`, `page.html`, `folder_index.html`, `404.html`, component templates
-- **Layouts:** `layouts/docs.html` with drawer/sidebar layout and mobile hamburger nav
+- **Layouts:** `layouts/default.html` with drawer/sidebar layout and mobile hamburger nav
 - **CSS:** compiled Tailwind + DaisyUI + callout/link/search styles (`rockgarden.css`)
 - **Search UI:** lunr.js + search component + client-side JavaScript
 - **Theme switching:** DaisyUI color palette toggle
@@ -127,10 +132,11 @@ Config options in `[theme]` are display/rendering concerns — a custom theme ma
 [site]          # title, description, og_image, source, output, clean_urls, base_url
 [build]         # ignore_patterns, icons_dir
 [hooks]         # pre_build, post_collect, post_build
-[nav]           # hide, labels, sort, link_auto_index
+[nav]           # hide, labels, sort, link_auto_index, links, links_position
 [toc]           # max_depth
 [search]        # include_content
 [dates]         # date field names
+[feed]          # Atom feed generation
 
 # Theme: display/rendering concerns
 [theme]
@@ -229,7 +235,7 @@ layout: talk # resolves to layouts/talk.html
 ---
 ```
 
-Resolution order: frontmatter `layout` → collection default → `[theme] default_layout` → `layouts/docs.html`.
+Resolution order: frontmatter `layout` → collection default → `[theme] default_layout` → `layouts/default.html`.
 
 ### Theme export
 

@@ -26,7 +26,7 @@ Point rockgarden at any directory of markdown files:
 rockgarden build
 ```
 
-By default, rockgarden reads markdown from the current directory and writes HTML to `./site/`. No configuration required: it handles Obsidian wiki-links, embeds, and callouts automatically.
+By default, rockgarden reads markdown from the current directory and writes HTML to `./_site/`. No configuration required: it handles Obsidian wiki-links, embeds, and callouts automatically.
 
 Preview the result:
 

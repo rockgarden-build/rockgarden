@@ -34,7 +34,7 @@ Theme-specific display and rendering options. These are supported by the default
 | Field               | Type        | Default       | Description                                                                                                                                                             |
 | ------------------- | ----------- | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `name`              | `str`       | `""`          | Theme directory name under `_themes/`. Empty = bundled default theme.                                                                                                   |
-| `default_layout`    | `str`       | `""`          | Default layout template for pages (e.g. `"docs"`). Resolved to `layouts/<value>.html`. Per-page `layout` frontmatter overrides this. Falls back to `layouts/docs.html`. |
+| `default_layout`    | `str`       | `""`          | Default layout template for pages (e.g. `"wide"`). Resolved to `layouts/<value>.html`. Per-page `layout` frontmatter overrides this. Falls back to `layouts/default.html`. |
 | `toc`               | `bool`      | `true`        | Show table of contents panel                                                                                                                                            |
 | `backlinks`         | `bool`      | `true`        | Show backlinks panel                                                                                                                                                    |
 | `search`            | `bool`      | `true`        | Enable search UI and index generation                                                                                                                                   |
@@ -53,6 +53,21 @@ Theme-specific display and rendering options. These are supported by the default
 | `labels`          | `dict`      | `{}`            | Custom labels for paths (e.g. `{"/api" = "API Reference"}`)         |
 | `sort`            | `str`       | `"files-first"` | Sort order: `"files-first"`, `"folders-first"`, or `"alphabetical"` |
 | `link_auto_index` | `bool`      | `false`         | Make folders with `index.md` clickable links in nav                 |
+| `links`           | `list`      | `[]`            | Custom navigation links. Each entry has `label`, `url`, and optional `children` (same structure, nested) |
+| `links_position`  | `str`       | `"after"`       | Where to place custom links relative to directory nav: `"before"` or `"after"` |
+
+## `[feed]`
+
+Atom feed generation. Requires `site.base_url` to be set.
+
+| Field           | Type        | Default        | Description                                                              |
+| --------------- | ----------- | -------------- | ------------------------------------------------------------------------ |
+| `enabled`       | `bool`      | `false`        | Enable Atom feed generation                                              |
+| `path`          | `str`       | `"/feed.xml"`  | Output path for the feed file                                            |
+| `limit`         | `int`       | `20`           | Maximum number of entries in the feed                                    |
+| `author`        | `str`       | `""`           | Feed author name                                                         |
+| `include_paths` | `list[str]` | `[]`           | Limit feed to pages under these paths. Empty = all pages.                |
+| `collections`   | `list[str]` | `[]`           | Include entries from these collections in the feed                       |
 
 ## `[toc]`
 
