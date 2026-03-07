@@ -16,3 +16,7 @@ sort = "files-first"
 [[nav.links]]
 label = "Tags"
 url = "/tags/"
+
+[[nav.links]]
+label = "GitHub"
+url = "https://github.com/rockgarden-build"

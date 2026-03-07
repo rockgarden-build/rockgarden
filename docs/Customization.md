@@ -43,7 +43,7 @@ layout: talk
 ---
 ```
 
-This resolves to `layouts/talk.html`. Resolution order: frontmatter `layout` → collection default → `[theme] default_layout` → `layouts/docs.html`.
+This resolves to `layouts/talk.html`. Resolution order: frontmatter `layout` → collection default → `[theme] default_layout` → `layouts/default.html`.
 
 ## Theme Export
 
