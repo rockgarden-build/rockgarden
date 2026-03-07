@@ -17,7 +17,7 @@
             {% for tag_slug, entries in tags.items() %}
             <section class="mb-10" id="{{ tag_slug }}">
                 <h2 class="text-xl font-bold mb-3">
-                    <a href="{{ tag_url(tag_slug) }}" class="badge badge-lg badge-ghost hover:badge-primary gap-2">#{{ tag_slug }} <span class="badge badge-xs badge-neutral">{{ entries | length }}</span></a>
+                    <a href="{{ tag_url(tag_slug) }}" class="badge badge-lg badge-soft badge-primary gap-2">#{{ tag_slug }} <span class="badge badge-xs badge-primary">{{ entries | length }}</span></a>
                 </h2>
                 <div>
                     {% for entry in entries %}
