@@ -30,4 +30,4 @@ Add custom CSS, override templates, create themes, and more — progressively, o
 
 ## Contributing
 
-Rockgarden is open source (MIT). Bug reports, feature requests, and PRs are welcome — open an issue first. See [CONTRIBUTING.md](https://github.com/tylerdave/rockgarden/blob/main/CONTRIBUTING.md) for guidelines.
+Contributions may be welcome if they fit the vision of this project. Please open an issue before submitting PRs. See [CONTRIBUTING.md](https://github.com/tylerdave/rockgarden/blob/main/CONTRIBUTING.md) for details.
