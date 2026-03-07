@@ -1,3 +1,13 @@
+## v0.6.0 (2026-03-07)
+
+### Features
+
+- upgrade to DaisyUI 5 and Tailwind 4 (#50)
+
+### Minor / Bug Fixes
+
+- add explicit nav links (#48)
+
 ## v0.5.3 (2026-03-07)
 
 ### Minor / Bug Fixes
