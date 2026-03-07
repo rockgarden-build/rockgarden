@@ -43,7 +43,6 @@ def build_tag_pages(
         return {
             "title": p.title,
             "url": get_url(p.slug, clean_urls, base_path),
-            "date": p.modified or p.created,
             "tags": [
                 normalize_tag(t)
                 for t in p.frontmatter.get("tags", [])
@@ -53,11 +52,7 @@ def build_tag_pages(
 
     def _sorted_entries(pages: list[Page]) -> list[dict]:
         entries = [_page_entry(p) for p in pages]
-        return sorted(
-            entries,
-            key=lambda e: (e["date"] or "", e["title"]),
-            reverse=True,
-        )
+        return sorted(entries, key=lambda e: e["title"])
 
     for tag_slug, tagged_pages in tags.items():
         page_entries = _sorted_entries(tagged_pages)
