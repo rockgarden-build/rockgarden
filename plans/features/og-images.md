@@ -51,7 +51,7 @@ node scripts/generate_og.js --content .rockgarden/content.json --output _site/og
 
 - **Pros**: Highest quality output (flexbox layout), fast (milliseconds per image), headless/CI-friendly. Node.js already present for Tailwind.
 - **Cons**: Adds JS complexity to what is otherwise a Python tool; users need `npm install`.
-- **Best for**: Sites needing polished, design-forward cards (e.g. PyOhio)
+- **Best for**: Sites needing polished, design-forward cards (e.g. conference sites)
 
 ### Option D: Post-collect hook pattern (most flexible, no built-in)
 
@@ -72,7 +72,7 @@ post_collect = ["python scripts/generate_og_images.py"]
 
 **Two-tier approach:**
 
-1. **Phase B (with hooks)**: Implement build hooks (Feature 15). Document the `post_collect` hook pattern for OG image generation. Provide example scripts — one Pillow-based (simple), one Satori-based (polished). Unblocks PyOhio and advanced users immediately with no new core deps.
+1. **Phase B (with hooks)**: Implement build hooks (Feature 15). Document the `post_collect` hook pattern for OG image generation. Provide example scripts — one Pillow-based (simple), one Satori-based (polished). Unblocks advanced users immediately with no new core deps.
 
 2. **Phase C (built-in)**: Add an opt-in built-in generator using **SVG template → CairoSVG**:
    ```toml

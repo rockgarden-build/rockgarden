@@ -191,6 +191,11 @@ details.callout .callout-content {
     color: oklch(var(--bc) / 0.3);
 }
 
+/* Inline code */
+.prose :where(code):not(:where([class~="not-prose"],[class~="not-prose"] *)) {
+    border-radius: 0;
+}
+
 /* Internal links */
 .internal-link {
     text-decoration: underline;

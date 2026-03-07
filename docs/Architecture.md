@@ -29,7 +29,11 @@ Each build is a full rebuild. The build pipeline is:
 
 See [[Build Hooks]] for hook configuration and usage.
 
-**Current implementation:** Markdown files only; in-memory store. Collections ([Feature 14](../plans/features/14-collections.md)) are not yet implemented.
+The content store supports markdown, YAML, JSON, and TOML files. Collections partition content into named subsets with optional Pydantic schema validation, custom templates, URL patterns, and page generation.
+
+### Future: Plugins
+
+The architecture is designed to support a future plugin system. Plugins would be project-local behavioral extensions in `_plugins/<name>/`, able to register build hooks, Jinja2 template filters, markdown-it-py extensions, and CLI subcommands. Themes and plugins are separate concepts — a theme handles presentation while a plugin handles behavior. This is not yet implemented.
 
 ## Design Principles
 
@@ -49,7 +53,10 @@ rockgarden/
 │   ├── assets.py           # Media index + asset copying
 │   ├── urls.py             # URL/slug generation
 │   ├── links.py            # Markdown link transformation
-│   ├── icons.py            # Icon resolution
+│   ├── icons/              # Icon resolution
+│   ├── macros.py           # User-defined Jinja2 macros
+│   ├── theme.py            # Theme export utilities
+│   ├── validation.py       # Config validation
 │   ├── content/
 │   │   ├── store.py        # ContentStore (in-memory)
 │   │   ├── loader.py       # File discovery + frontmatter parsing
@@ -71,6 +78,7 @@ rockgarden/
 │   │   ├── builder.py      # Build orchestration
 │   │   ├── build_info.py   # Build timestamp + git info
 │   │   ├── search.py       # Search index generation
+│   │   ├── feed.py         # Atom feed generation
 │   │   ├── sitemap.py      # Sitemap XML generation
 │   │   └── tags.py         # Tag index page generation
 │   ├── templates/          # Default theme templates
@@ -83,12 +91,13 @@ rockgarden/
 
 The build produces these pages and artifacts:
 
-- **Content pages** — one per markdown file
-- **Folder index pages** — directory listings
-- **Tag index pages** — `/tags/` root listing all tags, plus `/tags/<tag>/` per tag
-- **Search index** — `search-index.json` for client-side search
-- **Sitemap** — `sitemap.xml` (when `site.base_url` is set)
-- **404 page** — always generated; override via `_templates/404.html`
+- **Content pages:** one per markdown file
+- **Folder index pages:** directory listings
+- **Tag index pages:** `/tags/` root listing all tags, plus `/tags/<tag>/` per tag
+- **Search index:** `search-index.json` for client-side search
+- **Sitemap:** `sitemap.xml` (when `site.base_url` is set)
+- **Atom feed:** `feed.xml` (when `feed.enabled` is set and `site.base_url` is configured)
+- **404 page:** always generated; override via `_templates/404.html`
 
 ## Core vs. Default Theme
 
@@ -96,11 +105,11 @@ The build produces these pages and artifacts:
 
 These are always present regardless of theme:
 
-- **Content ingestion** — markdown loading, frontmatter parsing, Obsidian syntax (wikilinks, embeds, transclusions, callouts)
-- **Content store** — in-memory store, navigation tree, backlinks index, TOC extraction, search index generation, sitemap
-- **Build pipeline** — template rendering, asset copying, tag pages, 404 generation, build hooks, CLI
-- **Template infrastructure** — Jinja2 environment, ChoiceLoader (3-tier resolution), layout system, template context
-- **SEO** — meta tags (description, Open Graph) driven by frontmatter and site config
+- **Content ingestion:** markdown loading, frontmatter parsing, Obsidian syntax (wikilinks, embeds, transclusions, callouts)
+- **Content store:** in-memory store, navigation tree, backlinks index, TOC extraction, search index generation, sitemap
+- **Build pipeline:** template rendering, asset copying, tag pages, 404 generation, build hooks, CLI
+- **Template infrastructure:** Jinja2 environment, ChoiceLoader (3-tier resolution), layout system, template context
+- **SEO:** meta tags (description, Open Graph) driven by frontmatter and site config
 
 The core provides no visible output on its own — it depends on a theme to supply templates and styles.
 
@@ -108,11 +117,11 @@ The core provides no visible output on its own — it depends on a theme to supp
 
 Shipped bundled in the package, active with zero config:
 
-- **Templates** — `base.html`, `page.html`, `folder_index.html`, `404.html`, component templates
-- **Layouts** — `layouts/docs.html` with drawer/sidebar layout and mobile hamburger nav
-- **CSS** — compiled Tailwind + DaisyUI + callout/link/search styles (`rockgarden.css`)
-- **Search UI** — lunr.js + search component + client-side JavaScript
-- **Theme switching** — DaisyUI color palette toggle
+- **Templates:** `base.html`, `page.html`, `folder_index.html`, `404.html`, component templates
+- **Layouts:** `layouts/default.html` with drawer/sidebar layout and mobile hamburger nav
+- **CSS:** compiled Tailwind + DaisyUI + callout/link/search styles (`rockgarden.css`)
+- **Search UI:** lunr.js + search component + client-side JavaScript
+- **Theme switching:** DaisyUI color palette toggle
 
 ### Configuration boundary
 
@@ -123,10 +132,11 @@ Config options in `[theme]` are display/rendering concerns — a custom theme ma
 [site]          # title, description, og_image, source, output, clean_urls, base_url
 [build]         # ignore_patterns, icons_dir
 [hooks]         # pre_build, post_collect, post_build
-[nav]           # hide, labels, sort, link_auto_index
+[nav]           # hide, labels, sort, link_auto_index, links, links_position
 [toc]           # max_depth
 [search]        # include_content
 [dates]         # date field names
+[feed]          # Atom feed generation
 
 # Theme: display/rendering concerns
 [theme]
@@ -173,13 +183,13 @@ Per-page values override site defaults. If neither is set, the tag is omitted.
 
 | Level | What                         | How                                                                   |
 | ----- | ---------------------------- | --------------------------------------------------------------------- |
-| 0     | Zero-config vault publishing | `rockgarden build` — default theme, no config                         |
-| 1     | Color scheme                 | `[theme] daisyui_default = "dark"` — swap DaisyUI palette             |
-| 2     | Custom CSS/JS                | Drop files in `_styles/` and `_scripts/` — auto-injected              |
-| 3     | Patch a component            | `_templates/components/nav.html` — override one file                  |
+| 0     | Zero-config vault publishing | `rockgarden build`: default theme, no config                          |
+| 1     | Color scheme                 | `[theme] daisyui_default = "dark"`: swap DaisyUI palette              |
+| 2     | Custom CSS/JS                | Drop files in `_styles/` and `_scripts/`: auto-injected               |
+| 3     | Patch a component            | `_templates/components/nav.html`: override one file                   |
 | 4     | Add content blocks           | Extend `page.html` named blocks (`after_heading`, `after_body`, etc.) |
 | 5     | Custom page layouts          | `_templates/layouts/speaker.html` + frontmatter `layout: speaker`     |
-| 6     | Custom theme                 | `_themes/pyohio/` — own base, own CSS, own components                 |
+| 6     | Custom theme                 | `_themes/mytheme/`: own base, own CSS, own components                 |
 | 7     | Export default theme         | `rockgarden theme export` → copy default theme as starting point      |
 
 ### Custom CSS and JavaScript
@@ -190,9 +200,9 @@ Drop files in `_styles/` and `_scripts/` at the site root. They are automaticall
 
 Templates are resolved in this order (first match wins):
 
-1. **Site templates** (`_templates/`) — override individual files
-2. **Named theme** (`_themes/<name>/`) — active when `theme.name` is set
-3. **Built-in default** — bundled with the package
+1. **Site templates** (`_templates/`): override individual files
+2. **Named theme** (`_themes/<name>/`): active when `theme.name` is set
+3. **Built-in default:** bundled with the package
 
 This allows overriding a single component without touching anything else, or replacing the entire template set with a custom theme.
 
@@ -225,7 +235,7 @@ layout: talk # resolves to layouts/talk.html
 ---
 ```
 
-Resolution order: frontmatter `layout` → collection default → `[theme] default_layout` → `layouts/docs.html`.
+Resolution order: frontmatter `layout` → collection default → `[theme] default_layout` → `layouts/default.html`.
 
 ### Theme export
 
@@ -245,13 +255,13 @@ Variables available in all templates:
 
 ## Dependencies
 
-- `typer` — CLI
-- `pydantic` — Config validation
-- `markdown-it-py` — Markdown parsing (CommonMark + GFM-like preset)
-- `jinja2` — Templates
-- `python-frontmatter` — YAML frontmatter
-- `tomllib` (stdlib) — Config parsing
-- `beautifulsoup4` — HTML parsing for TOC extraction
+- `typer`: CLI
+- `pydantic`: Config validation
+- `markdown-it-py`: Markdown parsing (CommonMark + GFM-like preset)
+- `jinja2`: Templates
+- `python-frontmatter`: YAML frontmatter
+- `tomllib` (stdlib): Config parsing
+- `beautifulsoup4`: HTML parsing for TOC extraction
 
 ## Key Decisions
 

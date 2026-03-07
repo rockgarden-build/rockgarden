@@ -14,9 +14,9 @@ You can override the default page by placing a `404.html` in your site's `_templ
 
 ### Provider-specific notes
 
-**Netlify** — `404.html` in the publish directory is detected automatically. No config required.
+**Netlify:** `404.html` in the publish directory is detected automatically. No config required.
 
-**Vercel** — `404.html` in the output directory is detected automatically. If you use clean URLs (`cleanUrls = true` in `rockgarden.toml`), add a `vercel.json` to enable server-side clean URL handling:
+**Vercel:** `404.html` in the output directory is detected automatically. If you use clean URLs (`cleanUrls = true` in `rockgarden.toml`), add a `vercel.json` to enable server-side clean URL handling:
 
 ```json
 {
@@ -24,15 +24,15 @@ You can override the default page by placing a `404.html` in your site's `_templ
 }
 ```
 
-**GitHub Pages** — `404.html` in the repository root (or `docs/` folder if configured) is detected automatically.
+**GitHub Pages:** `404.html` in the repository root (or `docs/` folder if configured) is detected automatically.
 
-**Apache** — Add to `.htaccess` in your document root:
+**Apache:** Add to `.htaccess` in your document root:
 
 ```apache
 ErrorDocument 404 /404.html
 ```
 
-**Nginx** — Add to your server block:
+**Nginx:** Add to your server block:
 
 ```nginx
 error_page 404 /404.html;
@@ -62,4 +62,4 @@ clean_urls = false
 
 ## Dev Server
 
-The built-in `rgdn serve` command is a simple development preview server. It does not simulate 404 behavior — visit `/404.html` directly to preview the error page during development.
+The built-in `rockgarden serve` command is a simple development preview server. It does not simulate 404 behavior — visit `/404.html` directly to preview the error page during development.

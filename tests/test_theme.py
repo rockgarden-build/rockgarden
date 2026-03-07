@@ -95,9 +95,9 @@ class TestThemeExport:
 
     def test_custom_dir(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
-        result = runner.invoke(app, ["theme", "export", "--dir", "pyohio"])
+        result = runner.invoke(app, ["theme", "export", "--dir", "mytheme"])
         assert result.exit_code == 0, result.output
-        assert (tmp_path / "_themes" / "pyohio" / "theme.toml").exists()
+        assert (tmp_path / "_themes" / "mytheme" / "theme.toml").exists()
 
     def test_errors_if_dir_exists(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)

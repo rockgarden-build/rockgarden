@@ -34,9 +34,9 @@ Rockgarden supports the superset of CommonMark, GFM (GitHub Flavored Markdown), 
 | Strikethrough       | `~~text~~`              | ✅     | Via markdown-it-py |
 | Task lists          | `- [ ]` and `- [x]`     | ✅     | Via markdown-it-py |
 | Autolinks           | Bare URLs               | ✅     | Via markdown-it-py |
-| Syntax highlighting | ` ```python `           | ✅     | Via markdown-it-py |
-| Footnotes           | `[^1]` and `[^1]: text` | ✅     | Via markdown-it-py |
-| Alerts              | `> [!NOTE]`             | Ready  | Feature 05         |
+| Syntax highlighting | ` ```python `           | ❌     | Planned            |
+| Footnotes           | `[^1]` and `[^1]: text` | ❌     | Planned            |
+| Alerts              | `> [!NOTE]`             | ✅     |                    |
 
 ## Obsidian Markdown
 
@@ -44,22 +44,22 @@ Rockgarden supports the superset of CommonMark, GFM (GitHub Flavored Markdown), 
 
 | Feature              | Syntax              | Status | Notes           |
 | -------------------- | ------------------- | ------ | --------------- |
-| Wiki-links           | `[[Page Name]]`     | ✅     | Feature 03      |
-| Wiki-links (aliased) | `[[Page\|Display]]` | ✅     | Feature 03      |
-| Headings links       | `[[Page#Heading]]`  | ⚠️     | Partial support |
+| Wiki-links           | `[[Page Name]]`     | ✅     |                 |
+| Wiki-links (aliased) | `[[Page\|Display]]` | ✅     |                 |
+| Heading links        | `[[Page#Heading]]`  | ✅     |                 |
 | Block references     | `[[Page#^block]]`   | ❌     | Future          |
 
 ### Embeds
 
 | Feature           | Syntax                     | Status | Notes      |
 | ----------------- | -------------------------- | ------ | ---------- |
-| Image embeds      | `![[image.png]]`           | ✅     | Feature 04 |
-| Image sizing      | `![[image.png\|200]]`      | ✅     | Feature 04 |
-| Image alt text    | `![[image.png\|alt text]]` | ✅     | Feature 04 |
-| Audio embeds      | `![[audio.mp3]]`           | ✅     | Feature 04 |
-| Video embeds      | `![[video.mp4]]`           | ✅     | Feature 04 |
-| PDF embeds        | `![[doc.pdf]]`             | ✅     | Feature 04 |
-| Note transclusion | `![[note]]`                | ❌     | Planned    |
+| Image embeds      | `![[image.png]]`           | ✅     |            |
+| Image sizing      | `![[image.png\|200]]`      | ✅     |            |
+| Image alt text    | `![[image.png\|alt text]]` | ✅     |            |
+| Audio embeds      | `![[audio.mp3]]`           | ✅     |            |
+| Video embeds      | `![[video.mp4]]`           | ✅     |            |
+| PDF embeds        | `![[doc.pdf]]`             | ✅     |            |
+| Note transclusion | `![[note]]`                | ✅     |            |
 
 ### Formatting
 
@@ -73,10 +73,10 @@ Rockgarden supports the superset of CommonMark, GFM (GitHub Flavored Markdown), 
 
 | Feature              | Syntax            | Status | Notes      |
 | -------------------- | ----------------- | ------ | ---------- |
-| Basic callouts       | `> [!note]`       | Ready  | Feature 05 |
-| Custom titles        | `> [!note] Title` | Ready  | Feature 05 |
-| Collapsible (open)   | `> [!note]+`      | Ready  | Feature 05 |
-| Collapsible (closed) | `> [!note]-`      | Ready  | Feature 05 |
+| Basic callouts       | `> [!note]`       | ✅     |            |
+| Custom titles        | `> [!note] Title` | ✅     |            |
+| Collapsible (open)   | `> [!note]+`      | ✅     |            |
+| Collapsible (closed) | `> [!note]-`      | ✅     |            |
 
 ### Math
 
@@ -84,13 +84,13 @@ Rockgarden supports the superset of CommonMark, GFM (GitHub Flavored Markdown), 
 | --------------- | ------------ | ------ | ------------------ |
 | Inline math     | `$E = mc^2$` | ❌     | Future             |
 | Block math      | `$$...$$`    | ❌     | Future             |
-| GFM math blocks | ` ```math `  | ✅     | Via markdown-it-py |
+| GFM math blocks | ` ```math `  | ❌     | Planned            |
 
 ### Diagrams
 
 | Feature | Syntax         | Status | Notes              |
 | ------- | -------------- | ------ | ------------------ |
-| Mermaid | ` ```mermaid ` | ✅     | Via markdown-it-py |
+| Mermaid | ` ```mermaid ` | ❌     | Planned            |
 
 ### Tags
 
@@ -123,38 +123,15 @@ This ensures:
 
 ## Future Syntax Additions
 
-Planned for future phases:
-
-### Phase A (Zero-Config Release)
-
-- ❌ Note transclusion: `![[note]]`
-
-### Phase B (General SSG)
-
-- None markdown-specific
-
-### Phase C (Enhanced Features)
-
-- ❌ Inline math: `$...$` and block math `$$...$$`
-- ❌ Highlights: `==text==`
-- ❌ Comment stripping: `%% comment %%`
-- ❌ Block references: `[[page#^block]]`
-- ❌ Inline fields: `key:: value` (Dataview compatibility)
+- Inline math: `$...$` and block math `$$...$$`
+- Highlights: `==text==`
+- Comment stripping: `%% comment %%`
+- Block references: `[[page#^block]]`
+- Inline fields: `key:: value` (Dataview compatibility)
+- Inline tags: `#tag`, `#parent/child`
 
 ### Not Planned
 
-- Canvas files (`.canvas`) — binary format, not markdown
-- Dataview queries — requires runtime evaluation
-- Plugin-specific syntax — too varied to support generically
-
-## Testing Strategy
-
-Each syntax feature should have test coverage for:
-
-1. Basic usage (happy path)
-2. Edge cases (nested, escaped, empty)
-3. Inside code blocks (should NOT process)
-4. Mixed with other syntax
-5. Invalid syntax (graceful degradation)
-
-See individual feature docs in `plans/features/` for detailed specs.
+- Canvas files (`.canvas`): binary format, not markdown
+- Dataview queries: requires runtime evaluation
+- Plugin-specific syntax: too varied to support generically
