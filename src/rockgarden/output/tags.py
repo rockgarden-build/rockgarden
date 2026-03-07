@@ -39,11 +39,24 @@ def build_tag_pages(
     tag_index_template = env.get_template("tag_index.html")
     tags_root_template = env.get_template("tags_root.html")
 
+    def _page_entry(p: Page) -> dict:
+        raw_tags = p.frontmatter.get("tags", [])
+        if isinstance(raw_tags, str):
+            raw_tags = [raw_tags]
+        return {
+            "title": p.title,
+            "url": get_url(p.slug, clean_urls, base_path),
+            "tags": [normalize_tag(t) for t in raw_tags if normalize_tag(t)],
+        }
+
+    def _sorted_entries(pages: list[Page]) -> list[dict]:
+        entries = [_page_entry(p) for p in pages]
+        return sorted(entries, key=lambda e: e["title"])
+
+    tags_data: dict[str, list[dict]] = {}
     for tag_slug, tagged_pages in tags.items():
-        page_entries = [
-            {"title": p.title, "url": get_url(p.slug, clean_urls, base_path)}
-            for p in tagged_pages
-        ]
+        page_entries = _sorted_entries(tagged_pages)
+        tags_data[tag_slug] = page_entries
         html = tag_index_template.render(
             tag=tag_slug,
             pages=page_entries,
@@ -56,10 +69,8 @@ def build_tag_pages(
             out_file = output / "tags" / f"{tag_slug}.html"
         out_file.parent.mkdir(parents=True, exist_ok=True)
         out_file.write_text(html)
-
-    tag_counts = {slug: len(pages) for slug, pages in tags.items()}
     html = tags_root_template.render(
-        tags=tag_counts,
+        tags=tags_data,
         site=site_config,
         layout_template=layout_template,
     )
