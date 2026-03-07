@@ -5,12 +5,12 @@ body:
   - type: markdown
     attributes:
       value: |
-        Feature PRs require prior discussion and approval — please open an issue first.
+        Feature PRs require prior discussion and approval. Please open an issue first.
   - type: textarea
     id: use-case
     attributes:
       label: What's the use case?
-      placeholder: Explain what you're trying to accomplish and why it matters.
+      placeholder: Explain what you're trying to accomplish and why it matters, and how it fits within this project's vision.
     validations:
       required: true
   - type: textarea
