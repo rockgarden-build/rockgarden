@@ -710,6 +710,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
             config.site.base_url,
             clean_urls,
             base_path,
+            config.feed.path,
             config.feed.limit,
             config.feed.include_paths or None,
         )

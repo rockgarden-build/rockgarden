@@ -208,3 +208,23 @@ class TestBuildAtomFeed:
         entry = root.find(_ns("entry"))
         updated = entry.find(_ns("updated")).text
         assert "+00:00" in updated
+
+    def test_custom_feed_path_in_self_link(self):
+        result = build_atom_feed(
+            [], "Site", "", "https://example.com", feed_path="/atom.xml"
+        )
+        root = fromstring(result)
+        links = root.findall(_ns("link"))
+        self_link = [el for el in links if el.get("rel") == "self"][0]
+        assert self_link.get("href") == "https://example.com/atom.xml"
+
+    def test_mixed_tz_aware_and_naive_dates(self):
+        pages = [
+            self._make_page("aware", modified=datetime(2026, 1, 1, tzinfo=UTC)),
+            self._make_page("naive", modified=datetime(2026, 2, 1)),
+            self._make_page("no-date"),
+        ]
+        result = build_atom_feed(pages, "Site", "", "https://example.com")
+        root = fromstring(result)
+        titles = [e.find(_ns("title")).text for e in root.findall(_ns("entry"))]
+        assert titles == ["naive", "aware", "no-date"]

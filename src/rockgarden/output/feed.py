@@ -28,6 +28,7 @@ def build_atom_feed(
     base_url: str,
     clean_urls: bool = True,
     base_path: str = "",
+    feed_path: str = "/feed.xml",
     limit: int = 20,
     include_paths: list[str] | None = None,
 ) -> str:
@@ -40,6 +41,7 @@ def build_atom_feed(
         base_url: Site base URL (e.g., "https://example.com").
         clean_urls: Whether clean URLs are enabled.
         base_path: URL path prefix (e.g., "/blog").
+        feed_path: Path to the feed file (e.g., "/feed.xml").
         limit: Maximum number of entries in the feed.
         include_paths: If set, only include pages whose slug starts with
             one of these path prefixes.
@@ -56,8 +58,19 @@ def build_atom_feed(
             if any(p.slug.startswith(prefix) for prefix in include_paths)
         ]
 
-    # Sort by date descending; pages without dates go last
-    candidates.sort(key=lambda p: _get_date(p) or datetime.min, reverse=True)
+    # Sort by date descending; pages without dates go last.
+    # Normalize all dates to tz-aware to avoid comparison errors.
+    _MIN_DT = datetime.min.replace(tzinfo=UTC)
+
+    def _sort_key(p: Page) -> datetime:
+        dt = _get_date(p)
+        if dt is None:
+            return _MIN_DT
+        if dt.tzinfo is None:
+            return dt.replace(tzinfo=UTC)
+        return dt
+
+    candidates.sort(key=_sort_key, reverse=True)
     entries = candidates[:limit]
 
     feed = Element("feed", xmlns=ATOM_NS)
@@ -74,7 +87,7 @@ def build_atom_feed(
         feed,
         "link",
         rel="self",
-        href=base_url + base_path + "/feed.xml",
+        href=base_url + base_path + feed_path,
     )
 
     id_el = SubElement(feed, "id")
