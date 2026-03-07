@@ -1,3 +1,9 @@
+## v0.5.3 (2026-03-07)
+
+### Minor / Bug Fixes
+
+- enrich tag index pages (#46)
+
 ## v0.5.2 (2026-03-06)
 
 ### Minor / Bug Fixes
