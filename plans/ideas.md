@@ -14,7 +14,8 @@ Future ideas and research notes. Not currently planned.
 
 ## Build & Performance
 
-- **Incremental builds** — file-mtime dirty checking, partial rebuilds, watch-mode selective rebuild
+- **Incremental builds** — file-mtime dirty checking, partial rebuilds
+- **Dev mode** — file watching with automatic partial rebuilds and local server with live reload
 - **ASCII-only slugs** — strip Unicode/accents from URLs. NFD normalization (no deps) handles European languages; `python-slugify` for full transliteration. See research notes below.
 - **Configurable URL casing** — option to preserve original filename casing instead of slugifying
 
