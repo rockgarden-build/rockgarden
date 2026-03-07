@@ -1,0 +1,21 @@
+name: Feature Request
+description: Suggest a new feature or enhancement
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Feature PRs require prior discussion and approval — please open an issue first.
+  - type: textarea
+    id: use-case
+    attributes:
+      label: What's the use case?
+      placeholder: Explain what you're trying to accomplish and why it matters.
+    validations:
+      required: true
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed solution
+    validations:
+      required: false

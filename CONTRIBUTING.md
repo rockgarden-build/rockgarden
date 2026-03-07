@@ -1,6 +1,6 @@
 # Contributing to Rockgarden
 
-Rockgarden is open source (MIT) but the maintainer asks that you discuss issues before making pull requests for features.
+Rockgarden is open source (MIT) but the maintainer asks that you discuss proposed changes before making pull requests.
 
 ## Bug Reports
 
