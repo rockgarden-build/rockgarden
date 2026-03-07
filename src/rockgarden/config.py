@@ -92,6 +92,7 @@ class FeedConfig(BaseModel):
     enabled: bool = False
     path: str = "/feed.xml"
     limit: int = 20
+    author: str = ""
     include_paths: list[str] = Field(default_factory=list)
     collections: list[str] = Field(default_factory=list)
 

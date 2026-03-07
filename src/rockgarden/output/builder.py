@@ -712,6 +712,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
             base_path,
             config.feed.path,
             config.feed.limit,
+            config.feed.author,
             config.feed.include_paths or None,
         )
         feed_path = config.feed.path.lstrip("/")

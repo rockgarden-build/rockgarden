@@ -30,6 +30,7 @@ def build_atom_feed(
     base_path: str = "",
     feed_path: str = "/feed.xml",
     limit: int = 20,
+    author: str = "",
     include_paths: list[str] | None = None,
 ) -> str:
     """Generate an Atom feed XML string.
@@ -43,6 +44,7 @@ def build_atom_feed(
         base_path: URL path prefix (e.g., "/blog").
         feed_path: Path to the feed file (e.g., "/feed.xml").
         limit: Maximum number of entries in the feed.
+        author: Default author name. Per-page frontmatter ``author`` overrides.
         include_paths: If set, only include pages whose slug starts with
             one of these path prefixes.
 
@@ -104,6 +106,11 @@ def build_atom_feed(
     updated_el = SubElement(feed, "updated")
     updated_el.text = _format_rfc3339(feed_updated)
 
+    if author:
+        author_el = SubElement(feed, "author")
+        name_el = SubElement(author_el, "name")
+        name_el.text = author
+
     for page in entries:
         entry_el = SubElement(feed, "entry")
 
@@ -119,6 +126,12 @@ def build_atom_feed(
         # atom:updated is required per RFC 4287 §4.1.2
         entry_updated = SubElement(entry_el, "updated")
         entry_updated.text = _format_rfc3339(_get_date(page) or feed_updated)
+
+        page_author = page.frontmatter.get("author", "")
+        if page_author and page_author != author:
+            entry_author = SubElement(entry_el, "author")
+            entry_author_name = SubElement(entry_author, "name")
+            entry_author_name.text = page_author
 
         if page.html:
             content_el = SubElement(entry_el, "content", type="html")

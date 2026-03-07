@@ -229,3 +229,46 @@ class TestBuildAtomFeed:
         root = fromstring(result)
         titles = [e.find(_ns("title")).text for e in root.findall(_ns("entry"))]
         assert titles == ["naive", "aware", "no-date"]
+
+    def test_feed_level_author(self):
+        result = build_atom_feed([], "Site", "", "https://example.com", author="Alice")
+        root = fromstring(result)
+        author_el = root.find(_ns("author"))
+        assert author_el is not None
+        assert author_el.find(_ns("name")).text == "Alice"
+
+    def test_no_author_when_not_configured(self):
+        result = build_atom_feed([], "Site", "", "https://example.com")
+        root = fromstring(result)
+        assert root.find(_ns("author")) is None
+
+    def test_entry_author_from_frontmatter(self):
+        page = self._make_page("p")
+        page.frontmatter["author"] = "Bob"
+        result = build_atom_feed([page], "Site", "", "https://example.com")
+        root = fromstring(result)
+        entry = root.find(_ns("entry"))
+        assert entry.find(_ns("author")).find(_ns("name")).text == "Bob"
+
+    def test_entry_author_omitted_when_same_as_feed(self):
+        page = self._make_page("p")
+        page.frontmatter["author"] = "Alice"
+        result = build_atom_feed(
+            [page], "Site", "", "https://example.com", author="Alice"
+        )
+        root = fromstring(result)
+        entry = root.find(_ns("entry"))
+        assert entry.find(_ns("author")) is None
+
+    def test_entry_author_overrides_feed_default(self):
+        page = self._make_page("p")
+        page.frontmatter["author"] = "Bob"
+        result = build_atom_feed(
+            [page], "Site", "", "https://example.com", author="Alice"
+        )
+        root = fromstring(result)
+        # Feed-level author is Alice
+        assert root.find(_ns("author")).find(_ns("name")).text == "Alice"
+        # Entry overrides with Bob
+        entry = root.find(_ns("entry"))
+        assert entry.find(_ns("author")).find(_ns("name")).text == "Bob"
