@@ -183,7 +183,7 @@ Per-page values override site defaults. If neither is set, the tag is omitted.
 | 3     | Patch a component            | `_templates/components/nav.html` — override one file                  |
 | 4     | Add content blocks           | Extend `page.html` named blocks (`after_heading`, `after_body`, etc.) |
 | 5     | Custom page layouts          | `_templates/layouts/speaker.html` + frontmatter `layout: speaker`     |
-| 6     | Custom theme                 | `_themes/pyohio/` — own base, own CSS, own components                 |
+| 6     | Custom theme                 | `_themes/mytheme/` — own base, own CSS, own components                |
 | 7     | Export default theme         | `rockgarden theme export` → copy default theme as starting point      |
 
 ### Custom CSS and JavaScript

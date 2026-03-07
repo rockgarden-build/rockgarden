@@ -39,12 +39,14 @@ A short alias is also available: `rgdn build`, `rgdn serve`.
 ## Features
 
 **Obsidian support:**
+
 - Wiki-links (`[[page]]`, `[[page|text]]`, `[[page#section]]`)
 - Note transclusions (`![[note]]`)
 - Media embeds (images, audio, video, PDF)
 - Callouts (all Obsidian callout types)
 
 **Navigation & discovery:**
+
 - Auto-generated sidebar, breadcrumbs, folder index pages
 - Per-page table of contents
 - Backlinks
@@ -54,6 +56,7 @@ A short alias is also available: `rgdn build`, `rgdn serve`.
 - Broken link detection with visual indication
 
 **Customization:**
+
 - Built-in theme with dark/light mode
 - Template overrides via `_templates/`
 - Layout system with named Jinja2 blocks
@@ -61,6 +64,7 @@ A short alias is also available: `rgdn build`, `rgdn serve`.
 - Theme export for full customization (`rockgarden theme export`)
 
 **Collections:**
+
 - Named content subsets scoped by directory
 - Load data from YAML, JSON, and TOML files
 - Pydantic model validation via `_models/`
@@ -68,12 +72,14 @@ A short alias is also available: `rgdn build`, `rgdn serve`.
 - Collection entries available in all templates
 
 **Build pipeline:**
+
 - Build hooks (`pre_build`, `post_collect`, `post_build`)
 - Content exported to `.rockgarden/content.json` for hook scripts
 - Base path prefix for subdirectory deploys
 - SEO meta tags from frontmatter (description, Open Graph)
 
 **Other:**
+
 - Clean URLs (`/page/` instead of `/page.html`)
 - Accessibility (skip links, ARIA landmarks, focus styles)
 - Zero lock-in — your content stays as plain markdown files
@@ -136,9 +142,13 @@ just css       # compile Tailwind CSS
 
 Python 3.13+
 
+## Acknowledgements
+
+Rockgarden was inspired by [Quartz](https://quartz.jzhao.xyz/), a static site generator for Obsidian vaults. When I found myself increasingly customizing my installation I decided to start building my own implementation, with the features I always wanted in a static site generator.
+
 ## Contributing
 
-Contributions welcome — please open an issue before submitting PRs. See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+Contributions may be welcome if they fit the vision of this project. Please open an issue before submitting PRs. See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ## License
 
