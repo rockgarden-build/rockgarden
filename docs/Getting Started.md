@@ -6,14 +6,16 @@ tags: [guide]
 
 ## Install
 
-```bash
-pip install rockgarden
-```
-
-Or with uv:
+With uv (recommended):
 
 ```bash
 uv tool install rockgarden
+```
+
+Or with pip:
+
+```bash
+pip install rockgarden
 ```
 
 ## Build a Site
@@ -24,15 +26,13 @@ Point rockgarden at any directory of markdown files:
 rockgarden build
 ```
 
-By default, rockgarden reads markdown from the current directory and writes HTML to `./site/`. No configuration required — it handles Obsidian wiki-links, embeds, and callouts automatically.
+By default, rockgarden reads markdown from the current directory and writes HTML to `./site/`. No configuration required: it handles Obsidian wiki-links, embeds, and callouts automatically.
 
 Preview the result:
 
 ```bash
 rockgarden serve
 ```
-
-A short alias is also available: `rgdn build`, `rgdn serve`.
 
 ## Adding Configuration
 

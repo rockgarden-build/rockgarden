@@ -8,3 +8,4 @@
 - **GFM math blocks not rendering**: ` ```math ` fences output `<code class="language-math">` but no math rendering occurs. Need KaTeX or MathJax client-side, or a build-time renderer.
 - **Config namespacing**: As config options grow, consider better sections or namespacing in `rockgarden.toml`. Options like `show_build_info` and `show_build_commit` sit under `[build]` but could warrant their own section.
 - **Replace ASCII diagrams with mermaid**: Once mermaid rendering is implemented, update the ASCII art diagrams in docs (e.g. Architecture.md build pipeline) to use mermaid.
+- **Dev server doesn't support custom 404 page**: The `serve` command uses Python's built-in HTTP server, which returns a generic 404 response. It should serve the site's custom `404.html` if present.

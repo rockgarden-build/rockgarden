@@ -34,8 +34,6 @@ rockgarden build     # build your site
 rockgarden serve     # preview locally
 ```
 
-A short alias is also available: `rgdn build`, `rgdn serve`.
-
 ## Features
 
 **Obsidian support:**

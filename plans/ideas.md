@@ -31,7 +31,7 @@ Future ideas and research notes. Not currently planned.
 - **Installable templates** — theme/plugin install from git URL or local directory via CLI
 - **Theme/plugin dependency resolution** — themes/plugins declare dependencies, installer offers to also install them
 - **Theme manifest collection defaults** — `theme.toml` declaring per-collection defaults (`template`, `url_pattern`, `model`) so sites only need to provide `source`
-- **`rgdn theme info` CLI command** — display theme options from `theme.toml` manifest. Show name, description, and available config keys with types, defaults, and descriptions. For the active theme (or a named theme via `--name`). Builds on the existing `load_theme_manifest()` in `validation.py`. The manifest format should be extended to support `type`, `default`, and `description` fields on config entries. Validation should also use the manifest to type-check values (not just check for unknown/required keys).
+- **`rockgarden theme info` CLI command** — display theme options from `theme.toml` manifest. Show name, description, and available config keys with types, defaults, and descriptions. For the active theme (or a named theme via `--name`). Builds on the existing `load_theme_manifest()` in `validation.py`. The manifest format should be extended to support `type`, `default`, and `description` fields on config entries. Validation should also use the manifest to type-check values (not just check for unknown/required keys).
 
 ## Configuration
 

@@ -62,4 +62,4 @@ clean_urls = false
 
 ## Dev Server
 
-The built-in `rgdn serve` command is a simple development preview server. It does not simulate 404 behavior — visit `/404.html` directly to preview the error page during development.
+The built-in `rockgarden serve` command is a simple development preview server. It does not simulate 404 behavior — visit `/404.html` directly to preview the error page during development.
