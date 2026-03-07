@@ -14,7 +14,7 @@
         </nav>
         <article>
             <h1 class="text-3xl font-bold mb-6">#{{ tag }}</h1>
-            <p class="text-base-content/60 mb-6">{{ pages | length }} {{ "page" if pages | length == 1 else "pages" }}</p>
+            <p class="text-base-content/60 mb-6">{{ pages | length }} {{ "item" if pages | length == 1 else "items" }}</p>
             {% if pages %}
             <div>
                 {% for entry in pages %}
