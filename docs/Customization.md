@@ -33,7 +33,7 @@ Use `{% extends "page.html" %}` and override specific blocks. Use `{{ super() }}
 
 ## Layout System
 
-Layouts define page structure. The default layout is `layouts/docs.html` (sidebar navigation with content area).
+Layouts define page structure. The default layout is `layouts/default.html` (sidebar navigation with content area).
 
 Select a layout per page via frontmatter:
 

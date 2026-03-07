@@ -35,7 +35,7 @@ This model supports the simple case (a folder of markdown) to the complex case (
   - CommonMark
   - GitHub Flavored Markdown (GFM)
   - Obsidian markdown
-  - Use plain markdown, GFM features (tables, task lists, alerts), Obsidian features (wiki-links, callouts with titles), or mix them freely in the same document. No mode detection, no feature flags nexesary.
+  - Use plain markdown, GFM features (tables, task lists, alerts), Obsidian features (wiki-links, callouts with titles), or mix them freely in the same document. No mode detection, no feature flags necessary.
 - **Works with Obsidian vaults as-is.** No special folder structure or file naming beyond what Obsidian uses.
 - **Works with plain markdown.** Obsidian syntax support is additive: plain markdown renders fine without it.
 - **Custom behavior is additive.** The core handles the common case. Customizations layer on top without modifying source content.
