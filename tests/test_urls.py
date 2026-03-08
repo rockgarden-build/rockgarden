@@ -1,6 +1,14 @@
 """Tests for URL and path generation utilities."""
 
-from rockgarden.urls import generate_slug, get_folder_url, get_output_path, get_url
+from rockgarden.config import Config, SiteConfig
+from rockgarden.output.builder import build_site
+from rockgarden.urls import (
+    generate_slug,
+    get_base_path,
+    get_folder_url,
+    get_output_path,
+    get_url,
+)
 
 
 class TestGenerateSlug:
@@ -145,3 +153,101 @@ class TestGetFolderUrl:
     def test_root_folder_no_clean_urls(self):
         """Root folder without clean URLs."""
         assert get_folder_url("", clean_urls=False) == "/index.html"
+
+
+class TestBasePath:
+    """Tests for base_path config field and its interaction with base_url."""
+
+    def test_base_path_config_field(self):
+        """base_path can be set directly in site config."""
+        site = SiteConfig(base_path="/docs")
+        assert site.base_path == "/docs"
+
+    def test_base_path_strips_trailing_slash(self):
+        """Trailing slash is stripped from base_path."""
+        site = SiteConfig(base_path="/docs/")
+        assert site.base_path == "/docs"
+
+    def test_base_path_adds_leading_slash(self):
+        """Leading slash is added if missing from base_path."""
+        site = SiteConfig(base_path="docs")
+        assert site.base_path == "/docs"
+
+    def test_base_path_takes_precedence_over_base_url(self):
+        """When both are set, base_path is used directly for URL prefixing."""
+        site = SiteConfig(base_path="/preview", base_url="https://example.com/docs")
+        # base_path is used directly, not derived from base_url
+        assert site.base_path == "/preview"
+
+    def test_base_url_derives_base_path(self):
+        """When only base_url is set, base_path is derived from it."""
+        base_path = get_base_path("https://example.com/docs")
+        assert base_path == "/docs"
+
+    def test_base_path_default_empty(self):
+        """base_path defaults to empty string."""
+        site = SiteConfig()
+        assert site.base_path == ""
+
+    def test_base_path_in_build_output(self, tmp_path):
+        """base_path is applied to asset and navigation URLs in built HTML."""
+        source = tmp_path / "source"
+        source.mkdir()
+        (source / "index.md").write_text("# Home\nHello")
+
+        output = tmp_path / "output"
+        config = Config(site=SiteConfig(base_path="/2026preview"))
+
+        build_site(config, source, output)
+
+        html = (output / "index.html").read_text()
+        assert "/2026preview/_assets/rockgarden.css" in html
+        assert "/2026preview/" in html
+
+    def test_base_url_derived_path_in_build_output(self, tmp_path):
+        """base_url-derived path is applied when base_path is not set."""
+        source = tmp_path / "source"
+        source.mkdir()
+        (source / "index.md").write_text("# Home\nHello")
+
+        output = tmp_path / "output"
+        config = Config(site=SiteConfig(base_url="https://example.com/mysite"))
+
+        build_site(config, source, output)
+
+        html = (output / "index.html").read_text()
+        assert "/mysite/_assets/rockgarden.css" in html
+
+    def test_no_base_path_or_base_url_in_build_output(self, tmp_path):
+        """Without base_path or base_url, URLs start from root."""
+        source = tmp_path / "source"
+        source.mkdir()
+        (source / "index.md").write_text("# Home\nHello")
+
+        output = tmp_path / "output"
+        config = Config()
+
+        build_site(config, source, output)
+
+        html = (output / "index.html").read_text()
+        assert '"/_assets/rockgarden.css' in html
+
+    def test_base_path_precedence_in_build_output(self, tmp_path):
+        """base_path takes precedence over base_url for URL prefixing."""
+        source = tmp_path / "source"
+        source.mkdir()
+        (source / "index.md").write_text("# Home\nHello")
+
+        output = tmp_path / "output"
+        config = Config(
+            site=SiteConfig(
+                base_path="/preview",
+                base_url="https://example.com/production",
+            )
+        )
+
+        build_site(config, source, output)
+
+        html = (output / "index.html").read_text()
+        assert "/preview/_assets/rockgarden.css" in html
+        assert "/production/_assets/" not in html

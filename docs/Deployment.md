@@ -40,14 +40,24 @@ error_page 404 /404.html;
 
 ## Subdirectory Deployment
 
-To deploy to a subdirectory (e.g., `example.com/docs/`), set `base_url` in `rockgarden.toml`:
+To deploy to a subdirectory (e.g., `example.com/docs/`), set `base_path` in `rockgarden.toml`:
 
 ```toml
 [site]
+base_path = "/docs"
+```
+
+All generated URLs (internal links, assets, media embeds, search index) will include the path prefix.
+
+If you also need absolute URLs for feeds and sitemap, set `base_url` as well:
+
+```toml
+[site]
+base_path = "/docs"
 base_url = "https://example.com/docs"
 ```
 
-All generated URLs (internal links, media embeds, search index, sitemap) will include the base path prefix.
+When only `base_url` is set, the path prefix is derived from it automatically.
 
 ## Clean URLs
 
