@@ -4,7 +4,7 @@ tags: [design, philosophy]
 
 # Vision
 
-Rockgarden is a static site generator built for progressive customization. It works with Obsidian vaults and plain markdown folders out of the box, but is a general-purpose SSG through configuration and customization.
+Rockgarden is a static site generator built for progressive customization. It builds sites from Markdown content out of the box, with support for Obsidian vault syntax, and scales to a general-purpose SSG through configuration and customization.
 
 ## Core Principles
 
@@ -18,7 +18,7 @@ All three share enough in common that they can use the same tool. Complexity is 
 
 ### Progressive Customization
 
-1. **Zero config:** Markdown files become pages. Obsidian syntax just works.
+1. **Zero config:** Markdown files become pages. Obsidian syntax is supported automatically.
 2. **Convention:** Drop files in `_styles/`, `_scripts/`, `_templates/` and they're picked up automatically.
 3. **Configuration:** `rockgarden.toml` for collections, navigation, themes, build hooks.
 4. **Full control:** Custom templates, data pipelines, external data sources, build hooks for asset compilation.
@@ -36,8 +36,8 @@ This model supports the simple case (a folder of markdown) to the complex case (
   - GitHub Flavored Markdown (GFM)
   - Obsidian markdown
   - Use plain markdown, GFM features (tables, task lists, alerts), Obsidian features (wiki-links, callouts with titles), or mix them freely in the same document. No mode detection, no feature flags necessary.
-- **Works with Obsidian vaults as-is.** No special folder structure or file naming beyond what Obsidian uses.
-- **Works with plain markdown.** Obsidian syntax support is additive: plain markdown renders fine without it.
+- **Works with plain Markdown.** Standard Markdown renders without any special configuration.
+- **Works with Obsidian vaults as-is.** No special folder structure or file naming required. Obsidian syntax support is additive.
 - **Custom behavior is additive.** The core handles the common case. Customizations layer on top without modifying source content.
 - **Build stays fast.** External data fetching is separate from the build pipeline. Builds only read local files.
 

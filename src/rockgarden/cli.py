@@ -39,7 +39,7 @@ def main_callback(
         ),
     ] = False,
 ) -> None:
-    """Rockgarden - A static site generator for Obsidian vaults."""
+    """Rockgarden - A static site generator for Markdown content."""
     pass
 
 
@@ -95,9 +95,6 @@ title = "{site_name}"
 source = "{source}"
 output = "{output}"
 clean_urls = true
-
-[build]
-ignore_patterns = [".obsidian", "Templates"]
 '''
 
     config_path.write_text(config_content)
@@ -134,7 +131,7 @@ def build(
         typer.Option("--clean", help="Clean output directory without prompting"),
     ] = False,
 ) -> None:
-    """Build the static site from an Obsidian vault."""
+    """Build the static site from Markdown source files."""
     # If source specified but no config, look for config in source directory
     if config_file is None and source is not None:
         source_config = source / "rockgarden.toml"

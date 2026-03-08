@@ -1,8 +1,8 @@
 # rockgarden
 
-A Python static site generator that works with Obsidian vaults and plain Markdown folders out of the box. Point it at a directory of Markdown files and get a navigable HTML site: no config required.
+A Python static site generator that builds sites from Markdown content. Point it at a directory of Markdown files and get a navigable HTML site: no config required.
 
-Rockgarden handles Obsidian-specific syntax (wiki-links, embeds, callouts) so you can publish your vault without changing how you write. For plain Markdown, it just works.
+Rockgarden supports Obsidian vaults out of the box — wiki-links, embeds, and callouts all work without changing how you write.
 
 ## Philosophy
 
@@ -38,13 +38,6 @@ rockgarden serve     # preview locally
 
 ## Features
 
-**Obsidian support:**
-
-- Wiki-links (`[[page]]`, `[[page|text]]`, `[[page#section]]`)
-- Note transclusions (`![[note]]`)
-- Media embeds (images, audio, video, PDF)
-- Callouts (all Obsidian callout types)
-
 **Navigation & discovery:**
 
 - Auto-generated sidebar, breadcrumbs, folder index pages
@@ -62,6 +55,13 @@ rockgarden serve     # preview locally
 - Layout system with named Jinja2 blocks
 - Custom CSS (`_styles/`) and JS (`_scripts/`) auto-injected
 - Theme export for full customization (`rockgarden theme export`)
+
+**Obsidian support:**
+
+- Wiki-links (`[[page]]`, `[[page|text]]`, `[[page#section]]`)
+- Note transclusions (`![[note]]`)
+- Media embeds (images, audio, video, PDF)
+- Callouts (all Obsidian callout types)
 
 **Collections:**
 
@@ -102,9 +102,6 @@ Optional. Create `rockgarden.toml` to customize:
 title = "My Site"
 source = "content"
 output = "_site"
-
-[build]
-ignore_patterns = [".obsidian", "Templates"]
 
 [nav]
 sort = "files-first"

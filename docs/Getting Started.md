@@ -20,13 +20,13 @@ pip install rockgarden
 
 ## Build a Site
 
-Point rockgarden at any directory of markdown files:
+Point rockgarden at any directory of Markdown files:
 
 ```bash
 rockgarden build
 ```
 
-By default, rockgarden reads markdown from the current directory and writes HTML to `./_site/`. No configuration required: it handles Obsidian wiki-links, embeds, and callouts automatically.
+By default, rockgarden reads Markdown from the current directory and writes HTML to `./_site/`. No configuration required. Obsidian syntax (wiki-links, embeds, callouts) is supported automatically.
 
 Preview the result:
 
