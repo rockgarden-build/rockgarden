@@ -33,6 +33,10 @@ class TestProcessInlineIcons:
         text = "```\n:lucide-info:\n```"
         assert process_inline_icons(text) == text
 
+    def test_tilde_fenced_code_block_preserved(self):
+        text = "~~~\n:lucide-info:\n~~~"
+        assert process_inline_icons(text) == text
+
     def test_double_colon_not_matched(self):
         text = "::lucide-info::"
         assert process_inline_icons(text) == text

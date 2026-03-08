@@ -9,7 +9,7 @@ import re
 
 from rockgarden.icons.resolver import resolve_icon
 
-CODE_BLOCK_PATTERN = re.compile(r"```[\s\S]*?```|`[^`\n]+`")
+CODE_BLOCK_PATTERN = re.compile(r"```[\s\S]*?```|~~~[\s\S]*?~~~|`[^`\n]+`")
 
 INLINE_ICON_PATTERN = re.compile(
     r"(?<![:\w])"

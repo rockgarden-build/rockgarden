@@ -12,7 +12,7 @@ EMBED_PATTERN = re.compile(
     r"\]\]"
 )
 
-CODE_BLOCK_PATTERN = re.compile(r"```[\s\S]*?```|`[^`\n]+`")
+CODE_BLOCK_PATTERN = re.compile(r"```[\s\S]*?```|~~~[\s\S]*?~~~|`[^`\n]+`")
 
 IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "svg", "webp", "bmp", "ico"}
 AUDIO_EXTENSIONS = {"mp3", "wav", "m4a", "ogg", "3gp", "flac"}

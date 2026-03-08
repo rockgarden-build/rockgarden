@@ -11,7 +11,7 @@ WIKILINK_PATTERN = re.compile(
     r"\]\]"
 )
 
-CODE_BLOCK_PATTERN = re.compile(r"```[\s\S]*?```|`[^`\n]+`")
+CODE_BLOCK_PATTERN = re.compile(r"```[\s\S]*?```|~~~[\s\S]*?~~~|`[^`\n]+`")
 
 
 def process_wikilinks(
