@@ -168,6 +168,11 @@ class TestBasePath:
         site = SiteConfig(base_path="/docs/")
         assert site.base_path == "/docs"
 
+    def test_base_path_adds_leading_slash(self):
+        """Leading slash is added if missing from base_path."""
+        site = SiteConfig(base_path="docs")
+        assert site.base_path == "/docs"
+
     def test_base_path_takes_precedence_over_base_url(self):
         """When both are set, base_path is used directly for URL prefixing."""
         site = SiteConfig(base_path="/preview", base_url="https://example.com/docs")
