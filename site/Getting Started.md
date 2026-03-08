@@ -21,7 +21,7 @@ pip install rockgarden
 
 ### Build
 
-Generate HTML from your markdown source:
+Generate HTML from your Markdown source:
 
 ```bash
 rockgarden build --source ./my-vault --output ./_site
@@ -39,7 +39,7 @@ rockgarden serve --port 8000
 
 ## Supported Content
 
-Rockgarden handles both Obsidian-style and plain markdown:
+Rockgarden handles both standard Markdown and Obsidian syntax:
 
 | Feature | Obsidian | Plain Markdown |
 |---------|----------|----------------|

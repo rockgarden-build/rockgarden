@@ -2,16 +2,15 @@
 title: Rockgarden
 ---
 
-A Python static site generator that works with Obsidian vaults and plain markdown directories.
+A Python static site generator that builds sites from Markdown content, with Obsidian vault support out of the box.
 
 ## Philosophy
 
 Rockgarden prioritizes simplicity and compatibility:
 
-- **Zero config by default** - Point it at a folder of markdown files and get a working site
+- **Zero config by default** - Point it at a folder of Markdown files and get a working site
 - **Non-destructive** - Never modifies your source files
-- **Obsidian-native** - Wiki-links, embeds, and callouts work out of the box
-- **Plain markdown friendly** - Standard markdown with `.md` links works too
+- **Markdown and Obsidian** - Standard Markdown and Obsidian syntax (wiki-links, embeds, callouts) both work out of the box
 - **Minimal output** - Generates clean HTML without JavaScript dependencies
 
 ## Features
