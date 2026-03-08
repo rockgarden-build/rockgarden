@@ -75,21 +75,23 @@ class BuildResult:
     duration_seconds: float = 0.0
 
 
-def copy_static_files(output: Path) -> None:
+def copy_static_files(output: Path, assets_dir: str = "_assets") -> None:
     """Copy bundled static assets (CSS, JS) to the output directory."""
     static_src = Path(__file__).resolve().parent.parent / "static"
-    static_dst = output / "_static"
+    static_dst = output / assets_dir
     if static_src.exists():
         shutil.copytree(static_src, static_dst, dirs_exist_ok=True)
 
 
-def copy_theme_static_files(theme_name: str, site_root: Path, output: Path) -> None:
+def copy_theme_static_files(
+    theme_name: str, site_root: Path, output: Path, assets_dir: str = "_assets"
+) -> None:
     """Copy theme static files to output, overriding bundled statics."""
     if not theme_name:
         return
     theme_static = site_root / "_themes" / theme_name / "static"
     if theme_static.exists():
-        shutil.copytree(theme_static, output / "_static", dirs_exist_ok=True)
+        shutil.copytree(theme_static, output / assets_dir, dirs_exist_ok=True)
 
 
 def discover_user_assets(site_root: Path) -> tuple[list[str], list[str]]:
@@ -128,9 +130,16 @@ def copy_user_assets(
             shutil.copy2(site_root / "_scripts" / name, out_scripts / name)
 
 
-def _static_hash(output: Path) -> str:
+def copy_user_static_files(site_root: Path, output: Path) -> None:
+    """Copy user _static/ directory contents to the output root."""
+    static_dir = site_root / "_static"
+    if static_dir.exists():
+        shutil.copytree(static_dir, output, dirs_exist_ok=True)
+
+
+def _static_hash(output: Path, assets_dir: str = "_assets") -> str:
     """Generate a short content hash of the CSS for cache busting."""
-    css_path = output / "_static" / "rockgarden.css"
+    css_path = output / assets_dir / "rockgarden.css"
     if css_path.exists():
         content = css_path.read_bytes()
         return hashlib.md5(content).hexdigest()[:8]
@@ -359,12 +368,13 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     """
     _start = time.perf_counter()
     output.mkdir(parents=True, exist_ok=True)
-    copy_static_files(output)
+    assets_dir = config.build.assets_dir
+    copy_static_files(output, assets_dir)
 
     site_root = source.parent
     macros = load_macros(site_root / "_macros")
     apply_macros = build_macro_renderer(macros)
-    copy_theme_static_files(config.theme.name, site_root, output)
+    copy_theme_static_files(config.theme.name, site_root, output, assets_dir)
     user_styles, user_scripts = discover_user_assets(site_root)
     copy_user_assets(site_root, output, user_styles, user_scripts)
 
@@ -430,7 +440,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         name: col.entries for name, col in collections.items()
     }
 
-    cache_hash = _static_hash(output)
+    cache_hash = _static_hash(output, assets_dir)
 
     build_info = None
     if config.theme.show_build_info:
@@ -456,6 +466,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
         "cache_hash": cache_hash,
         "user_styles": user_styles,
         "user_scripts": user_scripts,
+        "assets_dir": assets_dir,
         "feed_enabled": config.feed.enabled and bool(config.site.base_url),
         "feed_path": config.feed.path,
     }
@@ -731,6 +742,8 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     (output / "404.html").write_text(
         not_found_template.render(site=site_config, layout_template=not_found_layout)
     )
+
+    copy_user_static_files(site_root, output)
 
     run_hooks(config.hooks.post_build, "post_build", cwd=site_root, env_vars=hook_env)
 

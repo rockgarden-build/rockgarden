@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{{ page.title }}{% if site.title %} - {{ site.title }}{% endif %}{% endblock %}</title>
     {% include "components/meta.html" %}
-    <link href="{{ site.base_path }}/_static/rockgarden.css{% if site.cache_hash %}?v={{ site.cache_hash }}{% endif %}" rel="stylesheet" type="text/css" />
+    <link href="{{ site.base_path }}/{{ site.assets_dir }}/rockgarden.css{% if site.cache_hash %}?v={{ site.cache_hash }}{% endif %}" rel="stylesheet" type="text/css" />
     {% if site.search_enabled %}
-    <script src="{{ site.base_path }}/_static/lunr.min.js{% if site.cache_hash %}?v={{ site.cache_hash }}{% endif %}"></script>
+    <script src="{{ site.base_path }}/{{ site.assets_dir }}/lunr.min.js{% if site.cache_hash %}?v={{ site.cache_hash }}{% endif %}"></script>
     {% endif %}
     {% for style in site.user_styles %}
     <link rel="stylesheet" href="{{ site.base_path }}/styles/{{ style }}" />
