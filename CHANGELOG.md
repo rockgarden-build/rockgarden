@@ -1,3 +1,10 @@
+## v0.6.2 (2026-03-08)
+
+### Minor / Bug Fixes
+
+- extend icon support to custom themes and markdown (#62)
+- compute project_root from config directory
+
 ## v0.6.1 (2026-03-08)
 
 ### Minor / Bug Fixes
