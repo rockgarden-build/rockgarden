@@ -26,8 +26,15 @@ class SiteConfig(BaseModel):
 class BuildConfig(BaseModel):
     """Build-related configuration."""
 
-    ignore_patterns: list[str] = [".obsidian", "private", "templates", "Templates"]
+    ignore_patterns: list[str] = [
+        ".obsidian",
+        "private",
+        "templates",
+        "Templates",
+        "_static",
+    ]
     icons_dir: Path | None = None
+    assets_dir: str = "_assets"
 
 
 class ThemeConfig(BaseModel):

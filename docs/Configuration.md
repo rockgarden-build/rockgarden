@@ -22,10 +22,11 @@ Configuration lives in `rockgarden.toml` at the site root.
 
 ## `[build]`
 
-| Field             | Type           | Default                                              | Description                                                                |
-| ----------------- | -------------- | ---------------------------------------------------- | -------------------------------------------------------------------------- |
-| `ignore_patterns` | `list[str]`    | `[".obsidian", "private", "templates", "Templates"]` | Paths to exclude from content loading                                      |
-| `icons_dir`       | `path \| null` | `null`                                               | Directory containing custom icon SVGs. Falls back to bundled Lucide icons. |
+| Field             | Type           | Default                                                          | Description                                                                |
+| ----------------- | -------------- | ---------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `ignore_patterns` | `list[str]`    | `[".obsidian", "private", "templates", "Templates", "_static"]`  | Paths to exclude from content loading                                      |
+| `icons_dir`       | `path \| null` | `null`                                                           | Directory containing custom icon SVGs. Falls back to bundled Lucide icons. |
+| `assets_dir`      | `str`          | `"_assets"`                                                      | Output subdirectory for bundled CSS and JS assets.                         |
 
 ## `[theme]`
 
@@ -157,4 +158,5 @@ These directories are discovered by convention at the site root:
 | `_themes/<name>/` | Custom theme directory (active when `theme.name` is set)   |
 | `_styles/`        | Custom CSS files (auto-injected as `<link>` tags)          |
 | `_scripts/`       | Custom JavaScript files (auto-injected as `<script>` tags) |
+| `_static/`        | Static files copied as-is to output root                   |
 | `.rockgarden/`    | Build cache and content JSON export (add to `.gitignore`)  |

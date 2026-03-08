@@ -6,6 +6,12 @@ tags: [guide]
 
 Rockgarden supports progressive customization — start with zero config and add layers as needed.
 
+## Static Files
+
+Place files in `_static/` at your site root to have them copied as-is to the output root during build. Useful for deployment platform files (`_redirects`, `_headers`), favicons, `robots.txt`, and verification files.
+
+Files in `_static/` are copied late in the build and overwrite any generated output at the same path.
+
 ## Custom CSS and JavaScript
 
 Drop files in `_styles/` and `_scripts/` at your site root. They are automatically copied to the output directory and injected as `<link>` / `<script>` tags.

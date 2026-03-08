@@ -130,7 +130,7 @@ Config options in `[theme]` are display/rendering concerns — a custom theme ma
 ```toml
 # Core: applies regardless of theme
 [site]          # title, description, og_image, source, output, clean_urls, base_url
-[build]         # ignore_patterns, icons_dir
+[build]         # ignore_patterns, icons_dir, assets_dir
 [hooks]         # pre_build, post_collect, post_build
 [nav]           # hide, labels, sort, link_auto_index, links, links_position
 [toc]           # max_depth
