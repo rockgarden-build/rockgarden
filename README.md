@@ -17,14 +17,16 @@ The goal is to scale from a personal wiki to a full-featured site without switch
 
 ## Installation
 
-```bash
-pip install rockgarden
-```
-
-Or with uv:
+With uv (recommended):
 
 ```bash
 uv tool install rockgarden
+```
+
+Or with pip:
+
+```bash
+pip install rockgarden
 ```
 
 ## Quick Start
@@ -80,7 +82,6 @@ rockgarden serve     # preview locally
 
 - Clean URLs (`/page/` instead of `/page.html`)
 - Accessibility (skip links, ARIA landmarks, focus styles)
-- Zero lock-in — your content stays as plain markdown files
 
 ## CLI Commands
 
