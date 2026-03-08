@@ -16,8 +16,9 @@ class SiteConfig(BaseModel):
     output: Path = Path("_site")
     clean_urls: bool = True
     base_url: str = ""
+    base_path: str = ""
 
-    @field_validator("base_url", mode="after")
+    @field_validator("base_url", "base_path", mode="after")
     @classmethod
     def strip_trailing_slash(cls, v: str) -> str:
         return v.rstrip("/")

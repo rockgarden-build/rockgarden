@@ -389,7 +389,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
 
     pages = load_content(source, config.build.ignore_patterns, config.dates)
     clean_urls = config.site.clean_urls
-    base_path = get_base_path(config.site.base_url)
+    base_path = config.site.base_path or get_base_path(config.site.base_url)
 
     collections = partition_collections(pages, config.collections, source)
 
