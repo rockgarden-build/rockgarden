@@ -95,23 +95,22 @@ Rockgarden bundles the full [Lucide](https://lucide.dev) icon set. Icons are ava
 Use the `icon` global function or filter to render inline SVG:
 
 ```jinja2
-{{ icon("lucide:map-pin") }}
 {{ icon("map-pin") }}
 {{ "github" | icon }}
 ```
 
-Unqualified names (without a `library:` prefix) default to Lucide. Missing icons render as empty strings and log a warning.
+Missing icons render as empty strings and log a warning.
 
 ### In Markdown
 
-Use `:library-name:` syntax to insert icons inline:
+Use `:lucide-name:` syntax to insert icons inline:
 
 ```markdown
 Click :lucide-settings: to configure.
 Find us at :lucide-map-pin: 123 Main St.
 ```
 
-Only icons that resolve successfully are replaced — unrecognized patterns are left as literal text, so the syntax degrades gracefully in other markdown renderers.
+Only icons that resolve successfully are replaced — unrecognized patterns are left as literal text, so the syntax degrades gracefully in other markdown renderers. Additional icon libraries may be supported in the future.
 
 Icons inside code blocks (fenced or inline) are never processed.
 

@@ -113,7 +113,7 @@ Rockgarden supports the superset of CommonMark, GFM (GitHub Flavored Markdown), 
 | ------------ | ------------------- | ------ | ---------------------- |
 | Inline icons | `:lucide-map-pin:`  | ✅     | Lucide library bundled |
 
-Insert icons inline using `:library-name:` syntax. Only resolved icons are replaced; unrecognized patterns are left as literal text. See [[Customization]] for template usage and custom icon overrides.
+Insert Lucide icons inline using `:lucide-name:` syntax. Only resolved icons are replaced; unrecognized patterns are left as literal text. See [[Customization]] for template usage and custom icon overrides.
 
 ## Syntax Priority
 
