@@ -28,6 +28,7 @@ Configuration lives in `rockgarden.toml` at the site root.
 | `ignore_patterns` | `list[str]`    | `[".obsidian", "private", "templates", "Templates", "_static"]`  | Paths to exclude from content loading                                      |
 | `icons_dir`       | `path \| null` | `null`                                                           | Directory containing custom icon SVGs. Falls back to bundled Lucide icons. |
 | `assets_dir`      | `str`          | `"_assets"`                                                      | Output subdirectory for bundled CSS and JS assets.                         |
+| `inline_icons`    | `bool`         | `true`                                                           | Enable `:library-name:` icon syntax in markdown content.                   |
 
 ## `[theme]`
 

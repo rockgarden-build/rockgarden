@@ -44,6 +44,7 @@ class BuildConfig(BaseModel):
     ]
     icons_dir: Path | None = None
     assets_dir: str = "_assets"
+    inline_icons: bool = True
 
 
 class ThemeConfig(BaseModel):

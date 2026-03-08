@@ -30,7 +30,7 @@ from rockgarden.content import (
     validate_entry,
 )
 from rockgarden.hooks import run_hooks
-from rockgarden.icons import configure_icons_dir
+from rockgarden.icons import configure_icons_dir, process_inline_icons
 from rockgarden.links import transform_md_links
 from rockgarden.macros import build_macro_renderer, load_macros
 from rockgarden.nav import (
@@ -579,6 +579,8 @@ def build_site(
             source_file = page.source_path.name
             broken_links_by_page[source_file] = [target for target, _ in broken]
         content = transform_md_links(content, clean_urls)
+        if config.build.inline_icons:
+            content = process_inline_icons(content)
         page.html = process_callouts(render_markdown(content))
 
         toc_entries = None

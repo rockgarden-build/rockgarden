@@ -86,6 +86,53 @@ url_pattern = "/speakers/{slug}/"
 
 See [[Configuration]] for full collection options.
 
+## Icons
+
+Rockgarden bundles the full [Lucide](https://lucide.dev) icon set. Icons are available in both templates and markdown content.
+
+### In Templates
+
+Use the `icon` global function or filter to render inline SVG:
+
+```jinja2
+{{ icon("lucide:map-pin") }}
+{{ icon("map-pin") }}
+{{ "github" | icon }}
+```
+
+Unqualified names (without a `library:` prefix) default to Lucide. Missing icons render as empty strings and log a warning.
+
+### In Markdown
+
+Use `:library-name:` syntax to insert icons inline:
+
+```markdown
+Click :lucide-settings: to configure.
+Find us at :lucide-map-pin: 123 Main St.
+```
+
+Only icons that resolve successfully are replaced — unrecognized patterns are left as literal text, so the syntax degrades gracefully in other markdown renderers.
+
+Icons inside code blocks (fenced or inline) are never processed.
+
+To disable inline icon processing, set `inline_icons = false` in `[build]`:
+
+```toml
+[build]
+inline_icons = false
+```
+
+### Custom Icons
+
+Place custom SVG files in an icons directory and set `build.icons_dir`:
+
+```toml
+[build]
+icons_dir = "_icons"
+```
+
+Custom icons at `_icons/lucide/<name>.svg` override the bundled version of that icon.
+
 ## Build Hooks
 
 Run shell commands at build lifecycle stages:
