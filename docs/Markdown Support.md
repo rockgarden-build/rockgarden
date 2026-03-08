@@ -107,13 +107,22 @@ Rockgarden supports the superset of CommonMark, GFM (GitHub Flavored Markdown), 
 | YAML frontmatter | `---` block   | ✅     | Fully parsed             |
 | Inline fields    | `key:: value` | ❌     | Future (Dataview compat) |
 
+## Icons
+
+| Feature      | Syntax              | Status | Notes                  |
+| ------------ | ------------------- | ------ | ---------------------- |
+| Inline icons | `:lucide-map-pin:`  | ✅     | Lucide library bundled |
+
+Insert icons inline using `:library-name:` syntax. Only resolved icons are replaced; unrecognized patterns are left as literal text. See [[Customization]] for template usage and custom icon overrides.
+
 ## Syntax Priority
 
 When features overlap (rare), rockgarden handles them in this order:
 
 1. **Obsidian-specific syntax** is preprocessed first (wiki-links, embeds, callouts, comments)
-2. **GFM/CommonMark** is parsed by markdown-it-py
-3. **HTML passthrough** for anything not matched
+2. **Inline icons** are resolved and replaced with SVG
+3. **GFM/CommonMark** is parsed by markdown-it-py
+4. **HTML passthrough** for anything not matched
 
 This ensures:
 
