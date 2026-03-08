@@ -355,13 +355,20 @@ def build_collection_pages(
     return generated
 
 
-def build_site(config: Config, source: Path, output: Path) -> BuildResult:
+def build_site(
+    config: Config,
+    source: Path,
+    output: Path,
+    project_root: Path | None = None,
+) -> BuildResult:
     """Build the static site.
 
     Args:
         config: The site configuration.
         source: Source directory containing markdown files.
         output: Output directory for generated HTML.
+        project_root: Root directory of the project (where _themes/, _templates/
+            etc. live). Defaults to source.parent for backward compatibility.
 
     Returns:
         BuildResult with page count and broken links information.
@@ -371,7 +378,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     assets_dir = config.build.assets_dir
     copy_static_files(output, assets_dir)
 
-    site_root = source.parent
+    site_root = project_root if project_root is not None else source.parent
     macros = load_macros(site_root / "_macros")
     apply_macros = build_macro_renderer(macros)
     copy_theme_static_files(config.theme.name, site_root, output, assets_dir)
@@ -379,7 +386,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
     copy_user_assets(site_root, output, user_styles, user_scripts)
 
     if config.build.icons_dir:
-        configure_icons_dir((source.parent / config.build.icons_dir).resolve())
+        configure_icons_dir((site_root / config.build.icons_dir).resolve())
 
     hook_env = {
         "ROCKGARDEN_SOURCE": str(source.resolve()),
@@ -435,7 +442,7 @@ def build_site(config: Config, source: Path, output: Path) -> BuildResult:
 
     nav_tree = build_nav_tree(pages, config.nav, clean_urls, base_path)
 
-    env = create_engine(config, site_root=source.parent, base_path=base_path)
+    env = create_engine(config, site_root=site_root, base_path=base_path)
     env.globals["collections"] = {
         name: col.entries for name, col in collections.items()
     }

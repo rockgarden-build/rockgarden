@@ -143,6 +143,8 @@ def build(
     source_dir = source or config.site.source
     source_dir = source_dir.resolve()
 
+    project_root = config_file.parent.resolve() if config_file else Path.cwd()
+
     # Resolve output relative to cwd (where config file is), not source directory
     if output:
         output_dir = output.resolve()
@@ -168,7 +170,7 @@ def build(
 
     typer.echo(f"Building site from {source_dir}")
 
-    result = build_site(config, source_dir, output_dir)
+    result = build_site(config, source_dir, output_dir, project_root=project_root)
 
     typer.echo(
         f"Built {result.page_count} pages"
