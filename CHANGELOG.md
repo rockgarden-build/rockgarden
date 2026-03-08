@@ -1,3 +1,11 @@
+## v0.6.1 (2026-03-08)
+
+### Minor / Bug Fixes
+
+- add support for base_path (#60)
+- update CLI messages and docs to be consistent (#59)
+- add support for static assets (#57)
+
 ## v0.6.0 (2026-03-07)
 
 ### Features
