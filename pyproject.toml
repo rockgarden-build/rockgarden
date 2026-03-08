@@ -1,7 +1,7 @@
 [project]
 name = "rockgarden"
 version = "0.6.0"
-description = "Obsidian-compatible static site generator"
+description = "Static site generator for Markdown and Obsidian"
 readme = "README.md"
 authors = [
     { name = "Dave Forgac", email = "tylerdave@tylerdave.com" }
@@ -28,6 +28,12 @@ dependencies = [
     "pydantic>=2.12.5",
     "pyyaml>=6.0",
 ]
+
+[project.urls]
+Homepage = "https://rockgarden.build/"
+Repository = "https://github.com/rockgarden-build/rockgarden"
+Issues = "https://github.com/rockgarden-build/rockgarden/issues"
+Changelog = "https://github.com/rockgarden-build/rockgarden/blob/main/CHANGELOG.md"
 
 [project.scripts]
 rockgarden = "rockgarden.cli:main"

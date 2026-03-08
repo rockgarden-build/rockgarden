@@ -1,8 +1,8 @@
 # rockgarden
 
-A Python static site generator that works with Obsidian vaults and plain markdown folders out of the box. Point it at a directory of markdown files and get a navigable HTML site: no config required.
+A Python static site generator that works with Obsidian vaults and plain Markdown folders out of the box. Point it at a directory of Markdown files and get a navigable HTML site: no config required.
 
-Rockgarden handles Obsidian-specific syntax (wiki-links, embeds, callouts) so you can publish your vault without changing how you write. For plain markdown, it just works.
+Rockgarden handles Obsidian-specific syntax (wiki-links, embeds, callouts) so you can publish your vault without changing how you write. For plain Markdown, it just works.
 
 ## Philosophy
 
