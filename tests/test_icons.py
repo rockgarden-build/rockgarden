@@ -20,8 +20,11 @@ class TestResolveIcon:
     def test_unknown_library(self):
         assert resolve_icon("fakelib:info") is None
 
-    def test_invalid_format_no_colon(self):
-        assert resolve_icon("justAName") is None
+    def test_unqualified_defaults_to_lucide(self):
+        assert resolve_icon("info") == resolve_icon("lucide:info")
+
+    def test_unqualified_unknown_returns_none(self):
+        assert resolve_icon("nonexistent-zzz-xyz") is None
 
     def test_empty_string(self):
         assert resolve_icon("") is None

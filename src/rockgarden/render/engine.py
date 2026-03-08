@@ -1,15 +1,36 @@
 """Jinja2 template engine setup."""
 
+import logging
 from datetime import UTC, datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from jinja2 import ChoiceLoader, Environment, FileSystemLoader, PackageLoader
+from markupsafe import Markup
 
 from rockgarden.config import Config
 from rockgarden.content.models import Page
+from rockgarden.icons import resolve_icon
 from rockgarden.nav.tree import NavNode
 from rockgarden.urls import get_tag_url, get_tags_root_url, normalize_tag
+
+logger = logging.getLogger(__name__)
+
+
+def _icon(ref: str) -> Markup:
+    """Resolve an icon reference to inline SVG markup.
+
+    Args:
+        ref: Icon reference (e.g., "lucide:info" or "info").
+
+    Returns:
+        Markup containing the SVG, or empty Markup if not found.
+    """
+    svg = resolve_icon(ref)
+    if svg is None:
+        logger.warning("Icon not found: %s", ref)
+        return Markup("")
+    return Markup(svg)
 
 
 def _make_format_datetime(tz_name: str):
@@ -67,6 +88,8 @@ def create_engine(
     env.globals["normalize_tag"] = normalize_tag
     env.globals["tag_url"] = lambda slug: get_tag_url(slug, clean_urls, base_path)
     env.globals["tags_root_url"] = get_tags_root_url(clean_urls, base_path)
+    env.globals["icon"] = _icon
+    env.filters["icon"] = _icon
     return env
 
 

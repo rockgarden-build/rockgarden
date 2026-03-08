@@ -11,6 +11,8 @@ from rockgarden.icons.lucide import load_lucide_icon
 
 _icons_dir: Path | None = None
 
+LIBRARY_ALIASES: dict[str, str] = {"fa": "fontawesome"}
+
 
 def configure_icons_dir(path: Path | None) -> None:
     """Set the project-local icons directory for override lookups."""
@@ -28,10 +30,12 @@ def resolve_icon(ref: str) -> str | None:
         SVG markup string, or None if the library or icon is not found.
     """
     if ":" not in ref:
-        return None
-    library, name = ref.split(":", 1)
+        library, name = "lucide", ref
+    else:
+        library, name = ref.split(":", 1)
     if not library or not name:
         return None
+    library = LIBRARY_ALIASES.get(library, library)
     if library == "lucide":
         return load_lucide_icon(name, _icons_dir)
     return None
