@@ -7,10 +7,13 @@ on:
 jobs:
   claude-review:
     if: |
-      contains(github.event.pull_request.labels.*.name, 'claude-review') ||
+      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.pull_request.author_association) &&
       (
-        github.actor != 'dependabot[bot]' &&
-        (github.event.pull_request.draft == false || github.event.action == 'ready_for_review')
+        contains(github.event.pull_request.labels.*.name, 'claude-review') ||
+        (
+          github.actor != 'dependabot[bot]' &&
+          (github.event.pull_request.draft == false || github.event.action == 'ready_for_review')
+        )
       )
     concurrency:
       group: claude-review-${{ github.repository }}-${{ github.event.pull_request.number }}
