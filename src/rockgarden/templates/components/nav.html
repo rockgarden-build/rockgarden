@@ -23,7 +23,7 @@
 {% endmacro %}
 
 <nav class="nav-tree" aria-label="Site navigation">
-  <ul class="menu menu-sm bg-base-200 rounded-box w-full">
+  <ul class="menu menu-sm bg-base-200 rounded-box w-full p-0">
     {% for node in site.nav.children %}
       {{ render_node(node, site.nav_default_state) }}
     {% endfor %}
