@@ -622,7 +622,9 @@ def build_site(
 
         count += 1
 
-    folder_indexes = generate_folder_indexes(pages, config.nav, clean_urls, base_path)
+    folder_indexes = generate_folder_indexes(
+        pages, config.nav, clean_urls, base_path, config.site.title
+    )
     rendered_folder_indexes: list = []
     folder_template = env.get_template("folder_index.html")
 
