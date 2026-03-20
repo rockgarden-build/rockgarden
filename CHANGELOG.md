@@ -1,3 +1,11 @@
+## v0.6.3 (2026-03-20)
+
+### Minor / Bug Fixes
+
+- add auto-index home page (#66)
+- improve build error messages (#65)
+- update layout breakpoints (#64)
+
 ## v0.6.2 (2026-03-08)
 
 ### Minor / Bug Fixes
