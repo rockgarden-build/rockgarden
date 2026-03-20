@@ -92,3 +92,35 @@ def test_init_skips_gitignore_prompt_if_already_present():
         )
         assert result.exit_code == 0
         assert ".gitignore" not in result.output
+
+
+def test_build_yaml_error_shows_hint(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    source = tmp_path / "content"
+    source.mkdir()
+    bad_file = source / "bad.md"
+    bad_file.write_text("---\ntitle: foo: bar: baz\n---\nHello\n")
+    config = tmp_path / "rockgarden.toml"
+    config.write_text('[site]\ntitle = "Test"\nsource = "content"\noutput = "_site"\n')
+    result = runner.invoke(app, ["build", "--clean"])
+    assert result.exit_code == 1
+    assert "Invalid YAML in frontmatter" in result.output
+    assert "Hint:" in result.output
+    assert "Traceback" not in result.output
+
+
+def test_build_unhandled_error_shows_type_and_message(tmp_path, monkeypatch):
+    from unittest.mock import patch
+
+    monkeypatch.chdir(tmp_path)
+    source = tmp_path / "content"
+    source.mkdir()
+    config = tmp_path / "rockgarden.toml"
+    config.write_text('[site]\ntitle = "Test"\nsource = "content"\noutput = "_site"\n')
+
+    side_effect = RuntimeError("something broke")
+    with patch("rockgarden.cli.build_site", side_effect=side_effect):
+        result = runner.invoke(app, ["build", "--clean"])
+    assert result.exit_code == 1
+    assert "RuntimeError: something broke" in result.output
+    assert "Traceback" not in result.output
