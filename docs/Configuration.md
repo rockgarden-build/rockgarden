@@ -152,7 +152,7 @@ rockgarden serve --output ./dist --port 3000
 
 ## Convention Directories
 
-These directories are discovered by convention at the site root:
+These directories are discovered by convention at the **site root** (the directory containing `rockgarden.toml`), not inside the source directory:
 
 | Directory         | Purpose                                                    |
 | ----------------- | ---------------------------------------------------------- |

@@ -6,6 +6,8 @@ tags: [guide]
 
 Rockgarden supports progressive customization — start with zero config and add layers as needed.
 
+Convention directories like `_styles/`, `_scripts/`, `_static/`, and `_templates/` are resolved relative to the **site root** — the directory containing `rockgarden.toml`. When your source directory is a subdirectory (e.g. `source = "vault"`), place these directories next to `rockgarden.toml`, not inside the source directory.
+
 ## Static Files
 
 Place files in `_static/` at your site root to have them copied as-is to the output root during build. Useful for deployment platform files (`_redirects`, `_headers`), favicons, `robots.txt`, and verification files.
