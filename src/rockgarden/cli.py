@@ -6,7 +6,7 @@ import socketserver
 import tomllib
 from functools import partial
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, NoReturn
 
 import typer
 
@@ -170,7 +170,10 @@ def build(
 
     typer.echo(f"Building site from {source_dir}")
 
-    result = build_site(config, source_dir, output_dir, project_root=project_root)
+    try:
+        result = build_site(config, source_dir, output_dir, project_root=project_root)
+    except Exception as exc:
+        _handle_build_error(exc)
 
     typer.echo(
         f"Built {result.page_count} pages"
@@ -404,5 +407,29 @@ def validate(
         raise typer.Exit(1)
 
 
+def _handle_build_error(exc: Exception) -> NoReturn:
+    import yaml
+
+    if isinstance(exc, yaml.YAMLError):
+        typer.echo(f"Error: Invalid YAML in frontmatter: {exc}", err=True)
+        typer.echo(
+            "Hint: Check your Markdown files for YAML syntax errors in the"
+            " frontmatter block (between --- markers).",
+            err=True,
+        )
+    else:
+        label = type(exc).__name__
+        typer.echo(f"Error: {label}: {exc}", err=True)
+
+    raise typer.Exit(1)
+
+
 def main() -> None:
-    app()
+    try:
+        app()
+    except SystemExit:
+        raise
+    except Exception as exc:
+        label = type(exc).__name__
+        typer.echo(f"Error: {label}: {exc}", err=True)
+        raise SystemExit(1) from None
