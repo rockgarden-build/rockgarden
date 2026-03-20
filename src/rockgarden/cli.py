@@ -6,7 +6,7 @@ import socketserver
 import tomllib
 from functools import partial
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, NoReturn
 
 import typer
 
@@ -407,7 +407,7 @@ def validate(
         raise typer.Exit(1)
 
 
-def _handle_build_error(exc: Exception) -> None:
+def _handle_build_error(exc: Exception) -> NoReturn:
     import yaml
 
     if isinstance(exc, yaml.YAMLError):
