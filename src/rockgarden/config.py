@@ -71,6 +71,7 @@ class ThemeConfig(BaseModel):
     nav_default_state: str = "collapsed"
     show_build_info: bool = True
     show_build_commit: bool = False
+    main_content_padding: str = "px-12"
 
 
 class NavLinkConfig(BaseModel):
