@@ -4,5 +4,6 @@ source = "./site"
 output = "./_site"
 
 [theme]
+#main_content_padding = "px-16"
 daisyui_default = "cyberpunk"
 daisyui_themes = ["light", "dark", "cupcake", "cyberpunk", "forest", "aqua", "lofi", "dracula"]

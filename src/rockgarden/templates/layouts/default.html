@@ -31,7 +31,7 @@
 
             <!-- Main content area -->
             <div class="flex flex-1 lg:min-h-screen">
-                <main id="main-content" class="flex-1 min-w-0 p-4 lg:py-6 lg:px-8">
+                <main id="main-content" class="flex-1 min-w-0 p-4 lg:py-6 lg:{{ site.main_content_padding }}">
                     <div class="max-w-4xl">
                         {% block content %}{% endblock %}
                         {% block footer %}

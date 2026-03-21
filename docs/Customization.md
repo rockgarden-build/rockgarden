@@ -53,6 +53,23 @@ layout: talk
 
 This resolves to `layouts/talk.html`. Resolution order: frontmatter `layout` → collection default → `[theme] default_layout` → `layouts/default.html`.
 
+## Theme Options
+
+The `[theme]` table includes options that control the default layout appearance.
+
+### Content Padding
+
+Control the horizontal padding of the main content area with a Tailwind CSS padding class:
+
+```toml
+[theme]
+main_content_padding = "px-12"
+```
+
+Default: `px-12`. Pre-built values available without a custom CSS build: `px-4`, `px-6`, `px-8`, `px-10`, `px-12`, `px-16`, `px-20`, `px-24`. The class is applied at the `lg` breakpoint; mobile padding remains `p-4`.
+
+For values outside this range, you'll need a custom Tailwind CSS build — see [Custom Themes](#custom-themes) or export the default theme with `rockgarden theme export`.
+
 ## Theme Export
 
 To fully customize the default theme, export it as a starting point:

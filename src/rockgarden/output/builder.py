@@ -474,6 +474,7 @@ def build_site(
         "user_styles": user_styles,
         "user_scripts": user_scripts,
         "assets_dir": assets_dir,
+        "main_content_padding": config.theme.main_content_padding,
         "feed_enabled": config.feed.enabled and bool(config.site.base_url),
         "feed_path": config.feed.path,
     }
