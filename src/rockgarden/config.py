@@ -138,6 +138,13 @@ class FeedConfig(BaseModel):
     collections: list[str] = Field(default_factory=list)
 
 
+class LlmsTxtConfig(BaseModel):
+    """llms.txt generation configuration."""
+
+    enabled: bool = False
+    description: str = ""
+
+
 class HooksConfig(BaseModel):
     """Build hook commands executed at lifecycle stages."""
 
@@ -169,6 +176,7 @@ class Config(BaseModel):
     search: SearchConfig = Field(default_factory=SearchConfig)
     dates: DatesConfig = Field(default_factory=DatesConfig)
     feed: FeedConfig = Field(default_factory=FeedConfig)
+    llms_txt: LlmsTxtConfig = Field(default_factory=LlmsTxtConfig)
     hooks: HooksConfig = Field(default_factory=HooksConfig)
     collections: list[CollectionConfig] = Field(default_factory=list)
 

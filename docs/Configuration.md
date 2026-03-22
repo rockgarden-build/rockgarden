@@ -115,6 +115,17 @@ Atom feed generation. Requires `site.base_url` to be set.
 | `modified_date_fallback` | `bool`      | `false`                                    | Use file modification time when no frontmatter date field matches    |
 | `timezone`               | `str`       | `"UTC"`                                    | IANA timezone for date display (e.g. `"US/Eastern"`)                 |
 
+## `[llms_txt]`
+
+Generates an `llms.txt` file following the [llmstxt.org](https://llmstxt.org/) specification, making site content discoverable by LLMs. Requires `site.base_url` to be set.
+
+| Field         | Type   | Default | Description                                       |
+| ------------- | ------ | ------- | ------------------------------------------------- |
+| `enabled`     | `bool` | `false` | Enable llms.txt generation                        |
+| `description` | `str`  | `""`    | Site summary shown as a blockquote below the title |
+
+Pages are grouped by named collection first, then by top-level directory, then root-level pages.
+
 ## `[hooks]`
 
 Shell commands executed at build lifecycle stages. Commands run sequentially; any non-zero exit aborts the build.
