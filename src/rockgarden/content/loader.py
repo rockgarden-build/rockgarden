@@ -63,7 +63,7 @@ def path_to_slug(path: Path, source: Path, url_style: str = "slug") -> str:
     Args:
         path: The file path.
         source: The source root directory.
-        url_style: Slug style ("kebab" or "preserve").
+        url_style: URL style ("slug", "preserve-case", or "preserve").
 
     Returns:
         The slug (e.g., 'index', 'npcs/olvir').
