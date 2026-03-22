@@ -51,7 +51,7 @@ def process_wikilinks(
 
         url = resolver(target)
         if url:
-            encoded_url = quote(url, safe="/:?#[]@!$&'()*+,;=")
+            encoded_url = quote(url, safe="/:?#[]@!$&'()*+,;=%")
             return f"[{display}]({encoded_url})"
         else:
             broken_links.append((target, display))

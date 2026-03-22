@@ -17,6 +17,16 @@ class SiteConfig(BaseModel):
     clean_urls: bool = True
     base_url: str = ""
     base_path: str = ""
+    url_style: str = "slug"
+
+    @field_validator("url_style", mode="after")
+    @classmethod
+    def validate_url_style(cls, v: str) -> str:
+        allowed = ("slug", "preserve-case", "preserve")
+        if v not in allowed:
+            msg = f"url_style must be one of {allowed}, got {v!r}"
+            raise ValueError(msg)
+        return v
 
     @field_validator("base_url", mode="after")
     @classmethod

@@ -57,22 +57,26 @@ def should_ignore(path: Path, source: Path, patterns: list[str]) -> bool:
     return False
 
 
-def path_to_slug(path: Path, source: Path) -> str:
+def path_to_slug(path: Path, source: Path, url_style: str = "slug") -> str:
     """Convert a file path to a URL slug.
 
     Args:
         path: The file path.
         source: The source root directory.
+        url_style: URL style ("slug", "preserve-case", or "preserve").
 
     Returns:
         The slug (e.g., 'index', 'npcs/olvir').
     """
     rel_path = str(path.relative_to(source))
-    return generate_slug(rel_path)
+    return generate_slug(rel_path, style=url_style)
 
 
 def load_page(
-    path: Path, source: Path, dates_config: DatesConfig | None = None
+    path: Path,
+    source: Path,
+    dates_config: DatesConfig | None = None,
+    url_style: str = "slug",
 ) -> Page:
     """Load a single page from a markdown file.
 
@@ -93,7 +97,7 @@ def load_page(
     if custom_slug := metadata.get("slug"):
         slug = custom_slug
     else:
-        slug = path_to_slug(path, source)
+        slug = path_to_slug(path, source, url_style)
 
     modified = _resolve_frontmatter_date(metadata, dates_config.modified_date_fields)
     if modified is None and dates_config.modified_date_fallback:
@@ -115,6 +119,7 @@ def load_content(
     source: Path,
     ignore_patterns: list[str],
     dates_config: DatesConfig | None = None,
+    url_style: str = "slug",
 ) -> list[Page]:
     """Discover and load all markdown files from source directory.
 
@@ -132,7 +137,7 @@ def load_content(
         if should_ignore(path, source, ignore_patterns):
             continue
 
-        page = load_page(path, source, dates_config)
+        page = load_page(path, source, dates_config, url_style)
         pages.append(page)
 
     return pages

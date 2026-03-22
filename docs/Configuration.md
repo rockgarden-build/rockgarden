@@ -18,8 +18,30 @@ Configuration lives in `rockgarden.toml` at the site root.
 | `source`      | `path` | `"."`       | Source directory containing content files                                                                                  |
 | `output`      | `path` | `"_site"`   | Output directory for built site                                                                                            |
 | `clean_urls`  | `bool` | `true`      | Generate `/page/index.html` instead of `/page.html`                                                                        |
+| `url_style`   | `str`  | `"slug"`    | How filenames become URLs. `"slug"` (lowercase, dashes), `"preserve-case"` (original casing, dashes), or `"preserve"` (original casing and spacing). See [[#URL Styles]]. |
 | `base_url`    | `str`  | `""`        | Full base URL (e.g. `https://example.com/docs`). Used for feeds, sitemap, and deriving `base_path` when not set explicitly. Trailing slash is stripped automatically. |
 | `base_path`   | `str`  | `""`        | URL path prefix for subdirectory deploys (e.g. `/docs`). When set, all generated URLs are prefixed with this path. If not set, derived from `base_url`. Trailing slash is stripped automatically. |
+
+### URL Styles
+
+Controls how filenames are transformed into URLs. Given a file `Session Logs/2026-03-21 - Session 40.md`:
+
+| Style            | Slug                                     | URL                                              |
+| ---------------- | ---------------------------------------- | ------------------------------------------------ |
+| `slug` (default) | `session-logs/2026-03-21-session-40`     | `/session-logs/2026-03-21-session-40/`           |
+| `preserve-case`  | `Session-Logs/2026-03-21-Session-40`     | `/Session-Logs/2026-03-21-Session-40/`           |
+| `preserve`       | `Session Logs/2026-03-21 - Session 40`   | `/Session%20Logs/2026-03-21%20-%20Session%2040/` |
+
+- **`slug`**: Lowercases, replaces spaces and underscores with dashes, collapses consecutive dashes.
+- **`preserve-case`**: Same as `slug` but keeps the original casing from filenames.
+- **`preserve`**: Keeps filenames exactly as-is (spaces, casing, characters). URLs are percent-encoded.
+
+All styles strip the `.md` extension and preserve directory structure. Per-page `slug` frontmatter overrides any style.
+
+```toml
+[site]
+url_style = "preserve-case"
+```
 
 ## `[build]`
 
