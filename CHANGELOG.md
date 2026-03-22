@@ -1,3 +1,11 @@
+## v0.6.4 (2026-03-22)
+
+### Minor / Bug Fixes
+
+- add support for multiple URL styles (#72)
+- add subtitle support + nav fixes (#71)
+- add configurable content padding (#70)
+
 ## v0.6.3 (2026-03-20)
 
 ### Minor / Bug Fixes
