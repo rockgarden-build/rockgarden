@@ -3,6 +3,7 @@
 ### Minor / Bug Fixes
 
 - add support for multiple URL styles (#72)
+  - Note: this change collapses sequential dashes in URLs (`---` becomes `-`). Use `slug` in frontmatter to explicitly override file URL.
 - add subtitle support + nav fixes (#71)
 - add configurable content padding (#70)
 
