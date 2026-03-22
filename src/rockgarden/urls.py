@@ -1,7 +1,7 @@
 """Centralized URL and path generation utilities."""
 
 import re
-from urllib.parse import urlparse
+from urllib.parse import quote, urlparse
 
 
 def normalize_tag(tag: str) -> str:
@@ -34,26 +34,32 @@ def get_base_path(base_url: str) -> str:
     return path
 
 
-def generate_slug(relative_path: str) -> str:
-    """Generate URL-safe slug from a relative file path.
-
-    Removes extension, lowercases, and replaces spaces/underscores with dashes.
-
-    Examples:
-        "Getting Started.md" → "getting-started"
-        "NPCs/Olvir the Wise.md" → "npcs/olvir-the-wise"
-        "folder/index.md" → "folder/index"
+def generate_slug(relative_path: str, style: str = "slug") -> str:
+    """Generate a slug from a relative file path.
 
     Args:
         relative_path: Relative path from source root (e.g., "NPCs/Olvir.md").
+        style: "slug" (lowercase, dashes), "preserve-case" (original casing,
+            dashes), or "preserve" (original casing and spacing).
 
     Returns:
-        URL-safe slug (e.g., "npcs/olvir").
+        Slug string. For slug: "npcs/olvir-the-wise".
+        For preserve-case: "NPCs/Olvir-the-Wise".
+        For preserve: "NPCs/Olvir the Wise".
     """
     slug = re.sub(r"\.md$", "", relative_path, flags=re.IGNORECASE)
-    slug = slug.lower()
+    if style == "preserve":
+        return slug
     slug = re.sub(r"[ _]+", "-", slug)
+    slug = re.sub(r"-+", "-", slug)
+    if style == "slug":
+        slug = slug.lower()
     return slug
+
+
+def _encode_slug(slug: str) -> str:
+    """Percent-encode each segment of a slug for use in URLs."""
+    return "/".join(quote(segment, safe="") for segment in slug.split("/"))
 
 
 def get_output_path(slug: str, clean_urls: bool = True) -> str:
@@ -92,17 +98,18 @@ def get_url(slug: str, clean_urls: bool = True, base_path: str = "") -> str:
         - clean_urls=False: "about" → "/about.html"
         - Index pages:      "folder/index" → "/folder/"
     """
+    encoded = _encode_slug(slug)
     parts = slug.split("/")
 
     if parts[-1] == "index":
-        folder_path = "/".join(parts[:-1])
+        folder_path = "/".join(quote(p, safe="") for p in parts[:-1])
         if folder_path:
             return f"{base_path}/{folder_path}/"
         return f"{base_path}/"
 
     if clean_urls:
-        return f"{base_path}/{slug}/"
-    return f"{base_path}/{slug}.html"
+        return f"{base_path}/{encoded}/"
+    return f"{base_path}/{encoded}.html"
 
 
 def get_tag_url(tag_slug: str, clean_urls: bool = True, base_path: str = "") -> str:
@@ -118,9 +125,10 @@ def get_tag_url(tag_slug: str, clean_urls: bool = True, base_path: str = "") -> 
         - clean_urls=True:  "python" → "/tags/python/"
         - clean_urls=False: "python" → "/tags/python.html"
     """
+    encoded = quote(tag_slug, safe="")
     if clean_urls:
-        return f"{base_path}/tags/{tag_slug}/"
-    return f"{base_path}/tags/{tag_slug}.html"
+        return f"{base_path}/tags/{encoded}/"
+    return f"{base_path}/tags/{encoded}.html"
 
 
 def get_tags_root_url(clean_urls: bool = True, base_path: str = "") -> str:
@@ -147,6 +155,7 @@ def get_folder_url(
     if not folder_path:
         return f"{base_path}/" if clean_urls else f"{base_path}/index.html"
 
+    encoded = _encode_slug(folder_path)
     if clean_urls:
-        return f"{base_path}/{folder_path}/"
-    return f"{base_path}/{folder_path}/index.html"
+        return f"{base_path}/{encoded}/"
+    return f"{base_path}/{encoded}/index.html"

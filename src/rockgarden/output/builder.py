@@ -394,7 +394,9 @@ def build_site(
     }
     run_hooks(config.hooks.pre_build, "pre_build", cwd=site_root, env_vars=hook_env)
 
-    pages = load_content(source, config.build.ignore_patterns, config.dates)
+    pages = load_content(
+        source, config.build.ignore_patterns, config.dates, config.site.url_style
+    )
     clean_urls = config.site.clean_urls
     base_path = config.site.base_path or get_base_path(config.site.base_url)
 
