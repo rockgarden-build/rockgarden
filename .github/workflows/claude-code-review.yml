@@ -3,20 +3,29 @@ name: Claude Code Review
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review, labeled]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to review (for external contributor PRs)'
+        required: true
+        type: number
 
 jobs:
   claude-review:
     if: |
-      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.pull_request.author_association) &&
+      github.event_name == 'workflow_dispatch' ||
       (
-        contains(github.event.pull_request.labels.*.name, 'claude-review') ||
+        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.pull_request.author_association) &&
         (
-          github.actor != 'dependabot[bot]' &&
-          (github.event.pull_request.draft == false || github.event.action == 'ready_for_review')
+          contains(github.event.pull_request.labels.*.name, 'claude-review') ||
+          (
+            github.actor != 'dependabot[bot]' &&
+            (github.event.pull_request.draft == false || github.event.action == 'ready_for_review')
+          )
         )
       )
     concurrency:
-      group: claude-review-${{ github.repository }}-${{ github.event.pull_request.number }}
+      group: claude-review-${{ github.repository }}-${{ github.event.inputs.pr_number || github.event.pull_request.number }}
       cancel-in-progress: true
     runs-on: ubuntu-latest
     permissions:
@@ -25,6 +34,25 @@ jobs:
       issues: read
       id-token: write
     steps:
+      - name: Resolve PR metadata
+        id: pr-meta
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_PR_NUMBER: ${{ github.event.inputs.pr_number }}
+          PR_EVENT_NUMBER: ${{ github.event.pull_request.number }}
+          PR_EVENT_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          REPO: ${{ github.repository }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            PR_DATA=$(gh pr view "$INPUT_PR_NUMBER" --repo "$REPO" --json headRefSha,number --jq '.')
+            echo "pr_number=$INPUT_PR_NUMBER" >> "$GITHUB_OUTPUT"
+            echo "head_sha=$(echo "$PR_DATA" | jq -r '.headRefSha')" >> "$GITHUB_OUTPUT"
+          else
+            echo "pr_number=$PR_EVENT_NUMBER" >> "$GITHUB_OUTPUT"
+            echo "head_sha=$PR_EVENT_HEAD_SHA" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
@@ -36,7 +64,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OWNER: ${{ github.repository_owner }}
           REPO: ${{ github.event.repository.name }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_NUMBER: ${{ steps.pr-meta.outputs.pr_number }}
         run: |
           # Query for previous reviews
           REVIEWS_JSON=$(gh api graphql -f query='
@@ -117,14 +145,14 @@ jobs:
         uses: anthropics/claude-code-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_NUMBER: ${{ steps.pr-meta.outputs.pr_number }}
           REPO: ${{ github.repository }}
-          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_HEAD_SHA: ${{ steps.pr-meta.outputs.head_sha }}
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           claude_args: '--model ${{ vars.CLAUDE_CODE_DEFAULT_MODEL || ''sonnet'' }} --dangerously-skip-permissions --allowed-tools "Bash(gh *),Bash(cat *),Bash(curl *)"'
           prompt: |
-            You are reviewing PR #${{ github.event.pull_request.number }} in ${{ github.repository }}.
+            You are reviewing PR #${{ steps.pr-meta.outputs.pr_number }} in ${{ github.repository }}.
 
             **REQUIRED FIRST STEP:**
             Read and understand the CLAUDE.md file in the repository root. This contains critical context about our architecture, conventions, and intentional design decisions.
