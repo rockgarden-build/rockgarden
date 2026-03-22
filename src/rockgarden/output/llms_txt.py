@@ -74,7 +74,10 @@ def build_llms_txt(
     all_items: list[Page | FolderIndex] = [
         p for p in pages if p.slug not in collected_slugs
     ]
-    all_items.extend(folder_indexes)
+    collected_dirs = {col.config.source for col in collections.values() if col.entries}
+    all_items.extend(
+        fi for fi in folder_indexes if fi.slug.rsplit("/", 1)[0] not in collected_dirs
+    )
 
     for item in all_items:
         parts = item.slug.split("/")

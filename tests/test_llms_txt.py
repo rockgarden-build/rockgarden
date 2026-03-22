@@ -157,6 +157,17 @@ class TestBuildLlmsTxt:
         )
         assert "## Links" not in result
 
+    def test_collection_folder_index_not_duplicated(self):
+        page = self._make_page("blog/post1", "First Post", source_prefix="blog")
+        folder = FolderIndex(slug="blog/index", title="Blog", children=[])
+        col_config = CollectionConfig(name="Blog", source="blog")
+        col = Collection(name="Blog", config=col_config, entries=[page])
+        result = build_llms_txt(
+            [page], [folder], {"blog": col}, "https://example.com", "My Site"
+        )
+        assert "## Blog" in result
+        assert "## blog" not in result
+
     def test_trailing_newline(self):
         result = build_llms_txt(
             [self._make_page("about", "About")],
