@@ -137,6 +137,9 @@ Per-page options set in YAML frontmatter:
 | `nav_order`   | `int`           | Pin position in navigation (lower = higher)                               |
 | `tags`        | `list[str]`     | Content tags, used for tag index pages                                    |
 | `layout`      | `str`           | Layout template name (e.g. `"talk"` → `layouts/talk.html`)                |
+| `aliases`     | `str` or `list` | Alternative names for wikilink resolution                                 |
+| `author`      | `str`           | Page author (used in Atom feed, overrides site-level feed author)         |
+| `subtitle`    | `str`           | Subtitle shown below the page title, in folder indexes, and tag indexes   |
 | `show_index`  | `bool`          | For `index.md` files: render page content + auto-generated folder listing |
 
 ## CLI Overrides

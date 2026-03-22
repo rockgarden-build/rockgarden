@@ -45,6 +45,7 @@ def build_tag_pages(
             raw_tags = [raw_tags]
         return {
             "title": p.title,
+            "subtitle": p.frontmatter.get("subtitle", ""),
             "url": get_url(p.slug, clean_urls, base_path),
             "tags": [normalize_tag(t) for t in raw_tags if normalize_tag(t)],
         }

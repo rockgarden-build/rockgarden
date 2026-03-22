@@ -16,6 +16,7 @@ class FolderChild:
     """A child item in a folder listing."""
 
     title: str
+    subtitle: str
     path: str
     is_folder: bool
     modified: datetime | None = None
@@ -205,6 +206,7 @@ def _get_folder_children(
             children.append(
                 FolderChild(
                     title=page.title,
+                    subtitle=page.frontmatter.get("subtitle", ""),
                     path=get_url(page.slug, clean_urls, base_path),
                     is_folder=False,
                     modified=modified,
@@ -232,6 +234,7 @@ def _get_folder_children(
                 children.append(
                     FolderChild(
                         title=label,
+                        subtitle="",
                         path=get_folder_url(subfolder_path, clean_urls, base_path),
                         is_folder=True,
                         nav_order=nav_order,
