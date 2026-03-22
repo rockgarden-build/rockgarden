@@ -762,6 +762,7 @@ def build_site(
             config.llms_txt.description,
             clean_urls,
             base_path,
+            config.nav.links,
         )
         (output / "llms.txt").write_text(llms_txt_content)
 

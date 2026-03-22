@@ -2,10 +2,21 @@
 
 from __future__ import annotations
 
+from rockgarden.config import NavLinkConfig
 from rockgarden.content.collection import Collection
 from rockgarden.content.models import Page
 from rockgarden.nav.folder_index import FolderIndex
 from rockgarden.urls import get_url
+
+
+def _flatten_nav_links(links: list[NavLinkConfig]) -> list[NavLinkConfig]:
+    """Flatten nested nav links, keeping only entries with a URL."""
+    result: list[NavLinkConfig] = []
+    for link in links:
+        if link.url:
+            result.append(link)
+        result.extend(_flatten_nav_links(link.children))
+    return result
 
 
 def build_llms_txt(
@@ -17,11 +28,12 @@ def build_llms_txt(
     description: str = "",
     clean_urls: bool = True,
     base_path: str = "",
+    nav_links: list[NavLinkConfig] | None = None,
 ) -> str:
     """Generate an llms.txt string.
 
     Sections are ordered: named collections first, then remaining pages grouped
-    by top-level directory, then root-level pages.
+    by top-level directory, then root-level pages, then nav links.
 
     Args:
         pages: All content pages.
@@ -32,6 +44,7 @@ def build_llms_txt(
         description: Site description for the blockquote.
         clean_urls: Whether clean URLs are enabled.
         base_path: URL path prefix.
+        nav_links: Custom navigation links from config.
 
     Returns:
         llms.txt content string.
@@ -88,6 +101,15 @@ def build_llms_txt(
         for item in items:
             url = base_url + get_url(item.slug, clean_urls, base_path)
             lines.append(f"- [{item.title}]({url})")
+
+    if nav_links:
+        flat_links = _flatten_nav_links(nav_links)
+        if flat_links:
+            lines.append("")
+            lines.append("## Links")
+            lines.append("")
+            for link in flat_links:
+                lines.append(f"- [{link.label}]({link.url})")
 
     lines.append("")
     return "\n".join(lines)

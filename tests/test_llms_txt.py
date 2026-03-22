@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from rockgarden.config import CollectionConfig
+from rockgarden.config import CollectionConfig, NavLinkConfig
 from rockgarden.content.collection import Collection
 from rockgarden.content.models import Page
 from rockgarden.nav.folder_index import FolderIndex
@@ -112,6 +112,50 @@ class TestBuildLlmsTxt:
     def test_empty_site(self):
         result = build_llms_txt([], [], {}, "https://example.com", "My Site")
         assert result == "# My Site\n"
+
+    def test_nav_links_section(self):
+        links = [
+            NavLinkConfig(label="GitHub", url="https://github.com/example"),
+            NavLinkConfig(label="Tags", url="/tags/"),
+        ]
+        result = build_llms_txt(
+            [], [], {}, "https://example.com", "My Site", nav_links=links
+        )
+        assert "## Links" in result
+        assert "- [GitHub](https://github.com/example)" in result
+        assert "- [Tags](/tags/)" in result
+
+    def test_nav_links_after_pages(self):
+        links = [NavLinkConfig(label="GitHub", url="https://github.com/example")]
+        pages = [self._make_page("about", "About")]
+        result = build_llms_txt(
+            pages, [], {}, "https://example.com", "My Site", nav_links=links
+        )
+        pages_pos = result.index("## Pages")
+        links_pos = result.index("## Links")
+        assert pages_pos < links_pos
+
+    def test_nav_links_flattens_nested(self):
+        links = [
+            NavLinkConfig(
+                label="Parent",
+                url="",
+                children=[
+                    NavLinkConfig(label="Child", url="https://example.com/child"),
+                ],
+            ),
+        ]
+        result = build_llms_txt(
+            [], [], {}, "https://example.com", "My Site", nav_links=links
+        )
+        assert "- [Child](https://example.com/child)" in result
+        assert "Parent" not in result
+
+    def test_no_nav_links_no_section(self):
+        result = build_llms_txt(
+            [], [], {}, "https://example.com", "My Site", nav_links=[]
+        )
+        assert "## Links" not in result
 
     def test_trailing_newline(self):
         result = build_llms_txt(
