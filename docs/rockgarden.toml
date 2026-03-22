@@ -3,6 +3,11 @@ title = "Rockgarden"
 clean_urls = true
 output = "../_site"
 ignore_patterns = []
+base_url = "https://rockgarden.build"
+
+[llms_txt]
+enabled = true
+description = "Rockgarden is an opinionated static site generator that turns a folder of Markdown files into a fast, searchable, interlinked website. It supports CommonMark, GitHub Flavored Markdown, and Obsidian syntax out of the box."
 
 [dates]
 timezone = "US/Eastern"
