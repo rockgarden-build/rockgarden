@@ -50,7 +50,7 @@
         <!-- Sidebar -->
         <div class="drawer-side z-40">
             <label for="nav-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-            <aside aria-label="Main navigation" class="bg-base-200 min-h-full w-60 pl-4 pr-2 py-2">
+            <aside id="nav-sidebar" aria-label="Main navigation" class="bg-base-200 min-h-full w-60 pl-4 pr-2 py-2">
                 <div class="flex items-center justify-between mb-4">
                     <a href="{{ site.base_path }}/" class="text-lg font-bold">{{ site.title or 'Home' }}</a>
                     <div class="hidden min-[750px]:block">
@@ -151,6 +151,16 @@
                     e.stopPropagation();
                 });
             });
+
+            const SCROLL_KEY = 'rockgarden-nav-scroll';
+            const scrollContainer = document.querySelector('.drawer-side');
+            if (scrollContainer) {
+                const saved = sessionStorage.getItem(SCROLL_KEY);
+                if (saved) scrollContainer.scrollTop = parseInt(saved, 10);
+                scrollContainer.addEventListener('scroll', function() {
+                    sessionStorage.setItem(SCROLL_KEY, scrollContainer.scrollTop);
+                });
+            }
         })();
 
         {% if site.search_enabled %}

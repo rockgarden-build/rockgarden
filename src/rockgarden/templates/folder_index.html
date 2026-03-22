@@ -20,11 +20,13 @@
   {% endif %}
 
   {% if folder.children %}
+  {% set has_subtitle = folder.children | selectattr('subtitle') | list | length > 0 %}
   <div class="overflow-x-auto">
     <table class="table table-zebra">
       <thead>
         <tr>
           <th scope="col">Title</th>
+          {% if has_subtitle %}<th scope="col">Subtitle</th>{% endif %}
           <th scope="col">Modified</th>
           <th scope="col">Tags</th>
         </tr>
@@ -44,6 +46,7 @@
             <a href="{{ child.path }}" class="link link-hover link-primary">{{ child.title }}</a>
             {% endif %}
           </td>
+          {% if has_subtitle %}<td class="text-base-content/60 text-sm">{{ child.subtitle }}</td>{% endif %}
           <td class="text-base-content/60 text-sm">{{ child.modified | format_datetime }}</td>
           <td>
             {% if child.tags %}
