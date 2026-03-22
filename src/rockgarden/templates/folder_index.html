@@ -25,9 +25,9 @@
     <table class="table table-zebra">
       <thead>
         <tr>
-          <th scope="col">Title</th>
-          {% if has_subtitle %}<th scope="col">Subtitle</th>{% endif %}
-          <th scope="col">Modified</th>
+          <th scope="col" style="width: 40%">Title</th>
+          {% if has_subtitle %}<th scope="col" style="width: 40%">Subtitle</th>{% endif %}
+          <th scope="col" class="whitespace-nowrap">Modified</th>
           <th scope="col">Tags</th>
         </tr>
       </thead>
@@ -47,7 +47,7 @@
             {% endif %}
           </td>
           {% if has_subtitle %}<td class="text-base-content/60 text-sm">{{ child.subtitle }}</td>{% endif %}
-          <td class="text-base-content/60 text-sm">{{ child.modified | format_datetime }}</td>
+          <td class="text-base-content/60 text-sm whitespace-nowrap">{{ child.modified | format_datetime }}</td>
           <td>
             {% if child.tags %}
             <div class="flex flex-wrap gap-1">
