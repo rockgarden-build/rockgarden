@@ -26,8 +26,8 @@ class TestHtmlToMarkdown:
     def test_empty_string(self):
         assert html_to_markdown("") == ""
 
-    def test_none_like_empty(self):
-        assert html_to_markdown(None) == ""
+    def test_whitespace_only_empty(self):
+        assert html_to_markdown("   ") == ""
 
     def test_whitespace_stripped(self):
         result = html_to_markdown("  <p>Hello</p>  ")
