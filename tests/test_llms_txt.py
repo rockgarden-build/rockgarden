@@ -238,7 +238,7 @@ class TestBuildLlmsFullTxt:
     def test_page_entry_has_title_heading(self):
         pages = [self._make_page("about", "About", html="<p>Content</p>")]
         result = build_llms_full_txt(pages, [], {}, "https://example.com", "My Site")
-        assert "## About" in result
+        assert "### About" in result
 
     def test_separator_between_entries(self):
         pages = [
@@ -251,7 +251,7 @@ class TestBuildLlmsFullTxt:
     def test_page_without_html(self):
         pages = [self._make_page("about", "About")]
         result = build_llms_full_txt(pages, [], {}, "https://example.com", "My Site")
-        assert "## About" in result
+        assert "### About" in result
         assert "Source: https://example.com/about/" in result
 
     def test_collection_pages(self):
@@ -263,7 +263,8 @@ class TestBuildLlmsFullTxt:
         result = build_llms_full_txt(
             [page], [], {"blog": col}, "https://example.com", "My Site"
         )
-        assert "## First Post" in result
+        assert "## Blog" in result
+        assert "### First Post" in result
         assert "Post content" in result
 
     def test_folder_index_content(self):
@@ -274,13 +275,13 @@ class TestBuildLlmsFullTxt:
             custom_content="<p>Welcome to docs</p>",
         )
         result = build_llms_full_txt([], [folder], {}, "https://example.com", "My Site")
-        assert "## Docs" in result
+        assert "### Docs" in result
         assert "Welcome to docs" in result
 
     def test_folder_index_no_content(self):
         folder = FolderIndex(slug="docs/index", title="Docs", children=[])
         result = build_llms_full_txt([], [folder], {}, "https://example.com", "My Site")
-        assert "## Docs" in result
+        assert "### Docs" in result
         assert "Source: https://example.com/docs/" in result
 
     def test_nav_links_are_link_only(self):
@@ -309,10 +310,10 @@ class TestBuildLlmsFullTxt:
             "My Site",
             nav_links=links,
         )
-        post_pos = result.index("## Post")
-        guide_pos = result.index("## Guide")
+        blog_pos = result.index("## Blog")
+        docs_pos = result.index("## docs")
         links_pos = result.index("## Links")
-        assert post_pos < guide_pos < links_pos
+        assert blog_pos < docs_pos < links_pos
 
     def test_trailing_newline(self):
         pages = [self._make_page("about", "About", html="<p>Content</p>")]
@@ -328,7 +329,8 @@ class TestBuildLlmsFullTxt:
         result = build_llms_full_txt(pages, [], {}, "https://example.com", "My Site")
         assert "#### Section" in result
         assert "##### Sub" in result
-        assert "\n## About\n" in result
+        assert "\n## Pages\n" in result
+        assert "\n### About\n" in result
 
     def test_empty_site(self):
         result = build_llms_full_txt([], [], {}, "https://example.com", "My Site")
