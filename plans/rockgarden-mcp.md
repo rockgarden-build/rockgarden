@@ -202,6 +202,7 @@ rockgarden-mcp/
 - **MCP SDK choice** — `mcp` SDK vs FastMCP. TBD based on evaluation.
 - **Search engine** — Whoosh vs TF-IDF vs tantivy. Prototype and benchmark with realistic content sizes.
 - **Content selector defaults** — Is `main` a good enough default, or should rockgarden's own templates mark the content region with a specific class?
+- **llms-full.txt content source** — `llms-full.txt` (see `plans/llms-full-txt.md`) currently uses `page.html` (pre-template content HTML) for v1. When selector-based extraction lands here, revisit switching `llms-full.txt` to use extracted content instead, for consistency and to support transformative custom templates.
 - **Multi-site resource URIs** — How should site namespacing work in MCP resource URIs? `page://engineering/auth-migration` vs `engineering://page/auth-migration`.
 - **Claude.ai OAuth contract** — What exactly does Claude.ai expect from a custom integration's OAuth endpoints? Need to verify the required flow (authorization code grant, callback URLs, token format).
 
