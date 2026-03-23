@@ -227,7 +227,7 @@ def build_llms_full_txt(
             lines.append("")
             lines.append(f"Source: {item.url}")
 
-            content = html_to_markdown(item.html or "")
+            content = html_to_markdown(item.html or "", heading_offset=2)
             if content:
                 lines.append("")
                 lines.append(content)
