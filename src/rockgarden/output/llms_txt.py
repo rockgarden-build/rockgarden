@@ -213,9 +213,10 @@ def build_llms_full_txt(
     )
 
     for section in sections:
+        lines.append("")
+        lines.append(f"## {section.heading}")
+
         if section.is_nav:
-            lines.append("")
-            lines.append(f"## {section.heading}")
             lines.append("")
             for item in section.items:
                 lines.append(f"- [{item.title}]({item.url})")
@@ -223,7 +224,7 @@ def build_llms_full_txt(
 
         for item in section.items:
             lines.append("")
-            lines.append(f"## {item.title}")
+            lines.append(f"### {item.title}")
             lines.append("")
             lines.append(f"Source: {item.url}")
 
