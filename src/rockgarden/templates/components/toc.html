@@ -3,7 +3,7 @@
 <ul class="space-y-1">
   {% for entry in entries %}
   <li>
-    <a href="#{{ entry.id }}" class="text-sm hover:underline">{{ entry.text }}</a>
+    <a href="#{{ entry.id }}" class="hover:underline">{{ entry.text }}</a>
     {% if entry.children %}
     <div class="ml-3 mt-1">
       {{ render_toc_entries(entry.children) }}
