@@ -6,7 +6,7 @@ from rockgarden.config import CollectionConfig, NavLinkConfig
 from rockgarden.content.collection import Collection
 from rockgarden.content.models import Page
 from rockgarden.nav.folder_index import FolderIndex
-from rockgarden.output.llms_txt import build_llms_txt
+from rockgarden.output.llms_txt import build_llms_full_txt, build_llms_txt
 
 
 class TestBuildLlmsTxt:
@@ -31,6 +31,32 @@ class TestBuildLlmsTxt:
     def test_no_description(self):
         result = build_llms_txt([], [], {}, "https://example.com", "My Site")
         assert ">" not in result
+
+    def test_full_url_in_description(self):
+        result = build_llms_txt(
+            [],
+            [],
+            {},
+            "https://example.com",
+            "My Site",
+            description="A cool site.",
+            full_url="https://example.com/llms-full.txt",
+        )
+        assert "> A cool site." in result
+        expected = "> Full content available at: https://example.com/llms-full.txt"
+        assert expected in result
+
+    def test_full_url_without_description(self):
+        result = build_llms_txt(
+            [],
+            [],
+            {},
+            "https://example.com",
+            "My Site",
+            full_url="https://example.com/llms-full.txt",
+        )
+        expected = "> Full content available at: https://example.com/llms-full.txt"
+        assert expected in result
 
     def test_root_pages_under_pages_heading(self):
         pages = [self._make_page("about", "About")]
@@ -177,3 +203,122 @@ class TestBuildLlmsTxt:
             "My Site",
         )
         assert result.endswith("\n")
+
+
+class TestBuildLlmsFullTxt:
+    def _make_page(self, slug, title=None, html=None, source_prefix=""):
+        source = f"{source_prefix}/{slug}.md" if source_prefix else f"{slug}.md"
+        return Page(
+            source_path=Path(source),
+            slug=slug,
+            frontmatter={"title": title} if title else {},
+            html=html,
+        )
+
+    def test_title_heading(self):
+        result = build_llms_full_txt([], [], {}, "https://example.com", "My Site")
+        assert result.startswith("# My Site\n")
+
+    def test_description_blockquote(self):
+        result = build_llms_full_txt(
+            [], [], {}, "https://example.com", "My Site", description="A cool site."
+        )
+        assert "> A cool site." in result
+
+    def test_page_content_included(self):
+        pages = [self._make_page("about", "About", html="<p>Hello world</p>")]
+        result = build_llms_full_txt(pages, [], {}, "https://example.com", "My Site")
+        assert "Hello world" in result
+
+    def test_page_entry_has_source_url(self):
+        pages = [self._make_page("about", "About", html="<p>Content</p>")]
+        result = build_llms_full_txt(pages, [], {}, "https://example.com", "My Site")
+        assert "Source: https://example.com/about/" in result
+
+    def test_page_entry_has_title_heading(self):
+        pages = [self._make_page("about", "About", html="<p>Content</p>")]
+        result = build_llms_full_txt(pages, [], {}, "https://example.com", "My Site")
+        assert "## About" in result
+
+    def test_separator_between_entries(self):
+        pages = [
+            self._make_page("about", "About", html="<p>About page</p>"),
+            self._make_page("contact", "Contact", html="<p>Contact page</p>"),
+        ]
+        result = build_llms_full_txt(pages, [], {}, "https://example.com", "My Site")
+        assert "\n---\n" in result
+
+    def test_page_without_html(self):
+        pages = [self._make_page("about", "About")]
+        result = build_llms_full_txt(pages, [], {}, "https://example.com", "My Site")
+        assert "## About" in result
+        assert "Source: https://example.com/about/" in result
+
+    def test_collection_pages(self):
+        page = self._make_page(
+            "blog/post1", "First Post", html="<p>Post content</p>", source_prefix="blog"
+        )
+        col_config = CollectionConfig(name="Blog", source="blog")
+        col = Collection(name="Blog", config=col_config, entries=[page])
+        result = build_llms_full_txt(
+            [page], [], {"blog": col}, "https://example.com", "My Site"
+        )
+        assert "## First Post" in result
+        assert "Post content" in result
+
+    def test_folder_index_content(self):
+        folder = FolderIndex(
+            slug="docs/index",
+            title="Docs",
+            children=[],
+            custom_content="<p>Welcome to docs</p>",
+        )
+        result = build_llms_full_txt([], [folder], {}, "https://example.com", "My Site")
+        assert "## Docs" in result
+        assert "Welcome to docs" in result
+
+    def test_folder_index_no_content(self):
+        folder = FolderIndex(slug="docs/index", title="Docs", children=[])
+        result = build_llms_full_txt([], [folder], {}, "https://example.com", "My Site")
+        assert "## Docs" in result
+        assert "Source: https://example.com/docs/" in result
+
+    def test_nav_links_are_link_only(self):
+        links = [
+            NavLinkConfig(label="GitHub", url="https://github.com/example"),
+        ]
+        result = build_llms_full_txt(
+            [], [], {}, "https://example.com", "My Site", nav_links=links
+        )
+        assert "## Links" in result
+        assert "- [GitHub](https://github.com/example)" in result
+
+    def test_section_ordering(self):
+        page_col = self._make_page(
+            "blog/post", "Post", html="<p>Blog</p>", source_prefix="blog"
+        )
+        page_dir = self._make_page("docs/guide", "Guide", html="<p>Guide</p>")
+        col_config = CollectionConfig(name="Blog", source="blog")
+        col = Collection(name="Blog", config=col_config, entries=[page_col])
+        links = [NavLinkConfig(label="GitHub", url="https://github.com")]
+        result = build_llms_full_txt(
+            [page_col, page_dir],
+            [],
+            {"blog": col},
+            "https://example.com",
+            "My Site",
+            nav_links=links,
+        )
+        post_pos = result.index("## Post")
+        guide_pos = result.index("## Guide")
+        links_pos = result.index("## Links")
+        assert post_pos < guide_pos < links_pos
+
+    def test_trailing_newline(self):
+        pages = [self._make_page("about", "About", html="<p>Content</p>")]
+        result = build_llms_full_txt(pages, [], {}, "https://example.com", "My Site")
+        assert result.endswith("\n")
+
+    def test_empty_site(self):
+        result = build_llms_full_txt([], [], {}, "https://example.com", "My Site")
+        assert result == "# My Site\n"

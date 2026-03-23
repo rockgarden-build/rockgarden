@@ -119,10 +119,11 @@ Atom feed generation. Requires `site.base_url` to be set.
 
 Generates an `llms.txt` file following the [llmstxt.org](https://llmstxt.org/) specification, making site content discoverable by LLMs. Requires `site.base_url` to be set.
 
-| Field         | Type   | Default | Description                                       |
-| ------------- | ------ | ------- | ------------------------------------------------- |
-| `enabled`     | `bool` | `false` | Enable llms.txt generation                        |
-| `description` | `str`  | `""`    | Site summary shown as a blockquote below the title |
+| Field         | Type   | Default | Description                                                          |
+| ------------- | ------ | ------- | -------------------------------------------------------------------- |
+| `enabled`     | `bool` | `false` | Enable llms.txt generation                                           |
+| `description` | `str`  | `""`    | Site summary shown as a blockquote below the title                   |
+| `full`        | `bool` | `false` | Also generate llms-full.txt with inline page content as markdown     |
 
 Pages are grouped by named collection first, then by top-level directory, then root-level pages.
 
