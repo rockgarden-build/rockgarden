@@ -44,3 +44,10 @@ class TestHtmlToMarkdown:
     def test_heading_offset_zero_unchanged(self):
         result = html_to_markdown("<h1>Top</h1>", heading_offset=0)
         assert result == "# Top"
+
+    def test_heading_offset_preserves_code_blocks(self):
+        html = "<h2>Title</h2><pre><code># comment\necho hello</code></pre>"
+        result = html_to_markdown(html, heading_offset=2)
+        assert "#### Title" in result
+        assert "# comment" in result
+        assert "### comment" not in result

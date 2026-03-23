@@ -7,21 +7,34 @@ import re
 from markdownify import markdownify
 
 _HEADING_RE = re.compile(r"^(#{1,6})\s", re.MULTILINE)
+_FENCE_RE = re.compile(r"^(`{3,}|~{3,}).*?^\1", re.MULTILINE | re.DOTALL)
 
 
 def _bump_headings(md: str, offset: int) -> str:
     """Increase heading levels by *offset* (e.g. ## → #### when offset=2).
 
     Headings that would exceed H6 are clamped at H6.
+    Fenced code blocks are preserved unchanged.
     """
     if offset <= 0:
         return md
 
-    def _replace(m: re.Match[str]) -> str:
+    def _replace_heading(m: re.Match[str]) -> str:
         new_level = min(len(m.group(1)) + offset, 6)
         return "#" * new_level + " "
 
-    return _HEADING_RE.sub(_replace, md)
+    # Stash fenced code blocks, transform headings, then restore.
+    stashed: list[str] = []
+
+    def _stash_fence(m: re.Match[str]) -> str:
+        stashed.append(m.group(0))
+        return f"\x00FENCE{len(stashed) - 1}\x00"
+
+    md = _FENCE_RE.sub(_stash_fence, md)
+    md = _HEADING_RE.sub(_replace_heading, md)
+    for i, block in enumerate(stashed):
+        md = md.replace(f"\x00FENCE{i}\x00", block)
+    return md
 
 
 def html_to_markdown(html: str, heading_offset: int = 0) -> str:
