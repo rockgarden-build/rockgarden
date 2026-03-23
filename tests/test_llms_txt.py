@@ -319,6 +319,17 @@ class TestBuildLlmsFullTxt:
         result = build_llms_full_txt(pages, [], {}, "https://example.com", "My Site")
         assert result.endswith("\n")
 
+    def test_content_headings_nested_under_page(self):
+        pages = [
+            self._make_page(
+                "about", "About", html="<h2>Section</h2><p>Text</p><h3>Sub</h3>"
+            )
+        ]
+        result = build_llms_full_txt(pages, [], {}, "https://example.com", "My Site")
+        assert "#### Section" in result
+        assert "##### Sub" in result
+        assert "\n## About\n" in result
+
     def test_empty_site(self):
         result = build_llms_full_txt([], [], {}, "https://example.com", "My Site")
         assert result == "# My Site\n"
