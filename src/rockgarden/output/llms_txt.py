@@ -23,6 +23,7 @@ class _SectionItem:
 class _Section:
     heading: str
     items: list[_SectionItem]
+    is_nav: bool = False
 
 
 def _flatten_nav_links(links: list[NavLinkConfig]) -> list[NavLinkConfig]:
@@ -108,7 +109,7 @@ def _group_content(
         flat_links = _flatten_nav_links(nav_links)
         if flat_links:
             items = [_SectionItem(link.label, link.url) for link in flat_links]
-            sections.append(_Section("Links", items))
+            sections.append(_Section("Links", items, is_nav=True))
 
     return sections
 
@@ -212,8 +213,7 @@ def build_llms_full_txt(
     )
 
     for section in sections:
-        # Nav links section: just links, no content
-        if section.heading == "Links":
+        if section.is_nav:
             lines.append("")
             lines.append(f"## {section.heading}")
             lines.append("")
