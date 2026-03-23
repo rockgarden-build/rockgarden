@@ -48,7 +48,7 @@ from rockgarden.obsidian import (
 )
 from rockgarden.output.build_info import get_build_info
 from rockgarden.output.feed import build_atom_feed
-from rockgarden.output.llms_txt import build_llms_txt
+from rockgarden.output.llms_txt import build_llms_full_txt, build_llms_txt
 from rockgarden.output.search import build_search_index, strip_html
 from rockgarden.output.sitemap import build_sitemap
 from rockgarden.output.tags import build_tag_pages, collect_tags
@@ -753,6 +753,11 @@ def build_site(
 
     # Generate llms.txt if base_url is configured and llms_txt enabled
     if config.site.base_url and config.llms_txt.enabled:
+        full_url = (
+            f"{config.site.base_url}{base_path}/llms-full.txt"
+            if config.llms_txt.full
+            else ""
+        )
         llms_txt_content = build_llms_txt(
             pages,
             rendered_folder_indexes,
@@ -763,8 +768,23 @@ def build_site(
             clean_urls,
             base_path,
             config.nav.links,
+            full_url,
         )
         (output / "llms.txt").write_text(llms_txt_content)
+
+        if config.llms_txt.full:
+            llms_full_content = build_llms_full_txt(
+                pages,
+                rendered_folder_indexes,
+                collections,
+                config.site.base_url,
+                config.site.title,
+                config.llms_txt.description,
+                clean_urls,
+                base_path,
+                config.nav.links,
+            )
+            (output / "llms-full.txt").write_text(llms_full_content)
 
     # Generate 404 page
     not_found_template = env.get_template("404.html")

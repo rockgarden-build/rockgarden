@@ -143,6 +143,7 @@ class LlmsTxtConfig(BaseModel):
 
     enabled: bool = False
     description: str = ""
+    full: bool = False
 
 
 class HooksConfig(BaseModel):
