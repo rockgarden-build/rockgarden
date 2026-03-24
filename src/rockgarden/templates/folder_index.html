@@ -25,7 +25,7 @@
     <table class="table table-zebra">
       <thead>
         <tr>
-          <th scope="col" style="width: 40%">Title</th>
+          <th scope="col" style="width: {% if has_subtitle %}40{% else %}80{% endif %}%">Title</th>
           {% if has_subtitle %}<th scope="col" style="width: 40%">Subtitle</th>{% endif %}
           <th scope="col" class="whitespace-nowrap">Modified</th>
           <th scope="col">Tags</th>
