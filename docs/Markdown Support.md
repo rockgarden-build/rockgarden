@@ -32,7 +32,7 @@ Rockgarden supports the superset of CommonMark, GFM (GitHub Flavored Markdown), 
 | ------------------- | ----------------------- | ------ | ------------------ |
 | Tables              | `\| col \| col \|`      | ✅     | Via markdown-it-py |
 | Strikethrough       | `~~text~~`              | ✅     | Via markdown-it-py |
-| Task lists          | `- [ ]` and `- [x]`     | ✅     | Via markdown-it-py |
+| Task lists          | `- [ ]` and `- [x]`     | ❌     | Planned            |
 | Autolinks           | Bare URLs               | ✅     | Via markdown-it-py |
 | Syntax highlighting | ` ```python `           | ❌     | Planned            |
 | Footnotes           | `[^1]` and `[^1]: text` | ❌     | Planned            |
