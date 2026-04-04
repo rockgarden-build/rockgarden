@@ -231,6 +231,26 @@ details.callout .callout-content {
     margin: 0;
 }
 
+/* Footnotes */
+.footnotes-sep {
+    margin-top: 2rem;
+}
+
+.footnotes {
+    font-size: 0.875rem;
+    color: color-mix(in oklch, var(--color-base-content) 70%, transparent);
+}
+
+.footnote-ref a {
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.footnote-backref {
+    text-decoration: none;
+    margin-left: 0.25rem;
+}
+
 /* Search */
 .search-modal {
     backdrop-filter: blur(4px);
