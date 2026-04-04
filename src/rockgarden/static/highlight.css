@@ -1,0 +1,170 @@
+/* Syntax highlighting — generated from Pygments */
+/* Light: 'default' theme | Dark: 'monokai' theme */
+/* Dark theme scoped to known dark daisyUI themes via [data-theme] */
+
+/* Base styles */
+.highlight pre {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin: 0;
+}
+
+/* Light theme (Pygments 'default') */
+.highlight pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #ffffcc }
+.highlight { background: #f8f8f8; }
+.highlight .c { color: #3D7B7B; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #F00 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666 } /* Operator */
+.highlight .ch { color: #3D7B7B; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #3D7B7B; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #9C6500 } /* Comment.Preproc */
+.highlight .cpf { color: #3D7B7B; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #3D7B7B; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #3D7B7B; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.highlight .gr { color: #E40000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #008400 } /* Generic.Inserted */
+.highlight .go { color: #717171 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #04D } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #687822 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #00F; font-weight: bold } /* Name.Class */
+.highlight .no { color: #800 } /* Name.Constant */
+.highlight .nd { color: #A2F } /* Name.Decorator */
+.highlight .ni { color: #717171; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #CB3F38; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #00F } /* Name.Function */
+.highlight .nl { color: #767600 } /* Name.Label */
+.highlight .nn { color: #00F; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #A2F; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #BBB } /* Text.Whitespace */
+.highlight .mb { color: #666 } /* Literal.Number.Bin */
+.highlight .mf { color: #666 } /* Literal.Number.Float */
+.highlight .mh { color: #666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666 } /* Literal.Number.Oct */
+.highlight .sa { color: #BA2121 } /* Literal.String.Affix */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .dl { color: #BA2121 } /* Literal.String.Delimiter */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #AA5D1F; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #A45A77; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #A45A77 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #00F } /* Name.Function.Magic */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .vm { color: #19177C } /* Name.Variable.Magic */
+.highlight .il { color: #666 } /* Literal.Number.Integer.Long */
+
+/* Dark theme (Pygments 'monokai') */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .hll { background-color: #49483e }
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight { background: #272822; color: #F8F8F2 }
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .c { color: #959077 } /* Comment */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .err { color: #ED007E; background-color: #1E0010 } /* Error */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .esc { color: #F8F8F2 } /* Escape */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .g { color: #F8F8F2 } /* Generic */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .k { color: #66D9EF } /* Keyword */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .l { color: #AE81FF } /* Literal */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .n { color: #F8F8F2 } /* Name */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .o { color: #FF4689 } /* Operator */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .x { color: #F8F8F2 } /* Other */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .p { color: #F8F8F2 } /* Punctuation */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .ch { color: #959077 } /* Comment.Hashbang */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .cm { color: #959077 } /* Comment.Multiline */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .cp { color: #959077 } /* Comment.Preproc */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .cpf { color: #959077 } /* Comment.PreprocFile */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .c1 { color: #959077 } /* Comment.Single */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .cs { color: #959077 } /* Comment.Special */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .gd { color: #FF4689 } /* Generic.Deleted */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .ge { color: #F8F8F2; font-style: italic } /* Generic.Emph */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .ges { color: #F8F8F2; font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .gr { color: #F8F8F2 } /* Generic.Error */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .gh { color: #F8F8F2 } /* Generic.Heading */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .gi { color: #A6E22E } /* Generic.Inserted */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .go { color: #66D9EF } /* Generic.Output */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .gp { color: #FF4689; font-weight: bold } /* Generic.Prompt */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .gs { color: #F8F8F2; font-weight: bold } /* Generic.Strong */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .gu { color: #959077 } /* Generic.Subheading */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .gt { color: #F8F8F2 } /* Generic.Traceback */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .kc { color: #66D9EF } /* Keyword.Constant */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .kd { color: #66D9EF } /* Keyword.Declaration */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .kn { color: #FF4689 } /* Keyword.Namespace */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .kp { color: #66D9EF } /* Keyword.Pseudo */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .kr { color: #66D9EF } /* Keyword.Reserved */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .kt { color: #66D9EF } /* Keyword.Type */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .ld { color: #E6DB74 } /* Literal.Date */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .m { color: #AE81FF } /* Literal.Number */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .s { color: #E6DB74 } /* Literal.String */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .na { color: #A6E22E } /* Name.Attribute */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .nb { color: #F8F8F2 } /* Name.Builtin */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .nc { color: #A6E22E } /* Name.Class */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .no { color: #66D9EF } /* Name.Constant */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .nd { color: #A6E22E } /* Name.Decorator */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .ni { color: #F8F8F2 } /* Name.Entity */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .ne { color: #A6E22E } /* Name.Exception */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .nf { color: #A6E22E } /* Name.Function */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .nl { color: #F8F8F2 } /* Name.Label */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .nn { color: #F8F8F2 } /* Name.Namespace */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .nx { color: #A6E22E } /* Name.Other */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .py { color: #F8F8F2 } /* Name.Property */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .nt { color: #FF4689 } /* Name.Tag */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .nv { color: #F8F8F2 } /* Name.Variable */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .ow { color: #FF4689 } /* Operator.Word */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .pm { color: #F8F8F2 } /* Punctuation.Marker */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .w { color: #F8F8F2 } /* Text.Whitespace */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .mb { color: #AE81FF } /* Literal.Number.Bin */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .mf { color: #AE81FF } /* Literal.Number.Float */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .mh { color: #AE81FF } /* Literal.Number.Hex */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .mi { color: #AE81FF } /* Literal.Number.Integer */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .mo { color: #AE81FF } /* Literal.Number.Oct */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .sa { color: #E6DB74 } /* Literal.String.Affix */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .sb { color: #E6DB74 } /* Literal.String.Backtick */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .sc { color: #E6DB74 } /* Literal.String.Char */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .dl { color: #E6DB74 } /* Literal.String.Delimiter */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .sd { color: #E6DB74 } /* Literal.String.Doc */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .s2 { color: #E6DB74 } /* Literal.String.Double */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .se { color: #AE81FF } /* Literal.String.Escape */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .sh { color: #E6DB74 } /* Literal.String.Heredoc */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .si { color: #E6DB74 } /* Literal.String.Interpol */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .sx { color: #E6DB74 } /* Literal.String.Other */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .sr { color: #E6DB74 } /* Literal.String.Regex */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .s1 { color: #E6DB74 } /* Literal.String.Single */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .ss { color: #E6DB74 } /* Literal.String.Symbol */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .bp { color: #F8F8F2 } /* Name.Builtin.Pseudo */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .fm { color: #A6E22E } /* Name.Function.Magic */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .vc { color: #F8F8F2 } /* Name.Variable.Class */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .vg { color: #F8F8F2 } /* Name.Variable.Global */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .vi { color: #F8F8F2 } /* Name.Variable.Instance */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .vm { color: #F8F8F2 } /* Name.Variable.Magic */
+:is([data-theme="dark"], [data-theme="synthwave"], [data-theme="halloween"], [data-theme="forest"], [data-theme="black"], [data-theme="luxury"], [data-theme="dracula"], [data-theme="night"], [data-theme="coffee"], [data-theme="dim"], [data-theme="sunset"], [data-theme="abyss"]) .highlight .il { color: #AE81FF } /* Literal.Number.Integer.Long */
