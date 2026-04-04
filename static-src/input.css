@@ -215,6 +215,22 @@ details.callout .callout-content {
     opacity: 0.8;
 }
 
+/* Task lists */
+.contains-task-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.task-list-item {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+}
+
+.task-list-item-checkbox {
+    margin: 0;
+}
+
 /* Search */
 .search-modal {
     backdrop-filter: blur(4px);

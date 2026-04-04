@@ -18,7 +18,7 @@ Configuration lives in `rockgarden.toml` at the site root.
 | `source`      | `path` | `"."`       | Source directory containing content files                                                                                  |
 | `output`      | `path` | `"_site"`   | Output directory for built site                                                                                            |
 | `clean_urls`  | `bool` | `true`      | Generate `/page/index.html` instead of `/page.html`                                                                        |
-| `url_style`   | `str`  | `"slug"`    | How filenames become URLs. `"slug"` (lowercase, dashes), `"preserve-case"` (original casing, dashes), or `"preserve"` (original casing and spacing). See [[#URL Styles]]. |
+| `url_style`   | `str`  | `"slug"`    | How filenames become URLs. `"slug"` (lowercase, dashes), `"preserve-case"` (original casing, dashes), or `"preserve"` (original casing and spacing). See URL Styles below. |
 | `base_url`    | `str`  | `""`        | Full base URL (e.g. `https://example.com/docs`). Used for feeds, sitemap, and deriving `base_path` when not set explicitly. Trailing slash is stripped automatically. |
 | `base_path`   | `str`  | `""`        | URL path prefix for subdirectory deploys (e.g. `/docs`). When set, all generated URLs are prefixed with this path. If not set, derived from `base_url`. Trailing slash is stripped automatically. |
 
