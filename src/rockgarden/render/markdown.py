@@ -12,6 +12,7 @@ from pygments.lexers import get_lexer_by_name
 from pygments.util import ClassNotFound
 
 _md: MarkdownIt | None = None
+_highlight_formatter = HtmlFormatter(nowrap=False, cssclass="highlight")
 
 
 def _fence_renderer(self, tokens, idx, options, env):
@@ -24,8 +25,7 @@ def _fence_renderer(self, tokens, idx, options, env):
     if lang:
         try:
             lexer = get_lexer_by_name(lang, stripall=True)
-            formatter = HtmlFormatter(nowrap=False, cssclass="highlight")
-            return highlight(code, lexer, formatter)
+            return highlight(code, lexer, _highlight_formatter)
         except ClassNotFound:
             pass
 
