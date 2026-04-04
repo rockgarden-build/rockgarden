@@ -4,6 +4,7 @@ import re
 from html import escape
 
 from markdown_it import MarkdownIt
+from mdit_py_plugins.footnote import footnote_plugin
 from mdit_py_plugins.tasklists import tasklists_plugin
 
 _md: MarkdownIt | None = None
@@ -19,10 +20,12 @@ def get_markdown_renderer() -> MarkdownIt:
 
     Additional plugins:
     - Task lists (- [ ] item) via mdit-py-plugins
+    - Footnotes ([^1] references and [^1]: definitions) via mdit-py-plugins
     """
     global _md
     if _md is None:
         _md = MarkdownIt("gfm-like", {"html": True, "breaks": True})
+        footnote_plugin(_md)
         tasklists_plugin(_md)
     return _md
 
