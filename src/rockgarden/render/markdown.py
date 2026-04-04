@@ -4,6 +4,7 @@ import re
 from html import escape
 
 from markdown_it import MarkdownIt
+from mdit_py_plugins.tasklists import tasklists_plugin
 
 _md: MarkdownIt | None = None
 
@@ -15,11 +16,14 @@ def get_markdown_renderer() -> MarkdownIt:
     - Tables
     - Strikethrough (~~text~~)
     - Autolinks (bare URLs)
-    - Task lists (- [ ] item)
+
+    Additional plugins:
+    - Task lists (- [ ] item) via mdit-py-plugins
     """
     global _md
     if _md is None:
         _md = MarkdownIt("gfm-like", {"html": True, "breaks": True})
+        tasklists_plugin(_md)
     return _md
 
 
