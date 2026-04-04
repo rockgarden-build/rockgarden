@@ -2,7 +2,7 @@
 
 - **Macros not processed in transclusions**: `preprocess_macros` is applied to page content and folder indexes but not inside `_make_note_resolver`. Transcluded notes that use macros render macro calls as literal text. Fix by passing the macros dict into the resolver and applying preprocessing there.
 - **Heading link fragments not slugified**: `[[Page#My Heading]]` passes the fragment through as-is, but markdown-it-py generates anchors like `#my-heading`. The fragment should be slugified to match the rendered heading anchor. See `content/store.py` `resolve_link()`.
-- **Footnotes not working**: `gfm-like` preset doesn't include footnotes and `mdit-py-plugins` is not installed. Renders as literal `[^1]` text. Need to add `mdit-py-plugins` dependency and enable the footnote plugin in `render/markdown.py`.
+- **Footnotes not working**: `gfm-like` preset doesn't include footnotes. Renders as literal `[^1]` text. Need to enable the footnote plugin from `mdit-py-plugins` in `render/markdown.py`.
 - **Syntax highlighting not working**: Code fences get `class="language-python"` but no actual colorization. Need a client-side highlighter (highlight.js or Prism) or a build-time approach.
 - **GFM math blocks not rendering**: ` ```math ` fences output `<code class="language-math">` but no math rendering occurs. Need KaTeX or MathJax client-side, or a build-time renderer.
 - **Replace ASCII diagrams with mermaid**: Once mermaid rendering is implemented, update the ASCII art diagrams in docs (e.g. Architecture.md build pipeline) to use mermaid.
