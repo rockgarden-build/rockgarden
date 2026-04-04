@@ -139,12 +139,17 @@ def copy_user_static_files(site_root: Path, output: Path) -> None:
 
 
 def _static_hash(output: Path, assets_dir: str = "_assets") -> str:
-    """Generate a short content hash of the CSS for cache busting."""
-    css_path = output / assets_dir / "rockgarden.css"
-    if css_path.exists():
-        content = css_path.read_bytes()
-        return hashlib.md5(content).hexdigest()[:8]
-    return ""
+    """Generate a short content hash of static CSS files for cache busting."""
+    assets = output / assets_dir
+    if not assets.exists():
+        return ""
+    files = sorted(assets.glob("*.css"))
+    if not files:
+        return ""
+    hasher = hashlib.md5()
+    for css_file in files:
+        hasher.update(css_file.read_bytes())
+    return hasher.hexdigest()[:8]
 
 
 def _make_note_resolver(

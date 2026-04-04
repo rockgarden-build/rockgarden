@@ -6,8 +6,32 @@ from html import escape
 from markdown_it import MarkdownIt
 from mdit_py_plugins.footnote import footnote_plugin
 from mdit_py_plugins.tasklists import tasklists_plugin
+from pygments import highlight
+from pygments.formatters import HtmlFormatter
+from pygments.lexers import get_lexer_by_name
+from pygments.util import ClassNotFound
 
 _md: MarkdownIt | None = None
+_highlight_formatter = HtmlFormatter(nowrap=False, cssclass="highlight")
+
+
+def _fence_renderer(self, tokens, idx, options, env):
+    """Render fenced code blocks with Pygments syntax highlighting."""
+    token = tokens[idx]
+    info = token.info.strip() if token.info else ""
+    lang = info.split()[0] if info else ""
+    code = token.content
+
+    if lang:
+        try:
+            lexer = get_lexer_by_name(lang, stripall=True)
+            return highlight(code, lexer, _highlight_formatter)
+        except ClassNotFound:
+            pass
+
+    escaped = escape(code)
+    lang_attr = f' class="language-{escape(lang)}"' if lang else ""
+    return f"<pre><code{lang_attr}>{escaped}</code></pre>\n"
 
 
 def get_markdown_renderer() -> MarkdownIt:
@@ -21,12 +45,14 @@ def get_markdown_renderer() -> MarkdownIt:
     Additional plugins:
     - Task lists (- [ ] item) via mdit-py-plugins
     - Footnotes ([^1] references and [^1]: definitions) via mdit-py-plugins
+    - Syntax highlighting via Pygments
     """
     global _md
     if _md is None:
         _md = MarkdownIt("gfm-like", {"html": True, "breaks": True})
         footnote_plugin(_md)
         tasklists_plugin(_md)
+        _md.add_render_rule("fence", _fence_renderer)
     return _md
 
 
