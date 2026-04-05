@@ -23,7 +23,7 @@
     {% endif %}
     {% if site.mermaid_cdn %}
     <script type="module">
-        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11.6.0/dist/mermaid.esm.min.mjs';
         mermaid.initialize({ startOnLoad: false, theme: 'default' });
         document.querySelectorAll('code.language-mermaid').forEach(function(el) {
             var pre = el.parentElement;
