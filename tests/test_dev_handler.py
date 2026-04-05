@@ -13,8 +13,9 @@ def _start_dev_server(output_dir):
     sse_clients = SSEClients()
     handler = make_dev_handler(output_dir, sse_clients)
 
-    class _Server(socketserver.TCPServer):
+    class _Server(socketserver.ThreadingTCPServer):
         allow_reuse_address = True
+        daemon_threads = True
 
     httpd = _Server(("127.0.0.1", 0), handler)
     port = httpd.server_address[1]
