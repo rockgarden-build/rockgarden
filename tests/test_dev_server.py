@@ -1,10 +1,18 @@
 """Integration tests for the dev command."""
 
+import re
+
 from typer.testing import CliRunner
 
 from rockgarden.cli import app
 
 runner = CliRunner()
+
+_ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
+
+
+def _strip_ansi(text: str) -> str:
+    return _ANSI_RE.sub("", text)
 
 
 def test_dev_command_exists():
@@ -16,9 +24,10 @@ def test_dev_command_exists():
 def test_dev_help():
     result = runner.invoke(app, ["dev", "--help"])
     assert result.exit_code == 0
-    assert "live reload" in result.output.lower()
-    assert "--port" in result.output
-    assert "--source" in result.output
-    assert "--output" in result.output
-    assert "--config" in result.output
-    assert "--clean" in result.output
+    output = _strip_ansi(result.output)
+    assert "live reload" in output.lower()
+    assert "--port" in output
+    assert "--source" in output
+    assert "--output" in output
+    assert "--config" in output
+    assert "--clean" in output
