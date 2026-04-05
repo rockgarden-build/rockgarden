@@ -21,6 +21,7 @@ Configuration lives in `rockgarden.toml` at the site root.
 | `url_style`   | `str`  | `"slug"`    | How filenames become URLs. `"slug"` (lowercase, dashes), `"preserve-case"` (original casing, dashes), or `"preserve"` (original casing and spacing). See URL Styles below. |
 | `base_url`    | `str`  | `""`        | Full base URL (e.g. `https://example.com/docs`). Used for feeds, sitemap, and deriving `base_path` when not set explicitly. Trailing slash is stripped automatically. |
 | `base_path`   | `str`  | `""`        | URL path prefix for subdirectory deploys (e.g. `/docs`). When set, all generated URLs are prefixed with this path. If not set, derived from `base_url`. Trailing slash is stripped automatically. |
+| `ascii_urls`  | `bool` | `false`     | Transliterate Unicode characters to ASCII in URLs and tag slugs. `Café` → `cafe`, `東京` → `dong-jing`. Applies to all URL styles. |
 
 ### URL Styles
 

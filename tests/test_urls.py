@@ -406,3 +406,86 @@ class TestSlugStyleConfig:
 
         html = (output / "index.html").read_text()
         assert "/Getting-Started/" in html
+
+
+class TestGenerateSlugAscii:
+    def test_accented_latin(self):
+        assert generate_slug("Café.md", ascii_urls=True) == "cafe"
+
+    def test_cjk(self):
+        assert generate_slug("東京.md", ascii_urls=True) == "dong-jing"
+
+    def test_cyrillic(self):
+        assert generate_slug("Москва.md", ascii_urls=True) == "moskva"
+
+    def test_nested_path(self):
+        assert generate_slug("Cities/Zürich.md", ascii_urls=True) == "cities/zurich"
+
+    def test_plain_ascii_unaffected(self):
+        assert generate_slug("about.md", ascii_urls=True) == "about"
+
+    def test_preserve_case_with_ascii(self):
+        result = generate_slug("Café.md", style="preserve-case", ascii_urls=True)
+        assert result == "Cafe"
+
+    def test_preserve_with_ascii(self):
+        result = generate_slug("Café Latte.md", style="preserve", ascii_urls=True)
+        assert result == "Cafe Latte"
+
+    def test_ascii_false_preserves_unicode(self):
+        assert generate_slug("Café.md", ascii_urls=False) == "café"
+
+
+class TestNormalizeTagUnicode:
+    """Tests for the bug fix: Unicode preserved when ascii_urls=False."""
+
+    def test_accented_preserved(self):
+        from rockgarden.urls import normalize_tag
+
+        assert normalize_tag("#Café") == "café"
+
+    def test_cjk_preserved(self):
+        from rockgarden.urls import normalize_tag
+
+        result = normalize_tag("#東京")
+        assert result == "東京"
+
+    def test_basic_tag_unchanged(self):
+        from rockgarden.urls import normalize_tag
+
+        assert normalize_tag("#python") == "python"
+
+    def test_nested_tag(self):
+        from rockgarden.urls import normalize_tag
+
+        assert normalize_tag("character/pc") == "character-pc"
+
+
+class TestNormalizeTagAscii:
+    def test_accented_transliterated(self):
+        from rockgarden.urls import normalize_tag
+
+        assert normalize_tag("#Café", ascii_urls=True) == "cafe"
+
+    def test_cjk_transliterated(self):
+        from rockgarden.urls import normalize_tag
+
+        assert normalize_tag("#東京", ascii_urls=True) == "dong-jing"
+
+    def test_cyrillic_transliterated(self):
+        from rockgarden.urls import normalize_tag
+
+        assert normalize_tag("#Москва", ascii_urls=True) == "moskva"
+
+    def test_basic_tag_unchanged(self):
+        from rockgarden.urls import normalize_tag
+
+        assert normalize_tag("#python", ascii_urls=True) == "python"
+
+
+class TestAsciiUrlsConfig:
+    def test_default_false(self):
+        assert SiteConfig().ascii_urls is False
+
+    def test_set_true(self):
+        assert SiteConfig(ascii_urls=True).ascii_urls is True

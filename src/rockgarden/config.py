@@ -18,6 +18,7 @@ class SiteConfig(BaseModel):
     base_url: str = ""
     base_path: str = ""
     url_style: str = "slug"
+    ascii_urls: bool = False
 
     @field_validator("url_style", mode="after")
     @classmethod

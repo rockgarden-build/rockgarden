@@ -420,7 +420,11 @@ def build_site(
     run_hooks(config.hooks.pre_build, "pre_build", cwd=site_root, env_vars=hook_env)
 
     pages = load_content(
-        source, config.build.ignore_patterns, config.dates, config.site.url_style
+        source,
+        config.build.ignore_patterns,
+        config.dates,
+        config.site.url_style,
+        config.site.ascii_urls,
     )
     clean_urls = config.site.clean_urls
     base_path = config.site.base_path or get_base_path(config.site.base_url)
@@ -789,11 +793,18 @@ def build_site(
 
     # Generate tag index pages if enabled
     if config.theme.tag_index:
-        tags = collect_tags(pages)
+        tags = collect_tags(pages, config.site.ascii_urls)
         if tags:
             tag_layout = resolve_layout({}, config.theme.default_layout)
             build_tag_pages(
-                tags, env, site_config, output, clean_urls, base_path, tag_layout
+                tags,
+                env,
+                site_config,
+                output,
+                clean_urls,
+                base_path,
+                tag_layout,
+                config.site.ascii_urls,
             )
 
     # Generate sitemap if base_url is configured

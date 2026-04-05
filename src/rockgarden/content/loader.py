@@ -57,19 +57,25 @@ def should_ignore(path: Path, source: Path, patterns: list[str]) -> bool:
     return False
 
 
-def path_to_slug(path: Path, source: Path, url_style: str = "slug") -> str:
+def path_to_slug(
+    path: Path,
+    source: Path,
+    url_style: str = "slug",
+    ascii_urls: bool = False,
+) -> str:
     """Convert a file path to a URL slug.
 
     Args:
         path: The file path.
         source: The source root directory.
         url_style: URL style ("slug", "preserve-case", or "preserve").
+        ascii_urls: When True, transliterate Unicode to ASCII.
 
     Returns:
         The slug (e.g., 'index', 'npcs/olvir').
     """
     rel_path = str(path.relative_to(source))
-    return generate_slug(rel_path, style=url_style)
+    return generate_slug(rel_path, style=url_style, ascii_urls=ascii_urls)
 
 
 def load_page(
@@ -77,6 +83,7 @@ def load_page(
     source: Path,
     dates_config: DatesConfig | None = None,
     url_style: str = "slug",
+    ascii_urls: bool = False,
 ) -> Page:
     """Load a single page from a markdown file.
 
@@ -97,7 +104,7 @@ def load_page(
     if custom_slug := metadata.get("slug"):
         slug = custom_slug
     else:
-        slug = path_to_slug(path, source, url_style)
+        slug = path_to_slug(path, source, url_style, ascii_urls)
 
     modified = _resolve_frontmatter_date(metadata, dates_config.modified_date_fields)
     if modified is None and dates_config.modified_date_fallback:
@@ -120,6 +127,7 @@ def load_content(
     ignore_patterns: list[str],
     dates_config: DatesConfig | None = None,
     url_style: str = "slug",
+    ascii_urls: bool = False,
 ) -> list[Page]:
     """Discover and load all markdown files from source directory.
 
@@ -137,7 +145,7 @@ def load_content(
         if should_ignore(path, source, ignore_patterns):
             continue
 
-        page = load_page(path, source, dates_config, url_style)
+        page = load_page(path, source, dates_config, url_style, ascii_urls)
         pages.append(page)
 
     return pages

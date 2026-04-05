@@ -85,7 +85,8 @@ def create_engine(
     )
     env.filters["format_datetime"] = _make_format_datetime(config.dates.timezone)
     clean_urls = config.site.clean_urls
-    env.globals["normalize_tag"] = normalize_tag
+    ascii_urls = config.site.ascii_urls
+    env.globals["normalize_tag"] = lambda tag: normalize_tag(tag, ascii_urls=ascii_urls)
     env.globals["tag_url"] = lambda slug: get_tag_url(slug, clean_urls, base_path)
     env.globals["tags_root_url"] = get_tags_root_url(clean_urls, base_path)
     env.globals["icon"] = _icon
