@@ -209,11 +209,19 @@ Per-page options set in YAML frontmatter:
 Command-line flags override config file values:
 
 ```bash
+rockgarden build                          # full build, overwrites in place
+rockgarden build --clean                  # delete output dir first, then build
+rockgarden build --incremental            # skip unchanged pages (faster rebuilds)
 rockgarden build --source ./vault --output ./dist
 rockgarden build --config ./custom.toml
-rockgarden build --clean
 rockgarden serve --output ./dist --port 3000
 ```
+
+### Build modes
+
+- **`build`** — Renders all pages and writes output. Existing files are overwritten but stale files from renamed/deleted pages are not removed. Use `--clean` periodically to avoid accumulation.
+- **`build --clean`** — Deletes the output directory before building. Guarantees a fresh output with no stale files.
+- **`build --incremental`** (`-i`) — Skips rendering pages whose source file hasn't changed since the last incremental build. Global outputs (folder indexes, search index, sitemap, feed, tags) always regenerate. A build manifest is stored in `.rockgarden/build-manifest.json`. Changes to config, templates, or macros trigger a full rebuild automatically. Renamed or deleted pages have their stale output files cleaned up.
 
 ## Convention Directories
 
