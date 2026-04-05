@@ -1,3 +1,22 @@
+## v0.6.5 (2026-04-05)
+
+### Minor / Bug Fixes
+
+- strip comments (#88)
+- add highlight support (#87)
+- add math support (#86)
+- render macro transculsions (#85)
+- fix links to fragments (#84)
+- add syntax highlighting (#83)
+- implement GFM footnotes (#82)
+- add GFM task list support (#81)
+- fix table spacing when there's no subtitle (#79)
+- make nav text consistent w/ body (#78)
+- add page heading to properly nest documents (#77)
+- nest document headings in llms-full.txt (#76)
+- add llms-full.txt generation (#75)
+- add optional llms.txt generation (#74)
+
 ## v0.6.4 (2026-03-22)
 
 ### Minor / Bug Fixes
