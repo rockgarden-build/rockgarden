@@ -144,7 +144,7 @@ def _sort_folder_children(
 
     if sort_strategy == "date":
         # Sort by modified date; items with no date sort last
-        _none_date = datetime.min
+        _none_date = datetime.max
         unpinned = sorted(unpinned, key=lambda c: c.modified or _none_date)
     elif sort_strategy == "folders-first":
         folders = sorted(
