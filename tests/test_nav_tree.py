@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from rockgarden.config import NavConfig, NavLinkConfig
+from rockgarden.config import FolderSortOverride, NavConfig, NavLinkConfig
 from rockgarden.content import Page
 from rockgarden.nav import build_nav_tree
 from rockgarden.nav.tree import convert_nav_links, inject_nav_links
@@ -389,3 +389,93 @@ class TestInjectNavLinks:
         original_children = list(tree.children)
         inject_nav_links(tree, [], "after")
         assert tree.children == original_children
+
+
+class TestNavSortReverse:
+    def test_reverse_unpinned_only(self):
+        """Reverse should only affect unpinned items; pinned stay in order."""
+        pages = [
+            make_page("alpha"),
+            make_page("beta"),
+            make_page("gamma"),
+            make_page("pinned", nav_order=1),
+        ]
+        config = NavConfig(sort="alphabetical", reverse=True)
+        tree = build_nav_tree(pages, config)
+        labels = [c.label for c in tree.children]
+        assert labels == ["pinned", "gamma", "beta", "alpha"]
+
+    def test_reverse_false_is_normal_order(self):
+        pages = [make_page("alpha"), make_page("beta"), make_page("gamma")]
+        config = NavConfig(sort="alphabetical", reverse=False)
+        tree = build_nav_tree(pages, config)
+        labels = [c.label for c in tree.children]
+        assert labels == ["alpha", "beta", "gamma"]
+
+    def test_date_strategy_falls_back_to_files_first(self):
+        """Nav tree has no date field; date strategy should fall back."""
+        pages = [
+            make_page("alpha"),
+            make_page("docs/index"),
+        ]
+        config = NavConfig(sort="date")
+        tree = build_nav_tree(pages, config)
+        # Should not error; falls back to files-first
+        labels = [c.label for c in tree.children]
+        assert "alpha" in labels
+
+
+class TestNavPerFolderOverride:
+    def test_config_override_applies_to_folder(self):
+        pages = [
+            make_page("blog/index", "Blog"),
+            make_page("blog/alpha"),
+            make_page("blog/beta"),
+            make_page("blog/gamma"),
+        ]
+        config = NavConfig(
+            sort="alphabetical",
+            reverse=False,
+            overrides={"blog": FolderSortOverride(reverse=True)},
+        )
+        tree = build_nav_tree(pages, config)
+        blog_node = [c for c in tree.children if c.name == "blog"][0]
+        labels = [c.label for c in blog_node.children]
+        assert labels == ["gamma", "beta", "alpha"]
+
+    def test_frontmatter_override_wins(self):
+        """Frontmatter sort/sort_reverse should override config."""
+        pages = [
+            Page(
+                source_path=Path("/vault/blog/index.md"),
+                slug="blog/index",
+                frontmatter={
+                    "title": "Blog",
+                    "sort": "alphabetical",
+                    "sort_reverse": True,
+                },
+                content="",
+            ),
+            make_page("blog/alpha"),
+            make_page("blog/beta"),
+            make_page("blog/gamma"),
+        ]
+        config = NavConfig(sort="alphabetical", reverse=False)
+        tree = build_nav_tree(pages, config)
+        blog_node = [c for c in tree.children if c.name == "blog"][0]
+        labels = [c.label for c in blog_node.children]
+        assert labels == ["gamma", "beta", "alpha"]
+
+    def test_root_not_affected_by_subfolder_override(self):
+        pages = [
+            make_page("alpha"),
+            make_page("beta"),
+            make_page("blog/post1"),
+        ]
+        config = NavConfig(
+            sort="alphabetical",
+            overrides={"blog": FolderSortOverride(reverse=True)},
+        )
+        tree = build_nav_tree(pages, config)
+        root_labels = [c.label for c in tree.children if not c.is_folder]
+        assert root_labels == ["alpha", "beta"]

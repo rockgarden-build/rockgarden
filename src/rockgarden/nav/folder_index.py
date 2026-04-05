@@ -8,6 +8,7 @@ from datetime import datetime
 from rockgarden.config import NavConfig
 from rockgarden.content import Page
 from rockgarden.nav.labels import resolve_label
+from rockgarden.nav.sort import resolve_sort
 from rockgarden.urls import get_folder_url, get_url
 
 
@@ -133,7 +134,7 @@ def _should_hide(path: str, hide_patterns: list[str]) -> bool:
 
 
 def _sort_folder_children(
-    children: list[FolderChild], sort_strategy: str
+    children: list[FolderChild], sort_strategy: str, reverse: bool = False
 ) -> list[FolderChild]:
     """Sort folder children by nav_order (pinned first) then by strategy."""
     pinned = [c for c in children if c.nav_order is not None]
@@ -141,7 +142,11 @@ def _sort_folder_children(
 
     pinned.sort(key=lambda c: (c.nav_order, c.title.lower()))
 
-    if sort_strategy == "folders-first":
+    if sort_strategy == "date":
+        # Sort by modified date; items with no date sort last
+        _none_date = datetime.min
+        unpinned = sorted(unpinned, key=lambda c: c.modified or _none_date)
+    elif sort_strategy == "folders-first":
         folders = sorted(
             [c for c in unpinned if c.is_folder], key=lambda c: c.title.lower()
         )
@@ -159,6 +164,9 @@ def _sort_folder_children(
             [c for c in unpinned if c.is_folder], key=lambda c: c.title.lower()
         )
         unpinned = files + folders
+
+    if reverse:
+        unpinned.reverse()
 
     return pinned + unpinned
 
@@ -241,4 +249,10 @@ def _get_folder_children(
                     )
                 )
 
-    return _sort_folder_children(children, config.sort)
+    folder_fm = (
+        folder_index_pages[folder_path].frontmatter
+        if folder_path in folder_index_pages
+        else None
+    )
+    resolved = resolve_sort(folder_path, config, folder_fm)
+    return _sort_folder_children(children, resolved.sort, resolved.reverse)

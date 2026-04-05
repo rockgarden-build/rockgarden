@@ -11,7 +11,7 @@ One branch + PR per item. Plan → implement → test → PR → feedback → me
 - [x] 2a. Math rendering (KaTeX)
 - [x] 2b. Highlights (`==text==`)
 - [x] 2c. Comment stripping (`%% comment %%`)
-- [ ] 3. Nav reverse ordering
+- [x] 3. Nav sorting improvements (reverse, date strategy, per-folder overrides)
 - [ ] 4. Dev server custom 404
 - [ ] 5. Incremental builds
 - [ ] 6. Dev mode with live reload

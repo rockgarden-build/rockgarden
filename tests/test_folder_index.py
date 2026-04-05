@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from rockgarden.config import NavConfig
+from rockgarden.config import FolderSortOverride, NavConfig
 from rockgarden.content import Page
 from rockgarden.nav.folder_index import (
     find_folders,
@@ -114,3 +114,119 @@ class TestGenerateFolderIndexes:
         blog = next(fi for fi in indexes if fi.slug == "blog/index")
         child_titles = {c.title for c in blog.children}
         assert child_titles == {"One", "Two"}
+
+
+class TestFolderIndexSortReverse:
+    def test_reverse_alphabetical(self):
+        pages = [
+            make_page("blog/alpha", "Alpha"),
+            make_page("blog/beta", "Beta"),
+            make_page("blog/gamma", "Gamma"),
+        ]
+        config = NavConfig(sort="alphabetical", reverse=True)
+        indexes = generate_folder_indexes(pages, config)
+        blog = next(fi for fi in indexes if fi.slug == "blog/index")
+        titles = [c.title for c in blog.children]
+        assert titles == ["Gamma", "Beta", "Alpha"]
+
+    def test_reverse_preserves_pinned_order(self):
+        pages = [
+            make_page("blog/alpha", "Alpha"),
+            make_page("blog/beta", "Beta"),
+            make_page("blog/pinned", "Pinned", nav_order=1),
+        ]
+        config = NavConfig(sort="alphabetical", reverse=True)
+        indexes = generate_folder_indexes(pages, config)
+        blog = next(fi for fi in indexes if fi.slug == "blog/index")
+        titles = [c.title for c in blog.children]
+        assert titles[0] == "Pinned"
+        assert titles[1:] == ["Beta", "Alpha"]
+
+
+class TestFolderIndexDateSort:
+    def _make_page_with_mtime(self, slug, title, tmp_path, mtime_offset=0):
+        """Create a page with a real file so mtime is available."""
+        import time
+
+        file_path = tmp_path / f"{slug}.md"
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        file_path.write_text(f"# {title}")
+        import os
+
+        target_time = time.time() + mtime_offset
+        os.utime(file_path, (target_time, target_time))
+        return Page(
+            source_path=file_path,
+            slug=slug,
+            frontmatter={"title": title},
+            content=f"# {title}",
+        )
+
+    def test_date_sort_ascending(self, tmp_path):
+        pages = [
+            self._make_page_with_mtime("blog/newest", "Newest", tmp_path, 100),
+            self._make_page_with_mtime("blog/oldest", "Oldest", tmp_path, -100),
+            self._make_page_with_mtime("blog/middle", "Middle", tmp_path, 0),
+        ]
+        config = NavConfig(sort="date")
+        indexes = generate_folder_indexes(pages, config)
+        blog = next(fi for fi in indexes if fi.slug == "blog/index")
+        titles = [c.title for c in blog.children]
+        assert titles == ["Oldest", "Middle", "Newest"]
+
+    def test_date_sort_reverse_newest_first(self, tmp_path):
+        pages = [
+            self._make_page_with_mtime("blog/newest", "Newest", tmp_path, 100),
+            self._make_page_with_mtime("blog/oldest", "Oldest", tmp_path, -100),
+            self._make_page_with_mtime("blog/middle", "Middle", tmp_path, 0),
+        ]
+        config = NavConfig(sort="date", reverse=True)
+        indexes = generate_folder_indexes(pages, config)
+        blog = next(fi for fi in indexes if fi.slug == "blog/index")
+        titles = [c.title for c in blog.children]
+        assert titles == ["Newest", "Middle", "Oldest"]
+
+
+class TestFolderIndexPerFolderOverride:
+    def test_config_override(self):
+        pages = [
+            make_page("blog/gamma", "Gamma"),
+            make_page("blog/alpha", "Alpha"),
+            make_page("blog/beta", "Beta"),
+            make_page("docs/one", "One"),
+            make_page("docs/two", "Two"),
+        ]
+        config = NavConfig(
+            sort="alphabetical",
+            overrides={"blog": FolderSortOverride(reverse=True)},
+        )
+        indexes = generate_folder_indexes(pages, config)
+        blog = next(fi for fi in indexes if fi.slug == "blog/index")
+        blog_titles = [c.title for c in blog.children]
+        assert blog_titles == ["Gamma", "Beta", "Alpha"]
+
+        docs = next(fi for fi in indexes if fi.slug == "docs/index")
+        docs_titles = [c.title for c in docs.children]
+        assert docs_titles == ["One", "Two"]
+
+    def test_frontmatter_override_wins(self):
+        pages = [
+            Page(
+                source_path=Path("/vault/blog/index.md"),
+                slug="blog/index",
+                frontmatter={"sort": "alphabetical", "sort_reverse": True},
+                content="",
+            ),
+            make_page("blog/alpha", "Alpha"),
+            make_page("blog/beta", "Beta"),
+            make_page("blog/gamma", "Gamma"),
+        ]
+        config = NavConfig(
+            sort="alphabetical",
+            reverse=False,
+            overrides={"blog": FolderSortOverride(reverse=False)},
+        )
+        indexes = generate_folder_indexes(pages, config)
+        blog = next(fi for fi in indexes if fi.slug == "blog/index")
+        titles = [c.title for c in blog.children]
+        assert titles == ["Gamma", "Beta", "Alpha"]

@@ -535,7 +535,11 @@ def build_site(
         nav_tree.children.append(col_node)
 
     inject_nav_links(
-        nav_tree, config.nav.links, config.nav.links_position, config.nav.sort
+        nav_tree,
+        config.nav.links,
+        config.nav.links_position,
+        config.nav.sort,
+        config.nav.reverse,
     )
 
     # Generate collection pages (nav tree is fully populated at this point).

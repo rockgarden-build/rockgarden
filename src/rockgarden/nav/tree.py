@@ -8,6 +8,7 @@ from fnmatch import fnmatch
 from rockgarden.config import NavConfig, NavLinkConfig
 from rockgarden.content import Page
 from rockgarden.nav.labels import resolve_label
+from rockgarden.nav.sort import resolve_sort
 from rockgarden.urls import get_folder_url, get_url
 
 
@@ -39,12 +40,15 @@ def _should_hide(path: str, hide_patterns: list[str]) -> bool:
     return False
 
 
-def _sort_nav_nodes(nodes: list[NavNode], sort_strategy: str) -> list[NavNode]:
+def _sort_nav_nodes(
+    nodes: list[NavNode], sort_strategy: str, reverse: bool = False
+) -> list[NavNode]:
     """Sort nav nodes by nav_order (pinned first) then by strategy.
 
     Args:
         nodes: List of NavNode objects to sort
         sort_strategy: One of "files-first", "folders-first", "alphabetical"
+        reverse: If True, reverse unpinned items after sorting
 
     Returns:
         Sorted list of NavNode objects
@@ -57,6 +61,10 @@ def _sort_nav_nodes(nodes: list[NavNode], sort_strategy: str) -> list[NavNode]:
     def by_label(n: NavNode) -> str:
         return n.label.lower()
 
+    # NavNode has no date field — fall back to files-first for date strategy
+    if sort_strategy == "date":
+        sort_strategy = "files-first"
+
     if sort_strategy == "folders-first":
         folders = sorted([n for n in unpinned if n.is_folder], key=by_label)
         files = sorted([n for n in unpinned if not n.is_folder], key=by_label)
@@ -67,6 +75,9 @@ def _sort_nav_nodes(nodes: list[NavNode], sort_strategy: str) -> list[NavNode]:
         files = sorted([n for n in unpinned if not n.is_folder], key=by_label)
         folders = sorted([n for n in unpinned if n.is_folder], key=by_label)
         unpinned = files + folders
+
+    if reverse:
+        unpinned.reverse()
 
     return pinned + unpinned
 
@@ -172,7 +183,9 @@ def build_nav_tree(
                     nav_order = page.frontmatter.get("nav_order")
 
             children = dict_to_nodes(data.get("_children", {}), path)
-            children = _sort_nav_nodes(children, config.sort)
+            folder_fm = folder_pages[path].frontmatter if path in folder_pages else None
+            resolved = resolve_sort(path, config, folder_fm)
+            children = _sort_nav_nodes(children, resolved.sort, resolved.reverse)
 
             index_path = None
             if is_folder:
@@ -194,7 +207,8 @@ def build_nav_tree(
                 )
             )
 
-        return _sort_nav_nodes(nodes, config.sort)
+        root_resolved = resolve_sort("", config)
+        return _sort_nav_nodes(nodes, root_resolved.sort, root_resolved.reverse)
 
     root_label = resolve_label("", "Home", config.labels, folder_pages)
     root_children = dict_to_nodes(tree)
@@ -237,6 +251,7 @@ def inject_nav_links(
     links: list[NavLinkConfig],
     position: str,
     sort_strategy: str = "files-first",
+    reverse: bool = False,
 ) -> None:
     """Insert custom nav link nodes into the root's children."""
     if not links:
@@ -245,6 +260,8 @@ def inject_nav_links(
     if position == "before":
         root.children = link_nodes + root.children
     elif position == "mixed":
-        root.children = _sort_nav_nodes(root.children + link_nodes, sort_strategy)
+        root.children = _sort_nav_nodes(
+            root.children + link_nodes, sort_strategy, reverse
+        )
     else:  # "after"
         root.children = root.children + link_nodes
