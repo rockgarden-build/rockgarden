@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from rockgarden.content.models import Page
-from rockgarden.urls import get_url
+from rockgarden.urls import get_url, slugify_heading
 
 if TYPE_CHECKING:
     from rockgarden.content.collection import Collection
@@ -121,7 +121,7 @@ class ContentStore:
         if page:
             url = get_url(page.slug, self.clean_urls, self.base_path)
             if fragment:
-                url = f"{url}#{fragment}"
+                url = f"{url}#{slugify_heading(fragment)}"
             return url
 
         # Try to resolve as a media file

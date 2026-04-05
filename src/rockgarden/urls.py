@@ -4,6 +4,18 @@ import re
 from urllib.parse import quote, urlparse
 
 
+def slugify_heading(text: str) -> str:
+    """Convert heading text to a URL-friendly slug.
+
+    Matches the slugification used for heading anchor IDs so that
+    fragment links like ``[[Page#My Heading]]`` resolve correctly.
+    """
+    text = text.lower()
+    text = re.sub(r"[^\w\s-]", "", text)
+    text = re.sub(r"[\s]+", "-", text.strip())
+    return text
+
+
 def normalize_tag(tag: str) -> str:
     """Normalize a tag to a URL-safe slug.
 

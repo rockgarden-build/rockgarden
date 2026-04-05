@@ -4,6 +4,8 @@ import re
 from dataclasses import dataclass, field
 from html import unescape
 
+from rockgarden.urls import slugify_heading
+
 HEADING_RE = re.compile(r"<(h[2-6])(\s[^>]*)?>(.+?)</\1>", re.DOTALL)
 TAG_RE = re.compile(r"<[^>]+>")
 
@@ -16,14 +18,6 @@ class TocEntry:
     text: str
     level: int
     children: list["TocEntry"] = field(default_factory=list)
-
-
-def _slugify(text: str) -> str:
-    """Convert heading text to a URL-friendly slug."""
-    text = text.lower()
-    text = re.sub(r"[^\w\s-]", "", text)
-    text = re.sub(r"[\s]+", "-", text.strip())
-    return text
 
 
 def _strip_tags(html: str) -> str:
@@ -78,7 +72,7 @@ def extract_toc(
         if level < min_level or level > max_level:
             # Still inject ID for anchor linking, but don't add to TOC
             text = _strip_tags(inner_html)
-            slug = _slugify(text)
+            slug = slugify_heading(text)
             if not slug:
                 return match.group(0)
             if slug in seen_ids:
@@ -91,7 +85,7 @@ def extract_toc(
             return f'<{tag}{attrs} id="{slug}">{inner_html}</{tag}>'
 
         text = _strip_tags(inner_html)
-        slug = _slugify(text)
+        slug = slugify_heading(text)
         if not slug:
             return match.group(0)
 

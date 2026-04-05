@@ -46,7 +46,7 @@ class TestResolveLink:
         store = ContentStore([page])
 
         url = store.resolve_link("Chamber of the Stone#Thalador")
-        assert url == "/chamber-of-the-stone/#Thalador"
+        assert url == "/chamber-of-the-stone/#thalador"
 
     def test_section_link_with_spaces(self):
         """Should preserve spaces in section fragment."""
@@ -59,7 +59,7 @@ class TestResolveLink:
         store = ContentStore([page])
 
         url = store.resolve_link("Session Log#Group Vision")
-        assert url == "/session-log/#Group Vision"
+        assert url == "/session-log/#group-vision"
 
     def test_section_link_whitespace_trimmed(self):
         """Should trim whitespace around page name and fragment."""
@@ -72,7 +72,7 @@ class TestResolveLink:
         store = ContentStore([page])
 
         url = store.resolve_link("Notes  #  Section  ")
-        assert url == "/notes/#Section"
+        assert url == "/notes/#section"
 
     def test_broken_link_returns_none(self):
         """Should return None for non-existent page."""
