@@ -12,6 +12,8 @@ from pygments.formatters import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
 from pygments.util import ClassNotFound
 
+from rockgarden.obsidian.highlights import highlight_plugin
+
 _md: MarkdownIt | None = None
 _highlight_formatter = HtmlFormatter(nowrap=False, cssclass="highlight")
 
@@ -50,6 +52,7 @@ def get_markdown_renderer() -> MarkdownIt:
     - Task lists (- [ ] item) via mdit-py-plugins
     - Footnotes ([^1] references and [^1]: definitions) via mdit-py-plugins
     - Dollar math ($..$ inline, $$...$$ block) via mdit-py-plugins
+    - Highlights (==text==) via custom plugin
     - Syntax highlighting via Pygments
     """
     global _md
@@ -58,6 +61,7 @@ def get_markdown_renderer() -> MarkdownIt:
         footnote_plugin(_md)
         tasklists_plugin(_md)
         dollarmath_plugin(_md, allow_digits=False, allow_space=False)
+        highlight_plugin(_md)
         _md.add_render_rule("fence", _fence_renderer)
     return _md
 
