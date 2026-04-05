@@ -1,3 +1,10 @@
+## v0.7.1 (2026-04-05)
+
+### Minor / Bug Fixes
+
+- add incremental build support (#92)
+- add nav and index sorting options (#91)
+
 ## v0.7.0 (2026-04-05)
 
 ### Minor / Bug Fixes
