@@ -1,10 +1,13 @@
+import socketserver
 import tempfile
+import threading
+import urllib.request
 from pathlib import Path
 
 from typer.testing import CliRunner
 
 from rockgarden import __version__
-from rockgarden.cli import app
+from rockgarden.cli import _make_handler, app
 
 runner = CliRunner()
 
@@ -124,3 +127,59 @@ def test_build_unhandled_error_shows_type_and_message(tmp_path, monkeypatch):
     assert result.exit_code == 1
     assert "RuntimeError: something broke" in result.output
     assert "Traceback" not in result.output
+
+
+def _start_serve_server(output_dir):
+    """Start the real rockgarden handler on an OS-assigned port."""
+    handler = _make_handler(output_dir)
+
+    # Suppress request logging during tests
+    handler.log_message = lambda self, *a, **kw: None  # type: ignore[assignment]
+
+    class ReuseAddrServer(socketserver.TCPServer):
+        allow_reuse_address = True
+
+    httpd = ReuseAddrServer(("127.0.0.1", 0), handler)
+    port = httpd.server_address[1]
+    thread = threading.Thread(target=httpd.serve_forever, daemon=True)
+    thread.start()
+    return httpd, port
+
+
+def test_serve_custom_404(tmp_path):
+    output_dir = tmp_path / "_site"
+    output_dir.mkdir()
+    (output_dir / "index.html").write_text("<h1>Home</h1>")
+    (output_dir / "404.html").write_text("<h1>Custom Not Found</h1>")
+
+    httpd, port = _start_serve_server(output_dir)
+    try:
+        try:
+            urllib.request.urlopen(f"http://127.0.0.1:{port}/nonexistent")
+        except urllib.error.HTTPError as e:
+            assert e.code == 404
+            body = e.read().decode()
+            assert "Custom Not Found" in body
+        else:
+            raise AssertionError("Expected 404 HTTPError")
+    finally:
+        httpd.shutdown()
+
+
+def test_serve_default_404_without_custom_page(tmp_path):
+    output_dir = tmp_path / "_site"
+    output_dir.mkdir()
+    (output_dir / "index.html").write_text("<h1>Home</h1>")
+
+    httpd, port = _start_serve_server(output_dir)
+    try:
+        try:
+            urllib.request.urlopen(f"http://127.0.0.1:{port}/nonexistent")
+        except urllib.error.HTTPError as e:
+            assert e.code == 404
+            body = e.read().decode()
+            assert "Custom Not Found" not in body
+        else:
+            raise AssertionError("Expected 404 HTTPError")
+    finally:
+        httpd.shutdown()
