@@ -4,18 +4,14 @@ Future ideas and research notes. Not currently planned.
 
 ## Syntax & Content
 
-- **Inline math** (`$...$`) and block math (`$$...$$`)
-- **Highlights** (`==text==`)
-- **Comment stripping** (`%% comment %%`)
 - **Block references** (`[[page#^block]]`)
 - **Inline fields** (`key:: value` — Dataview compatibility)
 - **Inline tags** (`#tag`, `#parent/child`)
 - **Configurable markdown preset** (commonmark, gfm-like, custom plugins)
+- **Build-time mermaid rendering** — render mermaid diagrams to SVG at build time instead of client-side JS (via mermaid CLI `mmdc`)
 
 ## Build & Performance
 
-- **Incremental builds** — file-mtime dirty checking, partial rebuilds
-- **Dev mode** — file watching with automatic partial rebuilds and local server with live reload
 - **ASCII-only slugs** — strip Unicode/accents from URLs. NFD normalization (no deps) handles European languages; `python-slugify` for full transliteration. See research notes below.
 - **Configurable URL casing** — option to preserve original filename casing instead of slugifying
 

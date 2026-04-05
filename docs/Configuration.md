@@ -70,6 +70,7 @@ Theme-specific display and rendering options. These are supported by the default
 | `show_build_info`   | `bool`      | `true`        | Show build timestamp in footer (default theme only)                                                                                                                     |
 | `show_build_commit` | `bool`      | `false`       | Show git commit in footer (default theme only)                                                                                                                          |
 | `math_cdn`          | `bool`      | `true`        | Load KaTeX from CDN for math rendering (default theme only). Set `false` to provide KaTeX yourself via `_styles/` and `_scripts/`. |
+| `mermaid_cdn`       | `bool`      | `true`        | Load Mermaid from CDN for diagram rendering (default theme only). Set `false` to provide Mermaid yourself via `_scripts/`. |
 
 ## `[nav]`
 
