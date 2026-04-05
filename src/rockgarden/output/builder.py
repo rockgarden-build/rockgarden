@@ -46,6 +46,7 @@ from rockgarden.obsidian import (
     process_note_transclusions,
     process_wikilinks,
 )
+from rockgarden.obsidian.comments import strip_comments
 from rockgarden.output.build_info import get_build_info
 from rockgarden.output.feed import build_atom_feed
 from rockgarden.output.llms_txt import build_llms_full_txt, build_llms_txt
@@ -187,6 +188,7 @@ def _make_note_resolver(
         )
 
         sub_content = page.content
+        sub_content = strip_comments(sub_content)
         if apply_macros:
             sub_content = apply_macros(sub_content, page)
         sub_content, media = process_media_embeds(sub_content, media_resolver)
@@ -565,6 +567,7 @@ def build_site(
         content = page.content
 
         content = strip_content_title(content)
+        content = strip_comments(content)
         if apply_macros:
             content = apply_macros(content, page)
 
@@ -651,6 +654,7 @@ def build_site(
         if folder.custom_content:
             processed = folder.custom_content
             processed = strip_content_title(processed)
+            processed = strip_comments(processed)
             if apply_macros:
                 processed = apply_macros(processed, folder)
             folder_src = folder_path + "/index.md" if folder_path else "index.md"
