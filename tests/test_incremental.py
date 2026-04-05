@@ -137,3 +137,17 @@ class TestIncrementalBuilds:
         _build(source, output, incremental=False)
         manifest_path = source.parent / ".rockgarden" / "build-manifest.json"
         assert not manifest_path.exists()
+
+    def test_renamed_page_cleans_stale_output(self, tmp_path):
+        source = tmp_path / "content"
+        source.mkdir()
+        old_page = _write_page(source, "about")
+        output = tmp_path / "output"
+
+        _build(source, output)
+        assert (output / "about" / "index.html").exists()
+
+        old_page.rename(source / "about-us.md")
+        _build(source, output)
+        assert not (output / "about" / "index.html").exists()
+        assert (output / "about-us" / "index.html").exists()

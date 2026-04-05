@@ -877,6 +877,14 @@ def build_site(
     run_hooks(config.hooks.post_build, "post_build", cwd=site_root, env_vars=hook_env)
 
     if incremental and manifest:
+        current_slugs = {p.slug for p in pages}
+        for old_slug, entry in list(manifest.pages.items()):
+            if old_slug not in current_slugs:
+                stale_file = output / entry.output_path
+                if stale_file.exists():
+                    stale_file.unlink()
+                del manifest.pages[old_slug]
+
         manifest.page_count = len(pages)
         manifest.save(manifest_path)
 
