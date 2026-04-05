@@ -9,7 +9,7 @@ One branch + PR per item. Plan → implement → test → PR → feedback → me
 - [x] 1a. Heading link fragments not slugified
 - [x] 1b. Macros not processed in transclusions
 - [x] 2a. Math rendering (KaTeX)
-- [ ] 2b. Highlights (`==text==`)
+- [x] 2b. Highlights (`==text==`)
 - [ ] 2c. Comment stripping (`%% comment %%`)
 - [ ] 3. Nav reverse ordering
 - [ ] 4. Dev server custom 404
