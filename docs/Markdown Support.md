@@ -66,7 +66,7 @@ Rockgarden supports the superset of CommonMark, GFM (GitHub Flavored Markdown), 
 | Feature       | Syntax             | Status | Notes                     |
 | ------------- | ------------------ | ------ | ------------------------- |
 | Highlights    | `==text==`         | ✅     | Renders as `<mark>`       |
-| Comments      | `%% comment %%`    | ❌     | Should strip during build |
+| Comments      | `%% comment %%`    | ✅     | Stripped during build     |
 | HTML comments | `<!-- comment -->` | ✅     | Standard markdown         |
 
 ### Callouts
@@ -134,7 +134,6 @@ This ensures:
 
 ## Future Syntax Additions
 
-- Comment stripping: `%% comment %%`
 - Block references: `[[page#^block]]`
 - Inline fields: `key:: value` (Dataview compatibility)
 - Inline tags: `#tag`, `#parent/child`
