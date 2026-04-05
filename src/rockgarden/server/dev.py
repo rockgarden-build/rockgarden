@@ -1,5 +1,6 @@
 """Dev server orchestrating HTTP serving, file watching, and live reload."""
 
+import errno
 import socketserver
 import threading
 from pathlib import Path
@@ -42,13 +43,14 @@ class DevServer:
 
         handler = make_dev_handler(self._output_dir, self._sse_clients)
 
-        class _Server(socketserver.TCPServer):
+        class _Server(socketserver.ThreadingTCPServer):
             allow_reuse_address = True
+            daemon_threads = True
 
         try:
             httpd = _Server(("", self._port), handler)
         except OSError as e:
-            if e.errno == 48:
+            if e.errno == errno.EADDRINUSE:
                 typer.echo(f"Error: Port {self._port} is already in use.", err=True)
                 raise typer.Exit(1) from None
             raise

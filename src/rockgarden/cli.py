@@ -1,5 +1,6 @@
 """Command-line interface for rockgarden."""
 
+import errno
 import http.server
 import shutil
 import socketserver
@@ -290,7 +291,7 @@ def serve(
     try:
         httpd = ReuseAddrServer(("", port), handler)
     except OSError as e:
-        if e.errno == 48:  # Address already in use
+        if e.errno == errno.EADDRINUSE:
             typer.echo(f"Error: Port {port} is already in use.", err=True)
             typer.echo(f"Try: rockgarden serve -p {port + 1}", err=True)
             raise typer.Exit(1) from None
