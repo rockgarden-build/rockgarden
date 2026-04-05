@@ -30,16 +30,24 @@ class SSEClients:
 
     def broadcast(self, event: str, data: str = "") -> None:
         with self._lock:
-            dead: list[http.server.BaseHTTPRequestHandler] = []
-            for client in self._clients:
-                try:
-                    msg = f"event: {event}\ndata: {data}\n\n"
-                    client.wfile.write(msg.encode("utf-8"))
-                    client.wfile.flush()
-                except Exception:
-                    dead.append(client)
-            for client in dead:
-                self._clients.remove(client)
+            clients = list(self._clients)
+
+        dead: list[http.server.BaseHTTPRequestHandler] = []
+        msg = f"event: {event}\ndata: {data}\n\n".encode()
+        for client in clients:
+            try:
+                client.wfile.write(msg)
+                client.wfile.flush()
+            except Exception:
+                dead.append(client)
+
+        if dead:
+            with self._lock:
+                for client in dead:
+                    try:
+                        self._clients.remove(client)
+                    except ValueError:
+                        pass
 
 
 def make_dev_handler(

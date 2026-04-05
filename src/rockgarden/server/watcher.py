@@ -70,7 +70,7 @@ def classify_changes(
     Returns True if any changed file is outside the content source directory
     (i.e., config, templates, macros, styles, scripts, or static files).
     """
-    source_prefix = str(source_dir.resolve())
+    source_prefix = str(source_dir.resolve()) + "/"
     for _change_type, path in changes:
         if not path.startswith(source_prefix):
             return True
