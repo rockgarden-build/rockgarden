@@ -25,7 +25,7 @@ class FileWatcher:
         self._stop_event = threading.Event()
 
     def _make_filter(self) -> Callable[[Change, str], bool]:
-        resolved = [str(p.resolve()) for p in self._ignore_paths]
+        resolved = [str(p.resolve()) + "/" for p in self._ignore_paths]
 
         def filter_fn(change: Change, path: str) -> bool:
             return not any(path.startswith(prefix) for prefix in resolved)
