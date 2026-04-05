@@ -50,6 +50,14 @@ from rockgarden.obsidian.comments import strip_comments
 from rockgarden.output.build_info import get_build_info
 from rockgarden.output.feed import build_atom_feed
 from rockgarden.output.llms_txt import build_llms_full_txt, build_llms_txt
+from rockgarden.output.manifest import (
+    BuildManifest,
+    PageManifestEntry,
+    compute_config_hash,
+    compute_macro_hash,
+    compute_template_hash,
+    hash_file,
+)
 from rockgarden.output.search import build_search_index, strip_html
 from rockgarden.output.sitemap import build_sitemap
 from rockgarden.output.tags import build_tag_pages, collect_tags
@@ -75,6 +83,7 @@ class BuildResult:
     page_count: int
     broken_links: dict[str, list[str]]
     duration_seconds: float = 0.0
+    skipped_count: int = 0
 
 
 def copy_static_files(output: Path, assets_dir: str = "_assets") -> None:
@@ -372,6 +381,8 @@ def build_site(
     source: Path,
     output: Path,
     project_root: Path | None = None,
+    incremental: bool = False,
+    config_path: Path | None = None,
 ) -> BuildResult:
     """Build the static site.
 
@@ -381,6 +392,8 @@ def build_site(
         output: Output directory for generated HTML.
         project_root: Root directory of the project (where _themes/, _templates/
             etc. live). Defaults to source.parent for backward compatibility.
+        incremental: If True, skip rendering unchanged pages.
+        config_path: Path to the config file (for hashing in incremental mode).
 
     Returns:
         BuildResult with page count and broken links information.
@@ -411,6 +424,35 @@ def build_site(
     )
     clean_urls = config.site.clean_urls
     base_path = config.site.base_path or get_base_path(config.site.base_url)
+
+    # Incremental build setup
+    manifest: BuildManifest | None = None
+    manifest_path = site_root / ".rockgarden" / "build-manifest.json"
+    skipped_count = 0
+    use_incremental = False
+    if incremental:
+        cur_config_hash = compute_config_hash(config_path)
+        cur_template_hash = compute_template_hash(site_root, config.theme.name)
+        cur_macro_hash = compute_macro_hash(site_root)
+        output_dir_str = str(output.resolve())
+
+        manifest = BuildManifest.load(manifest_path)
+        if manifest and not manifest.needs_full_rebuild(
+            cur_config_hash,
+            cur_template_hash,
+            cur_macro_hash,
+            output_dir_str,
+            len(pages),
+        ):
+            use_incremental = True
+        else:
+            manifest = BuildManifest(
+                config_hash=cur_config_hash,
+                template_hash=cur_template_hash,
+                macro_hash=cur_macro_hash,
+                output_dir=output_dir_str,
+                page_count=len(pages),
+            )
 
     collections = partition_collections(pages, config.collections, source)
 
@@ -568,6 +610,14 @@ def build_site(
             if show_index_map.get(folder_path, False):
                 continue
 
+        page_content_hash = ""
+        if use_incremental and manifest:
+            page_content_hash = hash_file(page.source_path)
+            if not manifest.is_page_dirty(page.slug, page_content_hash, output):
+                skipped_count += 1
+                count += 1
+                continue
+
         content = page.content
 
         content = strip_content_title(content)
@@ -638,9 +688,18 @@ def build_site(
             layout_template,
         )
 
-        output_file = output / get_output_path(page.slug, clean_urls)
+        output_rel = get_output_path(page.slug, clean_urls)
+        output_file = output / output_rel
         output_file.parent.mkdir(parents=True, exist_ok=True)
         output_file.write_text(html)
+
+        if incremental and manifest:
+            if not page_content_hash:
+                page_content_hash = hash_file(page.source_path)
+            manifest.pages[page.slug] = PageManifestEntry(
+                content_hash=page_content_hash,
+                output_path=str(output_rel),
+            )
 
         count += 1
 
@@ -817,10 +876,15 @@ def build_site(
 
     run_hooks(config.hooks.post_build, "post_build", cwd=site_root, env_vars=hook_env)
 
+    if incremental and manifest:
+        manifest.page_count = len(pages)
+        manifest.save(manifest_path)
+
     return BuildResult(
         page_count=count,
         broken_links=broken_links_by_page,
         duration_seconds=time.perf_counter() - _start,
+        skipped_count=skipped_count,
     )
 
 

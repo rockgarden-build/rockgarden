@@ -130,6 +130,10 @@ def build(
         bool,
         typer.Option("--clean", help="Clean output directory without prompting"),
     ] = False,
+    incremental: Annotated[
+        bool,
+        typer.Option("--incremental", "-i", help="Skip rebuilding unchanged pages"),
+    ] = False,
 ) -> None:
     """Build the static site from Markdown source files."""
     # If source specified but no config, look for config in source directory
@@ -155,30 +159,38 @@ def build(
         typer.echo(f"Error: Source directory not found: {source_dir}", err=True)
         raise typer.Exit(1)
 
-    # Handle cleaning output directory
-    if _output_dir_has_contents(output_dir):
-        if clean:
-            shutil.rmtree(output_dir)
-        else:
-            confirm = typer.confirm(
-                f"Output directory {output_dir} exists. Delete contents?"
-            )
-            if confirm:
-                shutil.rmtree(output_dir)
-            else:
-                raise typer.Exit(0)
+    if clean and _output_dir_has_contents(output_dir):
+        shutil.rmtree(output_dir)
 
     typer.echo(f"Building site from {source_dir}")
 
+    resolved_config_path = (
+        config_file.resolve() if config_file else Path("rockgarden.toml").resolve()
+    )
+
     try:
-        result = build_site(config, source_dir, output_dir, project_root=project_root)
+        result = build_site(
+            config,
+            source_dir,
+            output_dir,
+            project_root=project_root,
+            incremental=incremental,
+            config_path=resolved_config_path,
+        )
     except Exception as exc:
         _handle_build_error(exc)
 
-    typer.echo(
-        f"Built {result.page_count} pages"
-        f" in {result.duration_seconds:.2f}s → {output_dir}"
-    )
+    if result.skipped_count:
+        typer.echo(
+            f"Built {result.page_count} pages"
+            f" ({result.skipped_count} unchanged)"
+            f" in {result.duration_seconds:.2f}s → {output_dir}"
+        )
+    else:
+        typer.echo(
+            f"Built {result.page_count} pages"
+            f" in {result.duration_seconds:.2f}s → {output_dir}"
+        )
 
     if result.broken_links:
         total = sum(len(targets) for targets in result.broken_links.values())

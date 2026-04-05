@@ -13,7 +13,7 @@ One branch + PR per item. Plan → implement → test → PR → feedback → me
 - [x] 2c. Comment stripping (`%% comment %%`)
 - [x] 3. Nav sorting improvements (reverse, date strategy, per-folder overrides)
 - [ ] 4. Dev server custom 404
-- [ ] 5. Incremental builds
+- [x] 5. Incremental builds
 - [ ] 6. Dev mode with live reload
 - [ ] 7. Example/demo site
 
