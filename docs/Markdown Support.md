@@ -92,7 +92,7 @@ Math syntax is always parsed. The default theme loads KaTeX from CDN for renderi
 
 | Feature | Syntax         | Status | Notes              |
 | ------- | -------------- | ------ | ------------------ |
-| Mermaid | ` ```mermaid ` | ❌     | Planned            |
+| Mermaid | ` ```mermaid ` | ✅     | Via CDN, client-side rendering |
 
 ### Tags
 

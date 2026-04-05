@@ -532,6 +532,7 @@ def build_site(
         "assets_dir": assets_dir,
         "main_content_padding": config.theme.main_content_padding,
         "math_cdn": config.theme.math_cdn,
+        "mermaid_cdn": config.theme.mermaid_cdn,
         "feed_enabled": config.feed.enabled and bool(config.site.base_url),
         "feed_path": config.feed.path,
     }

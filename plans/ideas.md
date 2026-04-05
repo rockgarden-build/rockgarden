@@ -2,50 +2,44 @@
 
 Future ideas and research notes. Not currently planned.
 
+## Pre-v1 Candidates
+
+- **ASCII-only slugs** — strip Unicode/accents from URLs. Breaking change (URLs change), best done before v1 locks them. NFD normalization (no deps) handles European languages; `python-slugify` for full transliteration. See research notes below.
+- **Configurable URL casing** — option to preserve original filename casing instead of slugifying
+
 ## Syntax & Content
 
-- **Inline math** (`$...$`) and block math (`$$...$$`)
-- **Highlights** (`==text==`)
-- **Comment stripping** (`%% comment %%`)
 - **Block references** (`[[page#^block]]`)
 - **Inline fields** (`key:: value` — Dataview compatibility)
 - **Inline tags** (`#tag`, `#parent/child`)
 - **Configurable markdown preset** (commonmark, gfm-like, custom plugins)
-
-## Build & Performance
-
-- **Incremental builds** — file-mtime dirty checking, partial rebuilds
-- **Dev mode** — file watching with automatic partial rebuilds and local server with live reload
-- **ASCII-only slugs** — strip Unicode/accents from URLs. NFD normalization (no deps) handles European languages; `python-slugify` for full transliteration. See research notes below.
-- **Configurable URL casing** — option to preserve original filename casing instead of slugifying
+- **Build-time mermaid rendering** — render mermaid diagrams to SVG at build time instead of client-side JS (via mermaid CLI `mmdc`)
 
 ## UI & Navigation
 
 - **Hover previews** — popover preview of linked page on hover
 - **Graph visualization** — interactive graph view of page links (see `features/graph-view.md`)
 - **Reading time** — estimated reading time per page (word count / ~230 WPM)
-- **Social links** — configurable list of social/external links with icons (e.g. GitHub, Mastodon, Bluesky) displayed in nav or footer. Could use bundled Lucide icons or allow custom SVGs.
+- **Social links** — configurable list of social/external links with icons (e.g. GitHub, Mastodon, Bluesky) displayed in nav or footer
 
 ## Extensibility
 
-- **Python plugins** — project-local behavioral extensions in `_plugins/<name>/`. Can register build hooks, Jinja2 filters, markdown-it-py extensions, CLI subcommands.
+- **Python plugins** — project-local behavioral extensions in `_plugins/<name>/`. See `features/plugins.md`.
 - **Installable templates** — theme/plugin install from git URL or local directory via CLI
 - **Theme/plugin dependency resolution** — themes/plugins declare dependencies, installer offers to also install them
-- **Theme manifest collection defaults** — `theme.toml` declaring per-collection defaults (`template`, `url_pattern`, `model`) so sites only need to provide `source`
-- **`rockgarden theme info` CLI command** — display theme options from `theme.toml` manifest. Show name, description, and available config keys with types, defaults, and descriptions. For the active theme (or a named theme via `--name`). Builds on the existing `load_theme_manifest()` in `validation.py`. The manifest format should be extended to support `type`, `default`, and `description` fields on config entries. Validation should also use the manifest to type-check values (not just check for unknown/required keys).
+- **Theme manifest collection defaults** — `theme.toml` declaring per-collection defaults
+- **`rockgarden theme info` CLI command** — display theme options from `theme.toml` manifest
 
 ## Configuration
 
-- **Configurable reserved directory names** — `_templates/`, `_themes/`, `_styles/`, `_scripts/` currently hardcoded; make configurable
-- **Tag URL prefix configurable** — `/tags/` is hardcoded; should be configurable to avoid conflicts with content pages
-- **Convention directories configurable** — same as reserved directory names
+- **Configurable reserved directory names** — `_templates/`, `_themes/`, `_styles/`, `_scripts/` currently hardcoded
+- **Tag URL prefix configurable** — `/tags/` is hardcoded; should be configurable
 
 ## Infrastructure
 
 - **Unified logging/output** — currently a mix of `print()`, `typer.echo()`, and stderr. Introduce consistent logging with verbosity control.
 - **Theme config update** — `set_theme_name_in_config` uses regex; swap for `tomlkit` for proper TOML writing
 - **User asset subdirectory support** — `_styles/` and `_scripts/` only discover top-level files; support nested dirs
-- **Date field defaults research** — validate default frontmatter field names for dates against real-world Obsidian plugins and other SSGs
 - **Extract icon handling** — move icon resolution into a standalone package
 - **Merge `./site` and `./docs`** — consolidate demo site and docs site
 
@@ -62,4 +56,4 @@ Future ideas and research notes. Not currently planned.
 
 **Implementation location**: `src/rockgarden/urls.py` — `generate_slug()` function.
 
-**Recommendation**: NFD strip approach (no deps) with optional python-slugify for advanced cases. Breaking change — URLs would change, but acceptable pre-1.0.
+**Recommendation**: NFD strip approach (no deps) with optional python-slugify for advanced cases. Breaking change — URLs would change, but acceptable pre-v1.
