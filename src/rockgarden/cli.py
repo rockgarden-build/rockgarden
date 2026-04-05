@@ -1,5 +1,6 @@
 """Command-line interface for rockgarden."""
 
+import errno
 import http.server
 import shutil
 import socketserver
@@ -111,6 +112,58 @@ clean_urls = true
             typer.echo(f"Added {labels} to .gitignore")
 
 
+class _BuildPaths:
+    """Resolved paths for a build."""
+
+    def __init__(
+        self,
+        config: Config,
+        source_dir: Path,
+        output_dir: Path,
+        project_root: Path,
+        config_path: Path,
+    ) -> None:
+        self.config = config
+        self.source_dir = source_dir
+        self.output_dir = output_dir
+        self.project_root = project_root
+        self.config_path = config_path
+
+
+def _resolve_build_paths(
+    source: Path | None,
+    output: Path | None,
+    config_file: Path | None,
+) -> _BuildPaths:
+    """Resolve config, source, output, and project root from CLI options."""
+    if config_file is None and source is not None:
+        source_config = source / "rockgarden.toml"
+        if source_config.exists():
+            config_file = source_config
+
+    config = Config.load(config_file)
+
+    source_dir = source or config.site.source
+    source_dir = source_dir.resolve()
+
+    project_root = config_file.parent.resolve() if config_file else Path.cwd()
+
+    if output:
+        output_dir = output.resolve()
+    else:
+        output_dir = config.site.output.resolve()
+
+    if not source_dir.exists():
+        typer.echo(f"Error: Source directory not found: {source_dir}", err=True)
+        raise typer.Exit(1)
+
+    config_path = (
+        config_file.resolve() if config_file else Path("rockgarden.toml").resolve()
+    )
+
+    return _BuildPaths(config, source_dir, output_dir, project_root, config_path)
+
+
 @app.command()
 def build(
     source: Annotated[
@@ -135,46 +188,21 @@ def build(
     ] = False,
 ) -> None:
     """Build the static site from Markdown source files."""
-    # If source specified but no config, look for config in source directory
-    if config_file is None and source is not None:
-        source_config = source / "rockgarden.toml"
-        if source_config.exists():
-            config_file = source_config
+    paths = _resolve_build_paths(source, output, config_file)
 
-    config = Config.load(config_file)
+    if clean and _output_dir_has_contents(paths.output_dir):
+        shutil.rmtree(paths.output_dir)
 
-    source_dir = source or config.site.source
-    source_dir = source_dir.resolve()
-
-    project_root = config_file.parent.resolve() if config_file else Path.cwd()
-
-    # Resolve output relative to cwd (where config file is), not source directory
-    if output:
-        output_dir = output.resolve()
-    else:
-        output_dir = config.site.output.resolve()
-
-    if not source_dir.exists():
-        typer.echo(f"Error: Source directory not found: {source_dir}", err=True)
-        raise typer.Exit(1)
-
-    if clean and _output_dir_has_contents(output_dir):
-        shutil.rmtree(output_dir)
-
-    typer.echo(f"Building site from {source_dir}")
-
-    resolved_config_path = (
-        config_file.resolve() if config_file else Path("rockgarden.toml").resolve()
-    )
+    typer.echo(f"Building site from {paths.source_dir}")
 
     try:
         result = build_site(
-            config,
-            source_dir,
-            output_dir,
-            project_root=project_root,
+            paths.config,
+            paths.source_dir,
+            paths.output_dir,
+            project_root=paths.project_root,
             incremental=incremental,
-            config_path=resolved_config_path,
+            config_path=paths.config_path,
         )
     except Exception as exc:
         _handle_build_error(exc)
@@ -183,12 +211,12 @@ def build(
         typer.echo(
             f"Built {result.page_count} pages"
             f" ({result.skipped_count} unchanged)"
-            f" in {result.duration_seconds:.2f}s → {output_dir}"
+            f" in {result.duration_seconds:.2f}s → {paths.output_dir}"
         )
     else:
         typer.echo(
             f"Built {result.page_count} pages"
-            f" in {result.duration_seconds:.2f}s → {output_dir}"
+            f" in {result.duration_seconds:.2f}s → {paths.output_dir}"
         )
 
     if result.broken_links:
@@ -263,7 +291,7 @@ def serve(
     try:
         httpd = ReuseAddrServer(("", port), handler)
     except OSError as e:
-        if e.errno == 48:  # Address already in use
+        if e.errno == errno.EADDRINUSE:
             typer.echo(f"Error: Port {port} is already in use.", err=True)
             typer.echo(f"Try: rockgarden serve -p {port + 1}", err=True)
             raise typer.Exit(1) from None
@@ -277,6 +305,48 @@ def serve(
             httpd.serve_forever()
         except KeyboardInterrupt:
             typer.echo("\nStopping server")
+
+
+@app.command()
+def dev(
+    source: Annotated[
+        Path | None,
+        typer.Option("--source", "-s", help="Source directory (overrides config)"),
+    ] = None,
+    output: Annotated[
+        Path | None,
+        typer.Option("--output", "-o", help="Output directory (overrides config)"),
+    ] = None,
+    config_file: Annotated[
+        Path | None,
+        typer.Option("--config", "-c", help="Path to config file"),
+    ] = None,
+    port: Annotated[
+        int,
+        typer.Option("--port", "-p", help="Port to serve on"),
+    ] = 8000,
+    clean: Annotated[
+        bool,
+        typer.Option("--clean", help="Clean output directory without prompting"),
+    ] = False,
+) -> None:
+    """Start dev server with live reload."""
+    from rockgarden.server import DevServer
+
+    paths = _resolve_build_paths(source, output, config_file)
+
+    if clean and _output_dir_has_contents(paths.output_dir):
+        shutil.rmtree(paths.output_dir)
+
+    server = DevServer(
+        config=paths.config,
+        source_dir=paths.source_dir,
+        output_dir=paths.output_dir,
+        project_root=paths.project_root,
+        config_path=paths.config_path,
+        port=port,
+    )
+    server.start()
 
 
 icons_app = typer.Typer(no_args_is_help=True, help="Manage icon assets.")
