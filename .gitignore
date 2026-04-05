@@ -6,4 +6,5 @@ dist/
 .env
 .DS_Store
 _site/
+.rockgarden/
 node_modules/
