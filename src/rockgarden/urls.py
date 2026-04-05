@@ -4,7 +4,6 @@ import re
 from urllib.parse import quote, urlparse
 
 from slugify import slugify as _ascii_slugify
-from text_unidecode import unidecode as _transliterate
 
 
 def slugify_heading(text: str) -> str:
@@ -73,8 +72,16 @@ def generate_slug(
         segments = slug.split("/")
         if style == "slug":
             segments = [_ascii_slugify(s, allow_unicode=False) for s in segments]
+        elif style == "preserve":
+            segments = [
+                _ascii_slugify(s, allow_unicode=False, lowercase=False, separator=" ")
+                for s in segments
+            ]
         else:
-            segments = [_transliterate(s) for s in segments]
+            segments = [
+                _ascii_slugify(s, allow_unicode=False, lowercase=False)
+                for s in segments
+            ]
         slug = "/".join(segments)
 
     if style == "preserve":
