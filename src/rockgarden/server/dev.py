@@ -90,9 +90,8 @@ class DevServer:
         theme = self._config.theme.name
         if theme:
             paths.append(root / "_themes" / theme)
-        # Watch config file's parent directory (to detect config edits)
         if self._config_path.exists():
-            paths.append(self._config_path.parent)
+            paths.append(self._config_path)
         return paths
 
     def _ignore_paths(self) -> list[Path]:
@@ -117,8 +116,6 @@ class DevServer:
             display += f" (+{len(changed_paths) - 3} more)"
         typer.echo(f"\nChanged: {display}")
 
-        # If watching config parent dir, ignore non-config file changes
-        # that happen to be in that directory
         needs_full = classify_changes(
             changes,
             self._source_dir,  # type: ignore[arg-type]

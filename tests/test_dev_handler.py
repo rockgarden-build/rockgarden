@@ -103,6 +103,33 @@ def test_sse_clients_broadcast():
     clients.broadcast("reload")
 
 
+def test_sse_broadcast_delivers_to_client(tmp_path):
+    import socket
+    import time
+
+    output_dir = tmp_path / "_site"
+    output_dir.mkdir()
+
+    httpd, port, sse_clients = _start_dev_server(output_dir)
+    try:
+        sock = socket.create_connection(("127.0.0.1", port), timeout=2)
+        sock.sendall(b"GET /_rockgarden/events HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n")
+        # Read headers
+        sock.recv(4096)
+        # Give the handler time to register the SSE client
+        time.sleep(0.1)
+
+        sse_clients.broadcast("reload", "now")
+
+        sock.settimeout(2)
+        data = sock.recv(4096).decode()
+        assert "event: reload" in data
+        assert "data: now" in data
+        sock.close()
+    finally:
+        httpd.shutdown()
+
+
 def test_inject_script_before_body():
     html = b"<html><body><h1>Hi</h1></body></html>"
     result = _inject_script(html)
