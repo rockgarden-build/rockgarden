@@ -96,15 +96,24 @@ class NavLinkConfig(BaseModel):
 NavLinkConfig.model_rebuild()
 
 
+class FolderSortOverride(BaseModel):
+    """Per-folder sort override."""
+
+    sort: str | None = None
+    reverse: bool | None = None
+
+
 class NavConfig(BaseModel):
     """Navigation structure configuration."""
 
     hide: list[str] = Field(default_factory=list)
     labels: dict[str, str] = Field(default_factory=dict)
     sort: str = "files-first"
+    reverse: bool = False
     link_auto_index: bool = False
     links: list[NavLinkConfig] = Field(default_factory=list)
     links_position: str = "after"
+    overrides: dict[str, FolderSortOverride] = Field(default_factory=dict)
 
 
 class TocConfig(BaseModel):

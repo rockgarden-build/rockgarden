@@ -77,10 +77,37 @@ Theme-specific display and rendering options. These are supported by the default
 | ----------------- | ----------- | --------------- | ------------------------------------------------------------------- |
 | `hide`            | `list[str]` | `[]`            | Paths to hide from sidebar navigation                               |
 | `labels`          | `dict`      | `{}`            | Custom labels for paths (e.g. `{"/api" = "API Reference"}`)         |
-| `sort`            | `str`       | `"files-first"` | Sort order: `"files-first"`, `"folders-first"`, or `"alphabetical"` |
+| `sort`            | `str`       | `"files-first"` | Sort order: `"files-first"`, `"folders-first"`, `"alphabetical"`, or `"date"` (folder index only) |
+| `reverse`         | `bool`      | `false`         | Reverse sort order of unpinned items (pinned items keep their `nav_order`) |
 | `link_auto_index` | `bool`      | `false`         | Make folders with `index.md` clickable links in nav                 |
 | `links`           | `list`      | `[]`            | Custom navigation links. Each entry has `label`, `url`, and optional `children` (same structure, nested) |
 | `links_position`  | `str`       | `"after"`       | Where to place custom links relative to directory nav: `"before"` or `"after"` |
+| `overrides`       | `dict`      | `{}`            | Per-folder sort overrides (see below)                               |
+
+### Per-folder sort overrides
+
+Override `sort` and `reverse` for specific folders via config or frontmatter.
+
+**In `rockgarden.toml`:**
+
+```toml
+[nav.overrides.blog]
+sort = "date"
+reverse = true
+```
+
+**In a folder's `index.md` frontmatter** (takes priority over config):
+
+```yaml
+---
+sort: date
+sort_reverse: true
+---
+```
+
+Priority: frontmatter > `[nav.overrides.<path>]` > global `[nav]` defaults.
+
+The `"date"` sort strategy orders by file modified time and is only available on folder index pages. In the nav sidebar, `"date"` falls back to `"files-first"`.
 
 ## `[feed]`
 
