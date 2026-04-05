@@ -28,6 +28,12 @@ class TestInlineMath:
         result = render_markdown("$ a $")
         assert "math" not in result
 
+    def test_dollar_variables_in_prose_not_math(self):
+        result = render_markdown("$a increases and $b decreases")
+        assert "math" not in result
+        assert "$a" in result
+        assert "$b" in result
+
 
 class TestBlockMath:
     def test_double_dollar(self):
