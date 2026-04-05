@@ -487,6 +487,7 @@ def build_site(
         "user_scripts": user_scripts,
         "assets_dir": assets_dir,
         "main_content_padding": config.theme.main_content_padding,
+        "math_enabled": config.theme.math,
         "feed_enabled": config.feed.enabled and bool(config.site.base_url),
         "feed_path": config.feed.path,
     }

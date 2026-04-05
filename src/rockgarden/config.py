@@ -75,6 +75,9 @@ class ThemeConfig(BaseModel):
     search: bool = True
     tag_index: bool = True
 
+    # Math rendering
+    math: bool = False
+
     # Default theme specific
     daisyui_default: str = "light"
     daisyui_themes: list[str] = Field(default_factory=list)
