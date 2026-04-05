@@ -1,8 +1,5 @@
 # Known Issues
 
-- **Macros not processed in transclusions**: `preprocess_macros` is applied to page content and folder indexes but not inside `_make_note_resolver`. Transcluded notes that use macros render macro calls as literal text. Fix by passing the macros dict into the resolver and applying preprocessing there.
-- **Heading link fragments not slugified**: `[[Page#My Heading]]` passes the fragment through as-is, but markdown-it-py generates anchors like `#my-heading`. The fragment should be slugified to match the rendered heading anchor. See `content/store.py` `resolve_link()`.
-- **GFM math blocks not rendering**: ` ```math ` fences output `<code class="language-math">` but no math rendering occurs. Need KaTeX or MathJax client-side, or a build-time renderer.
 - **Replace ASCII diagrams with mermaid**: Once mermaid rendering is implemented, update the ASCII art diagrams in docs (e.g. Architecture.md build pipeline) to use mermaid.
 - **Dev server doesn't support custom 404 page**: The `serve` command uses Python's built-in HTTP server, which returns a generic 404 response. It should serve the site's custom `404.html` if present.
 - **Search stopword list needs research and configurability**: The client-side JS search library's default stopword list is long and may filter out actual content. The stopword configuration needs to be passed through from rockgarden config to the JS library. Needs: (1) research a better default list, (2) make the list configurable via `rockgarden.toml` so users can adjust it for their content, (3) pass the configured list to the JS search library initialization.

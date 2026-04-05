@@ -69,6 +69,7 @@ Theme-specific display and rendering options. These are supported by the default
 | `nav_default_state` | `str`       | `"collapsed"` | Sidebar nav state: `"collapsed"` or `"expanded"` (default theme only)                                                                                                   |
 | `show_build_info`   | `bool`      | `true`        | Show build timestamp in footer (default theme only)                                                                                                                     |
 | `show_build_commit` | `bool`      | `false`       | Show git commit in footer (default theme only)                                                                                                                          |
+| `math_cdn`          | `bool`      | `true`        | Load KaTeX from CDN for math rendering (default theme only). Set `false` to provide KaTeX yourself via `_styles/` and `_scripts/`. |
 
 ## `[nav]`
 

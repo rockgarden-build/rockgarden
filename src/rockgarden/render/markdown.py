@@ -4,6 +4,7 @@ import re
 from html import escape
 
 from markdown_it import MarkdownIt
+from mdit_py_plugins.dollarmath import dollarmath_plugin
 from mdit_py_plugins.footnote import footnote_plugin
 from mdit_py_plugins.tasklists import tasklists_plugin
 from pygments import highlight
@@ -21,6 +22,9 @@ def _fence_renderer(self, tokens, idx, options, env):
     info = token.info.strip() if token.info else ""
     lang = info.split()[0] if info else ""
     code = token.content
+
+    if lang == "math":
+        return f'<div class="math block">\n{escape(code)}</div>\n'
 
     if lang:
         try:
@@ -45,6 +49,7 @@ def get_markdown_renderer() -> MarkdownIt:
     Additional plugins:
     - Task lists (- [ ] item) via mdit-py-plugins
     - Footnotes ([^1] references and [^1]: definitions) via mdit-py-plugins
+    - Dollar math ($..$ inline, $$...$$ block) via mdit-py-plugins
     - Syntax highlighting via Pygments
     """
     global _md
@@ -52,6 +57,7 @@ def get_markdown_renderer() -> MarkdownIt:
         _md = MarkdownIt("gfm-like", {"html": True, "breaks": True})
         footnote_plugin(_md)
         tasklists_plugin(_md)
+        dollarmath_plugin(_md, allow_digits=False, allow_space=False)
         _md.add_render_rule("fence", _fence_renderer)
     return _md
 

@@ -82,6 +82,7 @@ class ThemeConfig(BaseModel):
     show_build_info: bool = True
     show_build_commit: bool = False
     main_content_padding: str = "px-12"
+    math_cdn: bool = True
 
 
 class NavLinkConfig(BaseModel):

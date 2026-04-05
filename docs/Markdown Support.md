@@ -80,11 +80,13 @@ Rockgarden supports the superset of CommonMark, GFM (GitHub Flavored Markdown), 
 
 ### Math
 
-| Feature         | Syntax       | Status | Notes              |
-| --------------- | ------------ | ------ | ------------------ |
-| Inline math     | `$E = mc^2$` | ❌     | Future             |
-| Block math      | `$$...$$`    | ❌     | Future             |
-| GFM math blocks | ` ```math `  | ❌     | Planned            |
+Math syntax is always parsed. The default theme loads KaTeX from CDN for rendering. Set `math_cdn = false` under `[theme]` to provide KaTeX yourself via `_styles/` and `_scripts/`.
+
+| Feature         | Syntax       | Status | Notes                        |
+| --------------- | ------------ | ------ | ---------------------------- |
+| Inline math     | `$E = mc^2$` | ✅     | Via mdit-py-plugins          |
+| Block math      | `$$...$$`    | ✅     | Via mdit-py-plugins          |
+| GFM math blocks | ` ```math `  | ✅     | Rendered as display math     |
 
 ### Diagrams
 
@@ -132,7 +134,6 @@ This ensures:
 
 ## Future Syntax Additions
 
-- Inline math: `$...$` and block math `$$...$$`
 - Highlights: `==text==`
 - Comment stripping: `%% comment %%`
 - Block references: `[[page#^block]]`
