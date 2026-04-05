@@ -80,7 +80,7 @@ Rockgarden supports the superset of CommonMark, GFM (GitHub Flavored Markdown), 
 
 ### Math
 
-Requires `math = true` under `[theme]` in `rockgarden.toml`. Rendered client-side via KaTeX (loaded from CDN).
+Math syntax is always parsed. The default theme loads KaTeX from CDN for rendering. Set `math_cdn = false` under `[theme]` to provide KaTeX yourself via `_styles/` and `_scripts/`.
 
 | Feature         | Syntax       | Status | Notes                        |
 | --------------- | ------------ | ------ | ---------------------------- |

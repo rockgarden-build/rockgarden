@@ -64,12 +64,12 @@ Theme-specific display and rendering options. These are supported by the default
 | `backlinks`         | `bool`      | `true`        | Show backlinks panel                                                                                                                                                    |
 | `search`            | `bool`      | `true`        | Enable search UI and index generation                                                                                                                                   |
 | `tag_index`         | `bool`      | `true`        | Generate `/tags/` index pages                                                                                                                                           |
-| `math`              | `bool`      | `false`       | Enable math rendering. Uses KaTeX loaded from CDN (jsdelivr.net). Supports `$...$` inline, `$$...$$` block, and ` ```math ` fenced blocks.                              |
 | `daisyui_default`   | `str`       | `"light"`     | Default DaisyUI color theme (default theme only)                                                                                                                        |
 | `daisyui_themes`    | `list[str]` | `[]`          | Available themes for the theme switcher. Empty = light/dark toggle. (default theme only)                                                                                |
 | `nav_default_state` | `str`       | `"collapsed"` | Sidebar nav state: `"collapsed"` or `"expanded"` (default theme only)                                                                                                   |
 | `show_build_info`   | `bool`      | `true`        | Show build timestamp in footer (default theme only)                                                                                                                     |
 | `show_build_commit` | `bool`      | `false`       | Show git commit in footer (default theme only)                                                                                                                          |
+| `math_cdn`          | `bool`      | `true`        | Load KaTeX from CDN for math rendering (default theme only). Set `false` to provide KaTeX yourself via `_styles/` and `_scripts/`. |
 
 ## `[nav]`
 
