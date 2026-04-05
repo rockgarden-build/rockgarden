@@ -3,6 +3,8 @@
 import re
 from urllib.parse import quote, urlparse
 
+from slugify import slugify as _ascii_slugify
+
 
 def slugify_heading(text: str) -> str:
     """Convert heading text to a URL-friendly slug.
@@ -16,18 +18,20 @@ def slugify_heading(text: str) -> str:
     return text
 
 
-def normalize_tag(tag: str) -> str:
+def normalize_tag(tag: str, ascii_urls: bool = False) -> str:
     """Normalize a tag to a URL-safe slug.
 
-    Strips leading '#', lowercases, and replaces any character that is not
-    alphanumeric, hyphen, or underscore with a hyphen. Prevents path traversal
-    via tags containing '/' or '..'.
+    Strips leading '#', lowercases, and replaces non-word characters with
+    hyphens. When *ascii_urls* is True, transliterates Unicode to ASCII.
 
     Tags 'Python', '#python', and 'python' all normalize to 'python'.
     Obsidian nested tags like 'character/pc' normalize to 'character-pc'.
     """
-    slug = tag.lstrip("#").lower()
-    slug = re.sub(r"[^a-z0-9_-]", "-", slug)
+    slug = tag.lstrip("#")
+    if ascii_urls:
+        return _ascii_slugify(slug, allow_unicode=False)
+    slug = slug.lower()
+    slug = re.sub(r"[^\w-]", "-", slug)
     slug = re.sub(r"-+", "-", slug)
     return slug.strip("-")
 
@@ -46,13 +50,16 @@ def get_base_path(base_url: str) -> str:
     return path
 
 
-def generate_slug(relative_path: str, style: str = "slug") -> str:
+def generate_slug(
+    relative_path: str, style: str = "slug", ascii_urls: bool = False
+) -> str:
     """Generate a slug from a relative file path.
 
     Args:
         relative_path: Relative path from source root (e.g., "NPCs/Olvir.md").
         style: "slug" (lowercase, dashes), "preserve-case" (original casing,
             dashes), or "preserve" (original casing and spacing).
+        ascii_urls: When True, transliterate Unicode to ASCII.
 
     Returns:
         Slug string. For slug: "npcs/olvir-the-wise".
@@ -60,11 +67,28 @@ def generate_slug(relative_path: str, style: str = "slug") -> str:
         For preserve: "NPCs/Olvir the Wise".
     """
     slug = re.sub(r"\.md$", "", relative_path, flags=re.IGNORECASE)
+
+    if ascii_urls:
+        segments = slug.split("/")
+        if style == "slug":
+            segments = [_ascii_slugify(s, allow_unicode=False) for s in segments]
+        elif style == "preserve":
+            segments = [
+                _ascii_slugify(s, allow_unicode=False, lowercase=False, separator=" ")
+                for s in segments
+            ]
+        else:
+            segments = [
+                _ascii_slugify(s, allow_unicode=False, lowercase=False)
+                for s in segments
+            ]
+        slug = "/".join(segments)
+
     if style == "preserve":
         return slug
     slug = re.sub(r"[ _]+", "-", slug)
     slug = re.sub(r"-+", "-", slug)
-    if style == "slug":
+    if style == "slug" and not ascii_urls:
         slug = slug.lower()
     return slug
 

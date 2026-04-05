@@ -8,7 +8,7 @@ from rockgarden.content.models import Page
 from rockgarden.urls import get_url, normalize_tag
 
 
-def collect_tags(pages: list[Page]) -> dict[str, list[Page]]:
+def collect_tags(pages: list[Page], ascii_urls: bool = False) -> dict[str, list[Page]]:
     """Return a mapping of normalized tag slug → list of pages with that tag.
 
     Pages are included in the order they appear in the input list. Tags with
@@ -20,7 +20,7 @@ def collect_tags(pages: list[Page]) -> dict[str, list[Page]]:
         if isinstance(raw_tags, str):
             raw_tags = [raw_tags]
         for tag in raw_tags:
-            slug = normalize_tag(tag)
+            slug = normalize_tag(tag, ascii_urls)
             if slug:
                 tags.setdefault(slug, []).append(page)
     return dict(sorted(tags.items()))
@@ -34,6 +34,7 @@ def build_tag_pages(
     clean_urls: bool = True,
     base_path: str = "",
     layout_template: str = "layouts/default.html",
+    ascii_urls: bool = False,
 ) -> None:
     """Generate /tags/<slug>/ and /tags/ pages in the output directory."""
     tag_index_template = env.get_template("tag_index.html")
@@ -47,7 +48,11 @@ def build_tag_pages(
             "title": p.title,
             "subtitle": p.frontmatter.get("subtitle", ""),
             "url": get_url(p.slug, clean_urls, base_path),
-            "tags": [normalize_tag(t) for t in raw_tags if normalize_tag(t)],
+            "tags": [
+                normalize_tag(t, ascii_urls)
+                for t in raw_tags
+                if normalize_tag(t, ascii_urls)
+            ],
         }
 
     def _sorted_entries(pages: list[Page]) -> list[dict]:
