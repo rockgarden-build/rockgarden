@@ -57,7 +57,7 @@ def get_markdown_renderer() -> MarkdownIt:
         _md = MarkdownIt("gfm-like", {"html": True, "breaks": True})
         footnote_plugin(_md)
         tasklists_plugin(_md)
-        dollarmath_plugin(_md)
+        dollarmath_plugin(_md, allow_digits=False, allow_space=False)
         _md.add_render_rule("fence", _fence_renderer)
     return _md
 

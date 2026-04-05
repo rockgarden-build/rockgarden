@@ -67,16 +67,14 @@ Independent of Phase 1. Can parallelize.
 
 ### 2a. Math rendering
 
-**Approach**: Use `dollarmath_plugin` from `mdit_py_plugins` (already installed, confirmed available) for `$...$` inline and `$$...$$` block. Handle ` ```math ` fences in `_fence_renderer`. Client-side KaTeX via CDN — avoids adding Node as a build dep.
-
-**SSG precedent**: Quartz, Hugo, Astro all use KaTeX. Client-side CDN is simplest; build-time rendering is a future optimization.
+**Approach**: Math parsing is always on via `dollarmath_plugin` (with `allow_digits=False, allow_space=False` to avoid false positives on currency and prose). ` ```math ` fences handled in `_fence_renderer`. Default theme loads KaTeX from CDN by default; `math_cdn = false` config option lets users provide KaTeX locally via `_styles/` and `_scripts/`.
 
 **Files**:
-- `src/rockgarden/render/markdown.py` — import `dollarmath_plugin`, register in `get_markdown_renderer()`. In `_fence_renderer`, handle `lang == "math"` by wrapping in `<div class="math display">`.
-- `src/rockgarden/templates/base.html` — conditional KaTeX CSS+JS from CDN (`{% if math_enabled %}`)
-- `src/rockgarden/config.py` — add `math: bool = False` to `ThemeConfig`
-- `src/rockgarden/output/builder.py` — pass `math_enabled` into template context
-- Tests: `test_math.py` (inline `$x^2$`, block `$$\sum$$`, ` ```math ` fence)
+- `src/rockgarden/render/markdown.py` — register `dollarmath_plugin` unconditionally. Handle `lang == "math"` in `_fence_renderer`.
+- `src/rockgarden/templates/base.html` — KaTeX CSS+JS from CDN, gated by `{% if site.math_cdn %}`
+- `src/rockgarden/config.py` — add `math_cdn: bool = True` to `ThemeConfig` (default-theme-specific section)
+- `src/rockgarden/output/builder.py` — pass `math_cdn` into template context
+- Tests: `test_math.py` (inline `$x^2$`, block `$$\sum$$`, ` ```math ` fence, dollar signs with digits not parsed)
 
 ### 2b. Highlights (`==text==`)
 

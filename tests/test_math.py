@@ -18,6 +18,16 @@ class TestInlineMath:
         result = render_markdown("Use `$variable` in bash")
         assert "math" not in result
 
+    def test_currency_not_math(self):
+        result = render_markdown("It costs $50 to $100")
+        assert "math" not in result
+        assert "$50" in result
+        assert "$100" in result
+
+    def test_spaced_dollars_not_math(self):
+        result = render_markdown("$ a $")
+        assert "math" not in result
+
 
 class TestBlockMath:
     def test_double_dollar(self):
