@@ -1,6 +1,8 @@
 """Tests for note transclusion processing."""
 
+from rockgarden.config import Config
 from rockgarden.obsidian.transclusions import process_note_transclusions
+from rockgarden.output.builder import build_site
 
 
 def _resolver(target: str) -> str | None:
@@ -81,3 +83,25 @@ class TestProcessNoteTransclusions:
         result = process_note_transclusions(content, cycle_resolver)
         assert result == "![[Note A]]"
         assert call_count == 1
+
+
+class TestTransclusionMacros:
+    def test_macros_expanded_in_transcluded_note(self, tmp_path):
+        """Macros in transcluded notes should be expanded, not rendered literally."""
+        source = tmp_path / "source"
+        source.mkdir()
+        macros_dir = tmp_path / "_macros"
+        macros_dir.mkdir()
+        (macros_dir / "utils.html").write_text(
+            "{% macro greeting(name) %}Hello, {{ name }}!{% endmacro %}"
+        )
+        (source / "note.md").write_text("{{ greeting('World') }}")
+        (source / "page.md").write_text("# Page\n\n![[note]]")
+
+        output = tmp_path / "output"
+        config = Config.load(None)
+        build_site(config, source, output)
+
+        page_html = (output / "page" / "index.html").read_text()
+        assert "Hello, World!" in page_html
+        assert "utils.greeting" not in page_html
