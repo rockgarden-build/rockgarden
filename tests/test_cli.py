@@ -1,4 +1,8 @@
+import http.server
+import socketserver
 import tempfile
+import threading
+import urllib.request
 from pathlib import Path
 
 from typer.testing import CliRunner
@@ -124,3 +128,76 @@ def test_build_unhandled_error_shows_type_and_message(tmp_path, monkeypatch):
     assert result.exit_code == 1
     assert "RuntimeError: something broke" in result.output
     assert "Traceback" not in result.output
+
+
+def _start_serve_server(output_dir, port):
+    """Start the rockgarden serve handler on a given port, return the server."""
+
+    class _Handler(http.server.SimpleHTTPRequestHandler):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, directory=str(output_dir), **kwargs)
+
+        def send_error(self, code, message=None, explain=None):
+            if code == 404:
+                custom_404 = Path(self.directory) / "404.html"
+                if custom_404.is_file():
+                    body = custom_404.read_bytes()
+                    self.send_response(404)
+                    self.send_header("Content-Type", "text/html; charset=utf-8")
+                    self.send_header("Content-Length", str(len(body)))
+                    self.end_headers()
+                    self.wfile.write(body)
+                    return
+            super().send_error(code, message, explain)
+
+        def log_message(self, format, *args):
+            pass  # suppress output during tests
+
+    class ReuseAddrServer(socketserver.TCPServer):
+        allow_reuse_address = True
+
+    httpd = ReuseAddrServer(("127.0.0.1", port), _Handler)
+    thread = threading.Thread(target=httpd.serve_forever, daemon=True)
+    thread.start()
+    return httpd
+
+
+def test_serve_custom_404(tmp_path):
+    output_dir = tmp_path / "_site"
+    output_dir.mkdir()
+    (output_dir / "index.html").write_text("<h1>Home</h1>")
+    (output_dir / "404.html").write_text("<h1>Custom Not Found</h1>")
+
+    port = 18765
+    httpd = _start_serve_server(output_dir, port)
+    try:
+        try:
+            urllib.request.urlopen(f"http://127.0.0.1:{port}/nonexistent")
+        except urllib.error.HTTPError as e:
+            assert e.code == 404
+            body = e.read().decode()
+            assert "Custom Not Found" in body
+        else:
+            raise AssertionError("Expected 404 HTTPError")
+    finally:
+        httpd.shutdown()
+
+
+def test_serve_default_404_without_custom_page(tmp_path):
+    output_dir = tmp_path / "_site"
+    output_dir.mkdir()
+    (output_dir / "index.html").write_text("<h1>Home</h1>")
+
+    port = 18766
+    httpd = _start_serve_server(output_dir, port)
+    try:
+        try:
+            urllib.request.urlopen(f"http://127.0.0.1:{port}/nonexistent")
+        except urllib.error.HTTPError as e:
+            assert e.code == 404
+            body = e.read().decode()
+            assert "Custom Not Found" not in body
+        else:
+            raise AssertionError("Expected 404 HTTPError")
+    finally:
+        httpd.shutdown()
