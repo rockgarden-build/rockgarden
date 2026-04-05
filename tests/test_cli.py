@@ -1,4 +1,3 @@
-import http.server
 import socketserver
 import tempfile
 import threading
@@ -8,7 +7,7 @@ from pathlib import Path
 from typer.testing import CliRunner
 
 from rockgarden import __version__
-from rockgarden.cli import app
+from rockgarden.cli import _make_handler, app
 
 runner = CliRunner()
 
@@ -130,36 +129,21 @@ def test_build_unhandled_error_shows_type_and_message(tmp_path, monkeypatch):
     assert "Traceback" not in result.output
 
 
-def _start_serve_server(output_dir, port):
-    """Start the rockgarden serve handler on a given port, return the server."""
+def _start_serve_server(output_dir):
+    """Start the real rockgarden handler on an OS-assigned port."""
+    handler = _make_handler(output_dir)
 
-    class _Handler(http.server.SimpleHTTPRequestHandler):
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, directory=str(output_dir), **kwargs)
-
-        def send_error(self, code, message=None, explain=None):
-            if code == 404:
-                custom_404 = Path(self.directory) / "404.html"
-                if custom_404.is_file():
-                    body = custom_404.read_bytes()
-                    self.send_response(404)
-                    self.send_header("Content-Type", "text/html; charset=utf-8")
-                    self.send_header("Content-Length", str(len(body)))
-                    self.end_headers()
-                    self.wfile.write(body)
-                    return
-            super().send_error(code, message, explain)
-
-        def log_message(self, format, *args):
-            pass  # suppress output during tests
+    # Suppress request logging during tests
+    handler.log_message = lambda self, *a, **kw: None  # type: ignore[assignment]
 
     class ReuseAddrServer(socketserver.TCPServer):
         allow_reuse_address = True
 
-    httpd = ReuseAddrServer(("127.0.0.1", port), _Handler)
+    httpd = ReuseAddrServer(("127.0.0.1", 0), handler)
+    port = httpd.server_address[1]
     thread = threading.Thread(target=httpd.serve_forever, daemon=True)
     thread.start()
-    return httpd
+    return httpd, port
 
 
 def test_serve_custom_404(tmp_path):
@@ -168,8 +152,7 @@ def test_serve_custom_404(tmp_path):
     (output_dir / "index.html").write_text("<h1>Home</h1>")
     (output_dir / "404.html").write_text("<h1>Custom Not Found</h1>")
 
-    port = 18765
-    httpd = _start_serve_server(output_dir, port)
+    httpd, port = _start_serve_server(output_dir)
     try:
         try:
             urllib.request.urlopen(f"http://127.0.0.1:{port}/nonexistent")
@@ -188,8 +171,7 @@ def test_serve_default_404_without_custom_page(tmp_path):
     output_dir.mkdir()
     (output_dir / "index.html").write_text("<h1>Home</h1>")
 
-    port = 18766
-    httpd = _start_serve_server(output_dir, port)
+    httpd, port = _start_serve_server(output_dir)
     try:
         try:
             urllib.request.urlopen(f"http://127.0.0.1:{port}/nonexistent")
