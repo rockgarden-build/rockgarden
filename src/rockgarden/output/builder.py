@@ -161,6 +161,7 @@ def _make_note_resolver(
     all_media: set[str],
     broken_links: dict[str, list[str]],
     base_path: str = "",
+    apply_macros=None,
 ):
     """Return a transclusion resolver that renders a note's content as HTML.
 
@@ -186,6 +187,8 @@ def _make_note_resolver(
         )
 
         sub_content = page.content
+        if apply_macros:
+            sub_content = apply_macros(sub_content, page)
         sub_content, media = process_media_embeds(sub_content, media_resolver)
         all_media.update(media)
         all_media.update(collect_markdown_images(sub_content, media_resolver))
@@ -200,6 +203,7 @@ def _make_note_resolver(
                 all_media,
                 broken_links,
                 base_path,
+                apply_macros,
             ),
         )
         sub_content, sub_broken = process_wikilinks(sub_content, store.resolve_link)
@@ -581,6 +585,7 @@ def build_site(
                 all_media,
                 broken_links_by_page,
                 base_path,
+                apply_macros,
             ),
         )
         content, broken = process_wikilinks(content, store.resolve_link)
@@ -665,6 +670,7 @@ def build_site(
                     all_media,
                     broken_links_by_page,
                     base_path,
+                    apply_macros,
                 ),
             )
             processed, broken = process_wikilinks(processed, store.resolve_link)
