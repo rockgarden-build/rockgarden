@@ -6,14 +6,12 @@ tags: [architecture, design]
 
 ## Build Pipeline
 
-```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│ Content Sources │ ──▶ │  Content Store  │ ──▶ │     Output      │
-│ (MD/YAML/JSON)  │     │  (Collections)  │     │  (HTML/Assets)  │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
-         ↑                       ↑                       ↑
-     pre_build              post_collect             post_build
-       hooks                  hooks                    hooks
+```mermaid
+flowchart LR
+    A["Content Sources\n(MD/YAML/JSON)"] --> B["Content Store\n(Collections)"] --> C["Output\n(HTML/Assets)"]
+    H1["pre_build\nhooks"] -.-> A
+    H2["post_collect\nhooks"] -.-> B
+    H3["post_build\nhooks"] -.-> C
 ```
 
 Each build is a full rebuild. The build pipeline is:

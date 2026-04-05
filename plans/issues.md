@@ -1,9 +1,5 @@
 # Known Issues
 
-## Doc tasks
-
-- **Replace ASCII diagrams with mermaid**: Now that mermaid rendering is implemented, update the ASCII art diagrams in docs (e.g. Architecture.md build pipeline) to use mermaid.
-
 ## Config / UX
 
 - **Search stopword list needs research and configurability**: The client-side JS search library's default stopword list is long and may filter out actual content. Needs: (1) research a better default list, (2) make the list configurable via `rockgarden.toml`, (3) pass the configured list to the JS search library initialization.
