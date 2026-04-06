@@ -22,13 +22,14 @@ Single test: `uv run pytest tests/test_cli.py::test_version`
 ## Directory Structure
 
 - `src/rockgarden/` — main package
-  - `cli.py` — Typer CLI (`build`, `serve`, `theme`, `init`)
+  - `cli.py` — Typer CLI (`build`, `serve`, `dev`, `theme`, `init`)
   - `config.py` — TOML config loading
   - `content/` — content store, file loader, data models
   - `nav/` — navigation tree, breadcrumbs, folder index
-  - `obsidian/` — wiki-link, embed, callout processing
+  - `obsidian/` — wiki-link, embed, callout, inline tag processing
   - `render/` — Jinja2 and markdown-it-py setup
   - `output/` — site builder
+  - `server/` — dev server with live reload (SSE, watchfiles)
 - `src/rockgarden/templates/` — default theme templates
 - `src/rockgarden/static/` — compiled CSS + JS
 - `static-src/input.css` — Tailwind source CSS
