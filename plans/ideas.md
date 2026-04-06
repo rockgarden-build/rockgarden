@@ -2,16 +2,11 @@
 
 Future ideas and research notes. Not currently planned.
 
-## Pre-v1 Candidates
-
-- **ASCII-only slugs** — strip Unicode/accents from URLs. Breaking change (URLs change), best done before v1 locks them. NFD normalization (no deps) handles European languages; `python-slugify` for full transliteration. See research notes below.
-- **Configurable URL casing** — option to preserve original filename casing instead of slugifying
-
 ## Syntax & Content
 
 - **Block references** (`[[page#^block]]`)
 - **Inline fields** (`key:: value` — Dataview compatibility)
-- **Inline tags** (`#tag`, `#parent/child`)
+
 - **Configurable markdown preset** (commonmark, gfm-like, custom plugins)
 - **Build-time mermaid rendering** — render mermaid diagrams to SVG at build time instead of client-side JS (via mermaid CLI `mmdc`)
 
@@ -43,17 +38,3 @@ Future ideas and research notes. Not currently planned.
 - **Extract icon handling** — move icon resolution into a standalone package
 - **Merge `./site` and `./docs`** — consolidate demo site and docs site
 
----
-
-## ASCII-only Slugs Research
-
-**Problem**: Unicode in URLs causes encoding issues, server compatibility problems, and SEO challenges.
-
-**Approaches**:
-
-1. **Strip accents (NFD normalization)** — no dependencies, works for European languages. "Café" → "Cafe". Doesn't handle Cyrillic/CJK.
-2. **python-slugify** — comprehensive transliteration including Cyrillic, Greek, CJK. Adds ~500KB dependency.
-
-**Implementation location**: `src/rockgarden/urls.py` — `generate_slug()` function.
-
-**Recommendation**: NFD strip approach (no deps) with optional python-slugify for advanced cases. Breaking change — URLs would change, but acceptable pre-v1.

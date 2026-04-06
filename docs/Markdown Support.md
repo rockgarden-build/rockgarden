@@ -98,8 +98,8 @@ Math syntax is always parsed. The default theme loads KaTeX from CDN for renderi
 
 | Feature          | Syntax               | Status | Notes                |
 | ---------------- | -------------------- | ------ | -------------------- |
-| Inline tags      | `#tag`               | ❌     | Future (collections) |
-| Nested tags      | `#parent/child`      | ❌     | Future (collections) |
+| Inline tags      | `#tag`               | ✅     | Extracted and rendered as links |
+| Nested tags      | `#parent/child`      | ✅     | Hierarchical — parent tags auto-created |
 | Frontmatter tags | `tags: [tag1, tag2]` | ✅     | Already parsed       |
 
 ### Metadata
@@ -136,7 +136,6 @@ This ensures:
 
 - Block references: `[[page#^block]]`
 - Inline fields: `key:: value` (Dataview compatibility)
-- Inline tags: `#tag`, `#parent/child`
 
 ### Not Planned
 
