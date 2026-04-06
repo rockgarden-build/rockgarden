@@ -69,6 +69,20 @@ class TestExtractInlineTags:
         content, tags = extract_inline_tags("foo#bar is not a tag")
         assert tags == []
 
+    def test_not_in_anchor_link(self):
+        content, tags = extract_inline_tags("[Jump](#introduction)")
+        assert tags == []
+        assert content == "[Jump](#introduction)"
+
+    def test_not_in_markdown_link_text(self):
+        content, tags = extract_inline_tags("[text with #python](http://example.com)")
+        assert tags == []
+
+    def test_tag_outside_link_still_works(self):
+        content, tags = extract_inline_tags("[link](#anchor) and #python")
+        assert tags == ["python"]
+        assert "[link](#anchor)" in content
+
 
 class TestExpandHierarchicalTags:
     def test_flat_tags_unchanged(self):

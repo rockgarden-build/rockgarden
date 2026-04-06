@@ -7,10 +7,13 @@ clickable links. Code blocks are protected from processing.
 
 import re
 
-from rockgarden.obsidian.embeds import CODE_BLOCK_PATTERN
 from rockgarden.urls import get_tag_url, normalize_tag
 
 INLINE_TAG_PATTERN = re.compile(r"(?<!\w)#([a-zA-Z][\w-]*(?:/[\w-]+)*)")
+# Protect code blocks AND markdown links from tag extraction
+PROTECTED_PATTERN = re.compile(
+    r"```[\s\S]*?```|~~~[\s\S]*?~~~|`[^`\n]+`|\[[^\]]*\]\([^)]*\)"
+)
 PLACEHOLDER_PATTERN = re.compile(r"\x00CODE(\d+)\x00")
 
 
@@ -32,7 +35,7 @@ def extract_inline_tags(
         code_blocks.append(match.group(0))
         return f"\x00CODE{len(code_blocks) - 1}\x00"
 
-    content = CODE_BLOCK_PATTERN.sub(save_code_block, content)
+    content = PROTECTED_PATTERN.sub(save_code_block, content)
 
     tags: list[str] = []
 
