@@ -1,3 +1,14 @@
+## v0.7.2 (2026-04-06)
+
+### Minor / Bug Fixes
+
+- add suppot for inline tags (#100)
+- add configurability to search stop words (#99)
+- add opt-in ASCII slug generation (#97)
+- add mermaid support (#96)
+- add dev mode to server (#95)
+- add custom 404 support to dev server (#94)
+
 ## v0.7.1 (2026-04-05)
 
 ### Minor / Bug Fixes
