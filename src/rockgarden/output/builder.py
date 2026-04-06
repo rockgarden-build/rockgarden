@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import re
 import shutil
 import sys
 import time
@@ -432,7 +433,8 @@ def build_site(
     # Resolve CDN auto-detection by scanning raw content
     math_cdn = config.theme.math_cdn
     if math_cdn == "auto":
-        math_cdn = any("$" in p.content or "```math" in p.content for p in pages)
+        _math_re = re.compile(r"\$\$|```math|\$[^\s\d$]")
+        math_cdn = any(_math_re.search(p.content) for p in pages)
     mermaid_cdn = config.theme.mermaid_cdn
     if mermaid_cdn == "auto":
         mermaid_cdn = any("```mermaid" in p.content for p in pages)
@@ -447,6 +449,7 @@ def build_site(
         cur_template_hash = compute_template_hash(site_root, config.theme.name)
         cur_macro_hash = compute_macro_hash(site_root)
         output_dir_str = str(output.resolve())
+        cur_cdn_flags = f"math={math_cdn},mermaid={mermaid_cdn}"
 
         manifest = BuildManifest.load(manifest_path)
         if manifest and not manifest.needs_full_rebuild(
@@ -455,6 +458,7 @@ def build_site(
             cur_macro_hash,
             output_dir_str,
             len(pages),
+            cur_cdn_flags,
         ):
             use_incremental = True
         else:
@@ -464,6 +468,7 @@ def build_site(
                 macro_hash=cur_macro_hash,
                 output_dir=output_dir_str,
                 page_count=len(pages),
+                cdn_flags=cur_cdn_flags,
             )
 
     collections = partition_collections(pages, config.collections, source)

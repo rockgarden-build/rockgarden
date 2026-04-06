@@ -75,6 +75,16 @@ def test_math_block_detected(tmp_path):
     assert "katex" in html.lower()
 
 
+def test_dollar_sign_in_prose_no_math(tmp_path):
+    html = _build_with_content(tmp_path, "# Pricing\n\nCosts $5 per month.\n")
+    assert "katex" not in html.lower()
+
+
+def test_block_math_double_dollar(tmp_path):
+    html = _build_with_content(tmp_path, "# Math\n\n$$x^2 + y^2$$\n")
+    assert "katex" in html.lower()
+
+
 def test_config_auto_default():
     config = ThemeConfig()
     assert config.math_cdn == "auto"
