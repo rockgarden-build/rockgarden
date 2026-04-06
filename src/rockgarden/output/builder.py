@@ -429,6 +429,14 @@ def build_site(
     clean_urls = config.site.clean_urls
     base_path = config.site.base_path or get_base_path(config.site.base_url)
 
+    # Resolve CDN auto-detection by scanning raw content
+    math_cdn = config.theme.math_cdn
+    if math_cdn == "auto":
+        math_cdn = any("$" in p.content or "```math" in p.content for p in pages)
+    mermaid_cdn = config.theme.mermaid_cdn
+    if mermaid_cdn == "auto":
+        mermaid_cdn = any("```mermaid" in p.content for p in pages)
+
     # Incremental build setup
     manifest: BuildManifest | None = None
     manifest_path = site_root / ".rockgarden" / "build-manifest.json"
@@ -529,14 +537,15 @@ def build_site(
         "daisyui_theme": config.theme.daisyui_default,
         "daisyui_themes": config.theme.daisyui_themes,
         "search_enabled": config.theme.search,
+        "search_stopwords": config.search.stopwords,
         "build_info": build_info,
         "cache_hash": cache_hash,
         "user_styles": user_styles,
         "user_scripts": user_scripts,
         "assets_dir": assets_dir,
         "main_content_padding": config.theme.main_content_padding,
-        "math_cdn": config.theme.math_cdn,
-        "mermaid_cdn": config.theme.mermaid_cdn,
+        "math_cdn": math_cdn,
+        "mermaid_cdn": mermaid_cdn,
         "feed_enabled": config.feed.enabled and bool(config.site.base_url),
         "feed_path": config.feed.path,
     }

@@ -83,8 +83,16 @@ class ThemeConfig(BaseModel):
     show_build_info: bool = True
     show_build_commit: bool = False
     main_content_padding: str = "px-12"
-    math_cdn: bool = True
-    mermaid_cdn: bool = True
+    math_cdn: bool | str = "auto"
+    mermaid_cdn: bool | str = "auto"
+
+    @field_validator("math_cdn", "mermaid_cdn", mode="after")
+    @classmethod
+    def validate_cdn(cls, v: bool | str) -> bool | str:
+        if isinstance(v, str) and v != "auto":
+            msg = f"must be true, false, or 'auto', got {v!r}"
+            raise ValueError(msg)
+        return v
 
 
 class NavLinkConfig(BaseModel):
@@ -128,6 +136,15 @@ class SearchConfig(BaseModel):
     """Search index configuration."""
 
     include_content: bool = True
+    stopwords: str | list[str] = "default"
+
+    @field_validator("stopwords", mode="after")
+    @classmethod
+    def validate_stopwords(cls, v: str | list[str]) -> str | list[str]:
+        if isinstance(v, str) and v not in ("default", "none"):
+            msg = f"stopwords must be 'default', 'none', or a list of words, got {v!r}"
+            raise ValueError(msg)
+        return v
 
 
 class DatesConfig(BaseModel):
