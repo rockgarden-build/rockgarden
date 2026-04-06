@@ -48,6 +48,9 @@ from rockgarden.obsidian import (
     process_wikilinks,
 )
 from rockgarden.obsidian.comments import strip_comments
+from rockgarden.obsidian.inline_tags import (
+    extract_inline_tags,
+)
 from rockgarden.output.build_info import get_build_info
 from rockgarden.output.feed import build_atom_feed
 from rockgarden.output.llms_txt import build_llms_full_txt, build_llms_txt
@@ -672,6 +675,15 @@ def build_site(
         content = transform_md_links(content, clean_urls)
         if config.build.inline_icons:
             content = process_inline_icons(content)
+        content, inline_tags = extract_inline_tags(
+            content, clean_urls, base_path, config.site.ascii_urls
+        )
+        if inline_tags:
+            existing = page.frontmatter.get("tags", [])
+            if isinstance(existing, str):
+                existing = [existing]
+            merged = list(dict.fromkeys(existing + inline_tags))
+            page.frontmatter["tags"] = merged
         page.html = process_callouts(render_markdown(content))
 
         toc_entries = None

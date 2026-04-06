@@ -5,6 +5,7 @@ from pathlib import Path
 from jinja2 import Environment
 
 from rockgarden.content.models import Page
+from rockgarden.obsidian.inline_tags import expand_hierarchical_tags
 from rockgarden.urls import get_url, normalize_tag
 
 
@@ -19,6 +20,7 @@ def collect_tags(pages: list[Page], ascii_urls: bool = False) -> dict[str, list[
         raw_tags = page.frontmatter.get("tags", [])
         if isinstance(raw_tags, str):
             raw_tags = [raw_tags]
+        raw_tags = expand_hierarchical_tags(raw_tags)
         for tag in raw_tags:
             slug = normalize_tag(tag, ascii_urls)
             if slug:
