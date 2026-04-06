@@ -1,5 +1,9 @@
 # Known Issues
 
+## CI
+
+- **Bump version PRs don't trigger CI checks**: The `bump-version.yml` workflow uses `GITHUB_TOKEN` to push the branch and create the PR. GitHub suppresses workflow triggers from `GITHUB_TOKEN` to prevent loops, so test/lint/review workflows never run on bump PRs. Fix: use a GitHub App token instead of `GITHUB_TOKEN` for the push and PR creation steps.
+
 ## Performance
 
 - **Mermaid ESM import lacks SRI integrity check**: KaTeX uses `integrity="sha384-..."` on its `<script>` tag, but ES module `import` statements don't support `integrity` directly. Could use an import map with integrity metadata to get equivalent protection. Low priority since the version is pinned.
