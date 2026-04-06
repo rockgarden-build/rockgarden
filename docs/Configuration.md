@@ -70,8 +70,8 @@ Theme-specific display and rendering options. These are supported by the default
 | `nav_default_state` | `str`       | `"collapsed"` | Sidebar nav state: `"collapsed"` or `"expanded"` (default theme only)                                                                                                   |
 | `show_build_info`   | `bool`      | `true`        | Show build timestamp in footer (default theme only)                                                                                                                     |
 | `show_build_commit` | `bool`      | `false`       | Show git commit in footer (default theme only)                                                                                                                          |
-| `math_cdn`          | `bool`      | `true`        | Load KaTeX from CDN for math rendering (default theme only). Set `false` to provide KaTeX yourself via `_styles/` and `_scripts/`. |
-| `mermaid_cdn`       | `bool`      | `true`        | Load Mermaid from CDN for diagram rendering (default theme only). Set `false` to provide Mermaid yourself via `_scripts/`. |
+| `math_cdn`          | `bool\|str` | `"auto"`      | KaTeX CDN loading. `"auto"` detects math usage at build time. `true` always loads, `false` never loads. Set `false` to provide KaTeX yourself via `_styles/` and `_scripts/`. |
+| `mermaid_cdn`       | `bool\|str` | `"auto"`      | Mermaid CDN loading. `"auto"` detects mermaid usage at build time. `true` always loads, `false` never loads. Set `false` to provide Mermaid yourself via `_scripts/`. |
 
 ## `[nav]`
 
@@ -132,9 +132,10 @@ Atom feed generation. Requires `site.base_url` to be set.
 
 ## `[search]`
 
-| Field             | Type   | Default | Description                                                                                      |
-| ----------------- | ------ | ------- | ------------------------------------------------------------------------------------------------ |
-| `include_content` | `bool` | `true`  | Include full page body in search index. When `false`, only title, slug, and tags are searchable. |
+| Field             | Type              | Default     | Description                                                                                      |
+| ----------------- | ----------------- | ----------- | ------------------------------------------------------------------------------------------------ |
+| `include_content` | `bool`            | `true`      | Include full page body in search index. When `false`, only title, slug, and tags are searchable. |
+| `stopwords`       | `str\|list[str]`  | `"default"` | Stopword filtering for search. `"default"` uses lunr.js built-in English stopwords. `"none"` disables filtering. A list of strings provides a custom stopword list. |
 
 ## `[dates]`
 

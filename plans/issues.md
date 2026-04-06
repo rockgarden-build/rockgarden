@@ -1,12 +1,7 @@
 # Known Issues
 
-## Config / UX
-
-- **Search stopword list needs research and configurability**: The client-side JS search library's default stopword list is long and may filter out actual content. Needs: (1) research a better default list, (2) make the list configurable via `rockgarden.toml`, (3) pass the configured list to the JS search library initialization.
-
 ## Performance
 
-- **CDN scripts load on every page regardless of usage**: KaTeX and Mermaid CDN scripts load on all pages even when no math or diagrams are present. Could detect usage at build time and set per-page flags to conditionally include them.
 - **Mermaid ESM import lacks SRI integrity check**: KaTeX uses `integrity="sha384-..."` on its `<script>` tag, but ES module `import` statements don't support `integrity` directly. Could use an import map with integrity metadata to get equivalent protection. Low priority since the version is pinned.
 
 ## Feature gaps

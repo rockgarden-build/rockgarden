@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import re
 import shutil
 import sys
 import time
@@ -429,6 +430,15 @@ def build_site(
     clean_urls = config.site.clean_urls
     base_path = config.site.base_path or get_base_path(config.site.base_url)
 
+    # Resolve CDN auto-detection by scanning raw content
+    math_cdn = config.theme.math_cdn
+    if math_cdn == "auto":
+        _math_re = re.compile(r"\$\$|```math|\$[^\s\d$]")
+        math_cdn = any(_math_re.search(p.content) for p in pages)
+    mermaid_cdn = config.theme.mermaid_cdn
+    if mermaid_cdn == "auto":
+        mermaid_cdn = any("```mermaid" in p.content for p in pages)
+
     # Incremental build setup
     manifest: BuildManifest | None = None
     manifest_path = site_root / ".rockgarden" / "build-manifest.json"
@@ -439,6 +449,7 @@ def build_site(
         cur_template_hash = compute_template_hash(site_root, config.theme.name)
         cur_macro_hash = compute_macro_hash(site_root)
         output_dir_str = str(output.resolve())
+        cur_cdn_flags = f"math={math_cdn},mermaid={mermaid_cdn}"
 
         manifest = BuildManifest.load(manifest_path)
         if manifest and not manifest.needs_full_rebuild(
@@ -447,6 +458,7 @@ def build_site(
             cur_macro_hash,
             output_dir_str,
             len(pages),
+            cur_cdn_flags,
         ):
             use_incremental = True
         else:
@@ -456,6 +468,7 @@ def build_site(
                 macro_hash=cur_macro_hash,
                 output_dir=output_dir_str,
                 page_count=len(pages),
+                cdn_flags=cur_cdn_flags,
             )
 
     collections = partition_collections(pages, config.collections, source)
@@ -529,14 +542,15 @@ def build_site(
         "daisyui_theme": config.theme.daisyui_default,
         "daisyui_themes": config.theme.daisyui_themes,
         "search_enabled": config.theme.search,
+        "search_stopwords": config.search.stopwords,
         "build_info": build_info,
         "cache_hash": cache_hash,
         "user_styles": user_styles,
         "user_scripts": user_scripts,
         "assets_dir": assets_dir,
         "main_content_padding": config.theme.main_content_padding,
-        "math_cdn": config.theme.math_cdn,
-        "mermaid_cdn": config.theme.mermaid_cdn,
+        "math_cdn": math_cdn,
+        "mermaid_cdn": mermaid_cdn,
         "feed_enabled": config.feed.enabled and bool(config.site.base_url),
         "feed_path": config.feed.path,
     }

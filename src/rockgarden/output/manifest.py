@@ -24,6 +24,7 @@ class BuildManifest:
     macro_hash: str
     output_dir: str
     page_count: int
+    cdn_flags: str = ""
     pages: dict[str, PageManifestEntry] = field(default_factory=dict)
 
     @classmethod
@@ -45,6 +46,7 @@ class BuildManifest:
                 macro_hash=data["macro_hash"],
                 output_dir=data["output_dir"],
                 page_count=data["page_count"],
+                cdn_flags=data.get("cdn_flags", ""),
                 pages=pages,
             )
         except (json.JSONDecodeError, KeyError, TypeError):
@@ -60,6 +62,7 @@ class BuildManifest:
             "macro_hash": self.macro_hash,
             "output_dir": self.output_dir,
             "page_count": self.page_count,
+            "cdn_flags": self.cdn_flags,
             "pages": {
                 slug: {"content_hash": e.content_hash, "output_path": e.output_path}
                 for slug, e in self.pages.items()
@@ -84,6 +87,7 @@ class BuildManifest:
         macro_hash: str,
         output_dir: str,
         page_count: int,
+        cdn_flags: str = "",
     ) -> bool:
         """Check if a full rebuild is needed due to global changes."""
         if self.config_hash != config_hash:
@@ -95,6 +99,8 @@ class BuildManifest:
         if self.output_dir != output_dir:
             return True
         if self.page_count != page_count:
+            return True
+        if self.cdn_flags != cdn_flags:
             return True
         if not Path(output_dir).exists():
             return True
