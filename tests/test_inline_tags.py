@@ -74,6 +74,19 @@ class TestExtractInlineTags:
         assert tags == []
         assert content == "[Jump](#introduction)"
 
+    def test_not_in_html_entity(self):
+        content, tags = extract_inline_tags("Freemen&#x27;s Wood")
+        assert tags == []
+        assert content == "Freemen&#x27;s Wood"
+
+    def test_not_in_numeric_html_entity(self):
+        content, tags = extract_inline_tags("&#xABCD;")
+        assert tags == []
+
+    def test_tag_after_html_entity_still_works(self):
+        content, tags = extract_inline_tags("Tom&#x27;s #python notes")
+        assert tags == ["python"]
+
     def test_not_in_markdown_link_text(self):
         content, tags = extract_inline_tags("[text with #python](http://example.com)")
         assert tags == []

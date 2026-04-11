@@ -9,7 +9,7 @@ import re
 
 from rockgarden.urls import get_tag_url, normalize_tag
 
-INLINE_TAG_PATTERN = re.compile(r"(?<!\w)#([a-zA-Z][\w-]*(?:/[\w-]+)*)")
+INLINE_TAG_PATTERN = re.compile(r"(?<![\w&])#([a-zA-Z][\w-]*(?:/[\w-]+)*)")
 # Protect code blocks AND markdown links from tag extraction
 PROTECTED_PATTERN = re.compile(
     r"```[\s\S]*?```|~~~[\s\S]*?~~~|`[^`\n]+`|\[[^\]]*\]\([^)]*\)"
