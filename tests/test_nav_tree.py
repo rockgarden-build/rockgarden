@@ -479,3 +479,47 @@ class TestNavPerFolderOverride:
         tree = build_nav_tree(pages, config)
         root_labels = [c.label for c in tree.children if not c.is_folder]
         assert root_labels == ["alpha", "beta"]
+
+
+class TestFolderNoteNav:
+    """Test nav tree with folder note pages (slug rewritten to index)."""
+
+    def test_folder_note_clickable_folder(self):
+        """Folder note should make the folder node clickable."""
+        pages = [
+            Page(
+                source_path=Path("/vault/locations/Fairshore/Fairshore.md"),
+                slug="locations/fairshore/index",
+                frontmatter={"title": "Fairshore"},
+                content="",
+            ),
+            make_page("locations/fairshore/the-salty-dog", "The Salty Dog"),
+        ]
+        tree = build_nav_tree(pages)
+
+        locations = tree.children[0]
+        assert locations.is_folder
+        fairshore = locations.children[0]
+        assert fairshore.is_folder
+        assert fairshore.index_path == "/locations/fairshore/"
+
+    def test_folder_note_not_duplicate_child(self):
+        """Folder note should not appear as a child of its own folder."""
+        pages = [
+            Page(
+                source_path=Path("/vault/locations/Fairshore/Fairshore.md"),
+                slug="locations/fairshore/index",
+                frontmatter={"title": "Fairshore"},
+                content="",
+            ),
+            make_page("locations/fairshore/the-salty-dog", "The Salty Dog"),
+            make_page("locations/fairshore/market-square", "Market Square"),
+        ]
+        tree = build_nav_tree(pages)
+
+        locations = tree.children[0]
+        fairshore = locations.children[0]
+        child_labels = [c.label for c in fairshore.children]
+        assert "Fairshore" not in child_labels
+        assert "The Salty Dog" in child_labels
+        assert "Market Square" in child_labels

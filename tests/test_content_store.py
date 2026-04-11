@@ -230,3 +230,65 @@ class TestCleanUrls:
 
         url = store.resolve_link("notes#section")
         assert url == "/notes.html#section"
+
+
+class TestFolderNoteResolution:
+    """Test wiki-link resolution for folder notes and index pages."""
+
+    def test_index_md_resolves_by_folder_name(self):
+        """[[Fairshore]] should resolve to Fairshore/index.md via fallback."""
+        page = Page(
+            source_path=Path("Fairshore/index.md"),
+            slug="fairshore/index",
+            frontmatter={},
+            content="",
+        )
+        store = ContentStore([page])
+
+        url = store.resolve_link("Fairshore")
+        assert url == "/fairshore/"
+
+    def test_index_fallback_no_overwrite(self):
+        """Stem-based match takes priority over index fallback."""
+        explicit_page = Page(
+            source_path=Path("Fairshore.md"),
+            slug="fairshore",
+            frontmatter={},
+            content="",
+        )
+        index_page = Page(
+            source_path=Path("other/fairshore/index.md"),
+            slug="other/fairshore/index",
+            frontmatter={},
+            content="",
+        )
+        store = ContentStore([explicit_page, index_page])
+
+        url = store.resolve_link("Fairshore")
+        assert url == "/fairshore/"
+
+    def test_folder_note_resolves_by_name(self):
+        """Folder note with rewritten slug still resolves via source_path stem."""
+        page = Page(
+            source_path=Path("locations/Fairshore/Fairshore.md"),
+            slug="locations/fairshore/index",
+            frontmatter={},
+            content="",
+        )
+        store = ContentStore([page])
+
+        url = store.resolve_link("Fairshore")
+        assert url == "/locations/fairshore/"
+
+    def test_index_fallback_case_insensitive(self):
+        """Index fallback should be case-insensitive."""
+        page = Page(
+            source_path=Path("Fairshore/index.md"),
+            slug="fairshore/index",
+            frontmatter={},
+            content="",
+        )
+        store = ContentStore([page])
+
+        assert store.resolve_link("fairshore") == "/fairshore/"
+        assert store.resolve_link("FAIRSHORE") == "/fairshore/"
