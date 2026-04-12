@@ -1,5 +1,6 @@
 """Configuration loading and defaults for rockgarden."""
 
+import re
 import tomllib
 from pathlib import Path
 
@@ -40,6 +41,11 @@ class SiteConfig(BaseModel):
         v = v.rstrip("/")
         if v and not v.startswith("/"):
             v = "/" + v
+        if v and (
+            v.startswith("//") or not re.fullmatch(r"/[A-Za-z0-9._~:@!$&()*+,;=/-]+", v)
+        ):
+            msg = f"base_path contains invalid URL path characters: {v!r}"
+            raise ValueError(msg)
         return v
 
 

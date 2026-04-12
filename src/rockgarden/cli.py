@@ -230,12 +230,28 @@ def build(
 
 def _make_handler(
     output_dir: Path,
+    base_path: str = "",
 ) -> type[http.server.SimpleHTTPRequestHandler]:
     """Create an HTTP handler that serves custom 404.html when present."""
 
     class _Handler(http.server.SimpleHTTPRequestHandler):
         def __init__(self, *args: object, **kwargs: object) -> None:
             super().__init__(*args, directory=str(output_dir), **kwargs)  # type: ignore[arg-type]
+
+        def do_GET(self) -> None:
+            if base_path:
+                self._strip_base_path()
+            super().do_GET()
+
+        def _strip_base_path(self) -> None:
+            """Strip base_path prefix from request path for local serving."""
+            parsed = self.path.split("?", 1)
+            url_path = parsed[0]
+            if url_path == base_path or url_path == base_path + "/":
+                url_path = "/"
+            elif url_path.startswith(base_path + "/"):
+                url_path = url_path[len(base_path) :]
+            self.path = url_path if len(parsed) == 1 else url_path + "?" + parsed[1]
 
         def send_error(
             self,
@@ -283,7 +299,8 @@ def serve(
         typer.echo("Run 'rockgarden build' first.", err=True)
         raise typer.Exit(1)
 
-    handler = _make_handler(output_dir)
+    base_path = config.site.base_path
+    handler = _make_handler(output_dir, base_path)
 
     class ReuseAddrServer(socketserver.TCPServer):
         allow_reuse_address = True
@@ -297,7 +314,8 @@ def serve(
             raise typer.Exit(1) from None
         raise
 
-    typer.echo(f"Serving {output_dir} at http://localhost:{port}")
+    url = f"http://localhost:{port}{base_path}/"
+    typer.echo(f"Serving {output_dir} at {url}")
     typer.echo("Press Ctrl+C to stop")
 
     with httpd:
