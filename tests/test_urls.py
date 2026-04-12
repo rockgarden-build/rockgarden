@@ -336,6 +336,10 @@ class TestBasePath:
         with pytest.raises(ValueError, match="invalid URL path characters"):
             SiteConfig(base_path="/my path")
 
+    def test_base_path_rejects_double_slash(self):
+        with pytest.raises(ValueError, match="invalid URL path characters"):
+            SiteConfig(base_path="//evil")
+
     def test_base_path_allows_valid_characters(self):
         site = SiteConfig(base_path="/my-site_v2.0")
         assert site.base_path == "/my-site_v2.0"
