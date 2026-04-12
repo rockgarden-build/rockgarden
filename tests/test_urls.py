@@ -324,6 +324,22 @@ class TestBasePath:
         assert "/preview/_assets/rockgarden.css" in html
         assert "/production/_assets/" not in html
 
+    def test_base_path_rejects_single_quote(self):
+        with pytest.raises(ValueError, match="invalid URL path characters"):
+            SiteConfig(base_path="/my's-blog")
+
+    def test_base_path_rejects_angle_bracket(self):
+        with pytest.raises(ValueError, match="invalid URL path characters"):
+            SiteConfig(base_path="/bad<path")
+
+    def test_base_path_rejects_spaces(self):
+        with pytest.raises(ValueError, match="invalid URL path characters"):
+            SiteConfig(base_path="/my path")
+
+    def test_base_path_allows_valid_characters(self):
+        site = SiteConfig(base_path="/my-site_v2.0")
+        assert site.base_path == "/my-site_v2.0"
+
 
 class TestGenerateSlugPreserveCase:
     def test_keeps_casing_replaces_spaces(self):
