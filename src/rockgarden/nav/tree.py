@@ -153,10 +153,7 @@ def build_nav_tree(
                     "_original_name": original_name,
                 }
             current = current[part]["_children"]
-
-        if not _should_hide(page.slug, config.hide) and not page.frontmatter.get(
-            "unlisted", False
-        ):
+        else:
             page_name = parts[-1]
             if page_name != "index":
                 current[page_name] = {

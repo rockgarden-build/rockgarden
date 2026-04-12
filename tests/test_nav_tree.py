@@ -594,3 +594,4 @@ class TestUnlistedPages:
         labels = [c.label for c in tree.children]
         assert "Public" in labels
         assert "secret" not in [c.label.lower() for c in tree.children]
+        assert "Details" not in labels
