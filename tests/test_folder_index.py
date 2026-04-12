@@ -230,3 +230,42 @@ class TestFolderIndexPerFolderOverride:
         blog = next(fi for fi in indexes if fi.slug == "blog/index")
         titles = [c.title for c in blog.children]
         assert titles == ["Gamma", "Beta", "Alpha"]
+
+
+class TestFolderNoteFolderIndex:
+    """Test folder index generation with folder notes (slug rewritten to index)."""
+
+    def test_folder_note_used_as_existing_index(self):
+        """Folder note content and title should be used for the folder index."""
+        pages = [
+            Page(
+                source_path=Path("/vault/Fairshore/Fairshore.md"),
+                slug="fairshore/index",
+                frontmatter={"title": "City of Fairshore"},
+                content="A coastal trading city.",
+            ),
+            make_page("fairshore/the-salty-dog", "The Salty Dog"),
+        ]
+        indexes = generate_folder_indexes(pages)
+        fairshore = next(fi for fi in indexes if fi.slug == "fairshore/index")
+        assert fairshore.title == "City of Fairshore"
+        assert fairshore.custom_content == "A coastal trading city."
+
+    def test_folder_note_not_in_children(self):
+        """Folder note should not appear in its own folder's children list."""
+        pages = [
+            Page(
+                source_path=Path("/vault/Fairshore/Fairshore.md"),
+                slug="fairshore/index",
+                frontmatter={"title": "City of Fairshore"},
+                content="",
+            ),
+            make_page("fairshore/the-salty-dog", "The Salty Dog"),
+            make_page("fairshore/market-square", "Market Square"),
+        ]
+        indexes = generate_folder_indexes(pages)
+        fairshore = next(fi for fi in indexes if fi.slug == "fairshore/index")
+        child_titles = [c.title for c in fairshore.children]
+        assert "City of Fairshore" not in child_titles
+        assert "The Salty Dog" in child_titles
+        assert "Market Square" in child_titles

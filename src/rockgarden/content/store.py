@@ -76,6 +76,14 @@ class ContentStore:
                 normalized_alias = unicodedata.normalize("NFC", aliases).lower()
                 self._by_name[normalized_alias] = page
 
+        # Index pages: register under parent folder name as fallback for wiki-links
+        parts = page.slug.split("/")
+        if parts[-1] == "index" and len(parts) >= 2:
+            folder_name = parts[-2]
+            normalized_folder = unicodedata.normalize("NFC", folder_name).lower()
+            if normalized_folder not in self._by_name:
+                self._by_name[normalized_folder] = page
+
     def get_by_slug(self, slug: str) -> Page | None:
         """Look up a page by its slug."""
         return self._by_slug.get(slug)

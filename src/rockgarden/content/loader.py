@@ -1,6 +1,7 @@
 """Content discovery and loading."""
 
 import fnmatch
+import logging
 from datetime import date, datetime
 from pathlib import Path
 
@@ -9,6 +10,8 @@ import frontmatter
 from rockgarden.config import DatesConfig
 from rockgarden.content.models import Page
 from rockgarden.urls import generate_slug
+
+logger = logging.getLogger(__name__)
 
 
 def _resolve_frontmatter_date(
@@ -105,6 +108,10 @@ def load_page(
         slug = custom_slug
     else:
         slug = path_to_slug(path, source, url_style, ascii_urls)
+        # Folder note: rewrite slug so downstream index-page logic applies
+        parts = slug.split("/")
+        if len(parts) >= 2 and parts[-1] == parts[-2]:
+            slug = "/".join(parts[:-1]) + "/index"
 
     modified = _resolve_frontmatter_date(metadata, dates_config.modified_date_fields)
     if modified is None and dates_config.modified_date_fallback:
@@ -147,5 +154,27 @@ def load_content(
 
         page = load_page(path, source, dates_config, url_style, ascii_urls)
         pages.append(page)
+
+    # Resolve conflicts: if both a folder note and index.md exist, index.md wins
+    index_slugs: dict[str, list[Page]] = {}
+    for page in pages:
+        if page.slug.endswith("/index") or page.slug == "index":
+            index_slugs.setdefault(page.slug, []).append(page)
+
+    for _slug, slug_pages in index_slugs.items():
+        if len(slug_pages) > 1:
+            explicit = [p for p in slug_pages if p.source_path.name == "index.md"]
+            folder_notes = [p for p in slug_pages if p.source_path.name != "index.md"]
+            if explicit and folder_notes:
+                for fn in folder_notes:
+                    fn.slug = path_to_slug(
+                        fn.source_path, source, url_style, ascii_urls
+                    )
+                    logger.warning(
+                        "Both %s and index.md exist in %s. "
+                        "Using index.md as the folder page.",
+                        fn.source_path.name,
+                        fn.source_path.parent,
+                    )
 
     return pages
