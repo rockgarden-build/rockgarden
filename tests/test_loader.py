@@ -85,12 +85,12 @@ class TestFolderNoteConflict:
         assert len(folder_notes) == 1
         assert folder_notes[0].slug == "fairshore/fairshore"
 
-    def test_conflict_emits_warning(self, source_dir, capsys):
+    def test_conflict_emits_warning(self, source_dir, caplog):
         """Conflict between folder note and index.md should emit a warning."""
         _write_page(source_dir, "Fairshore/Fairshore.md")
         _write_page(source_dir, "Fairshore/index.md")
 
-        load_content(source_dir, [])
-        captured = capsys.readouterr()
-        assert "index.md" in captured.err
-        assert "folder page" in captured.err
+        with caplog.at_level("WARNING", logger="rockgarden.content.loader"):
+            load_content(source_dir, [])
+        assert "index.md" in caplog.text
+        assert "folder page" in caplog.text

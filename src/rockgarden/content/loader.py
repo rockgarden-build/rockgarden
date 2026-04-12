@@ -1,7 +1,7 @@
 """Content discovery and loading."""
 
 import fnmatch
-import sys
+import logging
 from datetime import date, datetime
 from pathlib import Path
 
@@ -10,6 +10,8 @@ import frontmatter
 from rockgarden.config import DatesConfig
 from rockgarden.content.models import Page
 from rockgarden.urls import generate_slug
+
+logger = logging.getLogger(__name__)
 
 
 def _resolve_frontmatter_date(
@@ -168,11 +170,11 @@ def load_content(
                     fn.slug = path_to_slug(
                         fn.source_path, source, url_style, ascii_urls
                     )
-                    print(
-                        f"Warning: both {fn.source_path.name} and index.md "
-                        f"exist in {fn.source_path.parent}. "
-                        f"Using index.md as the folder page.",
-                        file=sys.stderr,
+                    logger.warning(
+                        "Both %s and index.md exist in %s. "
+                        "Using index.md as the folder page.",
+                        fn.source_path.name,
+                        fn.source_path.parent,
                     )
 
     return pages
