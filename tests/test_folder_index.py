@@ -269,3 +269,18 @@ class TestFolderNoteFolderIndex:
         assert "City of Fairshore" not in child_titles
         assert "The Salty Dog" in child_titles
         assert "Market Square" in child_titles
+
+
+class TestUnlistedFolderIndex:
+    """Test that unlisted pages are excluded from folder index children."""
+
+    def test_unlisted_page_hidden_from_folder_children(self):
+        pages = [
+            make_page("docs/visible", "Visible"),
+            make_page("docs/secret", "Secret", unlisted=True),
+        ]
+        indexes = generate_folder_indexes(pages)
+        docs = next(fi for fi in indexes if fi.slug == "docs/index")
+        child_titles = [c.title for c in docs.children]
+        assert "Visible" in child_titles
+        assert "Secret" not in child_titles

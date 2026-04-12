@@ -523,3 +523,52 @@ class TestFolderNoteNav:
         assert "Fairshore" not in child_labels
         assert "The Salty Dog" in child_labels
         assert "Market Square" in child_labels
+
+
+class TestUnlistedPages:
+    """Test that unlisted frontmatter hides pages from nav."""
+
+    def test_unlisted_page_hidden_from_nav(self):
+        pages = [
+            make_page("about", "About"),
+            Page(
+                source_path=Path("/vault/secret.md"),
+                slug="secret",
+                frontmatter={"title": "Secret", "unlisted": True},
+                content="",
+            ),
+        ]
+        tree = build_nav_tree(pages)
+        labels = [c.label for c in tree.children]
+        assert "About" in labels
+        assert "Secret" not in labels
+
+    def test_unlisted_page_folder_still_shown(self):
+        pages = [
+            Page(
+                source_path=Path("/vault/docs/hidden.md"),
+                slug="docs/hidden",
+                frontmatter={"title": "Hidden", "unlisted": True},
+                content="",
+            ),
+            make_page("docs/visible", "Visible"),
+        ]
+        tree = build_nav_tree(pages)
+        docs = tree.children[0]
+        assert docs.is_folder
+        child_labels = [c.label for c in docs.children]
+        assert "Visible" in child_labels
+        assert "Hidden" not in child_labels
+
+    def test_unlisted_false_still_shown(self):
+        pages = [
+            Page(
+                source_path=Path("/vault/page.md"),
+                slug="page",
+                frontmatter={"title": "Page", "unlisted": False},
+                content="",
+            ),
+        ]
+        tree = build_nav_tree(pages)
+        labels = [c.label for c in tree.children]
+        assert "Page" in labels

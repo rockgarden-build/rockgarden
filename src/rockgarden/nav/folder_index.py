@@ -204,7 +204,9 @@ def _get_folder_children(
         if len(parts) == 1:
             if parts[0] == "index":
                 continue
-            if _should_hide(page.slug, config.hide):
+            if _should_hide(page.slug, config.hide) or page.frontmatter.get(
+                "unlisted", False
+            ):
                 continue
 
             modified = None
