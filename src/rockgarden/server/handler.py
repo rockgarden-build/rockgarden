@@ -68,7 +68,8 @@ def make_dev_handler(
 
             if base_path:
                 clean = self.path.split("?", 1)[0]
-                if clean == "/" or not (clean == base_path or clean.startswith(base_path + "/")):
+                under_base = clean == base_path or clean.startswith(base_path + "/")
+                if clean == "/" or not under_base:
                     self._serve_base_path_index()
                     return
                 self._strip_base_path()
