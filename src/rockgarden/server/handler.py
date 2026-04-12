@@ -53,6 +53,7 @@ class SSEClients:
 def make_dev_handler(
     output_dir: Path,
     sse_clients: SSEClients,
+    base_path: str = "",
 ) -> type[http.server.SimpleHTTPRequestHandler]:
     """Create an HTTP handler with SSE support and live-reload JS injection."""
 
@@ -64,6 +65,14 @@ def make_dev_handler(
             if self.path == "/_rockgarden/events":
                 self._handle_sse()
                 return
+
+            if base_path:
+                clean = self.path.split("?", 1)[0]
+                under_base = clean == base_path or clean.startswith(base_path + "/")
+                if clean == "/" or not under_base:
+                    self._serve_base_path_index()
+                    return
+                self._strip_base_path()
 
             # Check if this will serve an HTML file so we can inject the script
             path = self.translate_path(self.path)
@@ -97,6 +106,32 @@ def make_dev_handler(
                     self.wfile.write(body)
                     return
             super().send_error(code, message, explain)
+
+        def _strip_base_path(self) -> None:
+            """Strip base_path prefix from request path for local serving."""
+            parsed = self.path.split("?", 1)
+            url_path = parsed[0]
+            if url_path == base_path or url_path == base_path + "/":
+                url_path = "/"
+            elif url_path.startswith(base_path + "/"):
+                url_path = url_path[len(base_path) :]
+            self.path = url_path if len(parsed) == 1 else url_path + "?" + parsed[1]
+
+        def _serve_base_path_index(self) -> None:
+            """Serve an info page at the root pointing to the base_path."""
+            body = (
+                "<!DOCTYPE html><html><head><meta charset='utf-8'>"
+                "<title>Rockgarden Dev Server</title></head><body>"
+                f"<p>This site uses <code>base_path</code>: "
+                f"<a href='{base_path}/'>{base_path}</a></p>"
+                "</body></html>"
+            ).encode()
+            body = _inject_script(body)
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
 
         def _handle_sse(self) -> None:
             self.send_response(200)

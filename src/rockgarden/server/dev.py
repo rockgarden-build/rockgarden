@@ -41,7 +41,8 @@ class DevServer:
         result = self._build(incremental=False)
         self._log_build_result(result)
 
-        handler = make_dev_handler(self._output_dir, self._sse_clients)
+        base_path = self._config.site.base_path
+        handler = make_dev_handler(self._output_dir, self._sse_clients, base_path)
 
         class _Server(socketserver.ThreadingTCPServer):
             allow_reuse_address = True
@@ -58,7 +59,8 @@ class DevServer:
         server_thread = threading.Thread(target=httpd.serve_forever, daemon=True)
         server_thread.start()
 
-        typer.echo(f"Dev server running at http://localhost:{self._port}")
+        url = f"http://localhost:{self._port}{base_path}/"
+        typer.echo(f"Dev server running at {url}")
         typer.echo("Watching for changes... (Ctrl+C to stop)")
 
         watcher = FileWatcher(
