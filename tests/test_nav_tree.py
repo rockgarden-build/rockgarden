@@ -572,3 +572,25 @@ class TestUnlistedPages:
         tree = build_nav_tree(pages)
         labels = [c.label for c in tree.children]
         assert "Page" in labels
+
+    def test_unlisted_folder_hidden_from_nav(self):
+        """Folder with unlisted index page should not appear in nav."""
+        pages = [
+            Page(
+                source_path=Path("/vault/secret/index.md"),
+                slug="secret/index",
+                frontmatter={"title": "Secret", "unlisted": True},
+                content="",
+            ),
+            Page(
+                source_path=Path("/vault/secret/details.md"),
+                slug="secret/details",
+                frontmatter={"title": "Details"},
+                content="",
+            ),
+            make_page("public", "Public"),
+        ]
+        tree = build_nav_tree(pages)
+        labels = [c.label for c in tree.children]
+        assert "Public" in labels
+        assert "secret" not in [c.label.lower() for c in tree.children]

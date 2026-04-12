@@ -138,7 +138,10 @@ def build_nav_tree(
             current_path_parts.append(part)
             folder_path = "/".join(current_path_parts)
 
-            if _should_hide(folder_path, config.hide):
+            folder_page = folder_pages.get(folder_path)
+            if _should_hide(folder_path, config.hide) or (
+                folder_page and folder_page.frontmatter.get("unlisted", False)
+            ):
                 break
 
             if part not in current:

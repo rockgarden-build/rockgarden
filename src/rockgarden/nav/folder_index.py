@@ -88,6 +88,9 @@ def generate_folder_indexes(
     for folder_path in sorted(folders):
         if _should_hide(folder_path, config.hide):
             continue
+        index_page = existing_indexes.get(folder_path)
+        if index_page and index_page.frontmatter.get("unlisted", False):
+            continue
 
         children = _get_folder_children(
             folder_path, pages, config, clean_urls, base_path
@@ -230,6 +233,11 @@ def _get_folder_children(
 
             if subfolder_path not in seen_subfolders:
                 if _should_hide(subfolder_path, config.hide):
+                    continue
+                subfolder_index = folder_index_pages.get(subfolder_path)
+                if subfolder_index and subfolder_index.frontmatter.get(
+                    "unlisted", False
+                ):
                     continue
 
                 seen_subfolders.add(subfolder_path)
