@@ -1,3 +1,9 @@
+## v0.7.5 (2026-04-13)
+
+### Minor / Bug Fixes
+
+- add separate folder metadata support (#108)
+
 ## v0.7.4 (2026-04-13)
 
 ### Minor / Bug Fixes
