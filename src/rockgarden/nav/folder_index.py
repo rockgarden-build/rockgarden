@@ -80,7 +80,6 @@ def generate_folder_indexes(
         folder_metas = {}
 
     folders = find_folders(pages)
-    folders.update(folder_metas.keys())
 
     existing_indexes: dict[str, Page] = {}
     for page in pages:

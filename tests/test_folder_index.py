@@ -315,3 +315,14 @@ class TestUnlistedFolderIndex:
         indexes = generate_folder_indexes(pages, folder_metas=metas)
         index_slugs = [fi.slug for fi in indexes]
         assert "secret/index" not in index_slugs
+
+
+class TestFolderMetaWithoutDescendants:
+    """`_folder.md` alone should not materialize an empty folder index."""
+
+    def test_folder_meta_with_no_pages_not_emitted(self):
+        pages = [make_page("about", "About")]
+        metas = {"empty": make_meta("empty", label="Empty")}
+        indexes = generate_folder_indexes(pages, folder_metas=metas)
+        index_slugs = [fi.slug for fi in indexes]
+        assert "empty/index" not in index_slugs
