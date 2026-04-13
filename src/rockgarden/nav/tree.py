@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from fnmatch import fnmatch
 
 from rockgarden.config import NavConfig, NavLinkConfig
-from rockgarden.content import Page
+from rockgarden.content import FolderMeta, Page
 from rockgarden.nav.labels import resolve_label
 from rockgarden.nav.sort import resolve_sort
 from rockgarden.urls import get_folder_url, get_url
@@ -87,6 +87,7 @@ def build_nav_tree(
     config: NavConfig | None = None,
     clean_urls: bool = True,
     base_path: str = "",
+    folder_metas: dict[str, FolderMeta] | None = None,
 ) -> NavNode:
     """Build navigation tree from a list of pages.
 
@@ -94,12 +95,17 @@ def build_nav_tree(
         pages: List of Page objects from the content store
         config: Navigation configuration (hide patterns, labels, etc.)
         clean_urls: If True, use /path/ instead of /path/index.html
+        folder_metas: Optional dict of folder-path → FolderMeta (from
+            `_folder.md` files). Used for folder nav_order, label, sort,
+            and unlisted.
 
     Returns:
         Root NavNode containing the full navigation tree
     """
     if config is None:
         config = NavConfig()
+    if folder_metas is None:
+        folder_metas = {}
 
     folder_pages: dict[str, Page] = {}
     for page in pages:
@@ -138,9 +144,9 @@ def build_nav_tree(
             current_path_parts.append(part)
             folder_path = "/".join(current_path_parts)
 
-            folder_page = folder_pages.get(folder_path)
+            folder_meta = folder_metas.get(folder_path)
             if _should_hide(folder_path, config.hide) or (
-                folder_page and folder_page.frontmatter.get("unlisted", False)
+                folder_meta and folder_meta.unlisted
             ):
                 break
 
@@ -175,10 +181,12 @@ def build_nav_tree(
 
             if is_folder:
                 original_name = data.get("_original_name", name)
-                label = resolve_label(path, original_name, config.labels, folder_pages)
+                label = resolve_label(
+                    path, original_name, config.labels, folder_metas, folder_pages
+                )
                 url_path = get_folder_url(path, clean_urls, base_path)
-                if path in folder_pages:
-                    nav_order = folder_pages[path].frontmatter.get("nav_order")
+                if path in folder_metas:
+                    nav_order = folder_metas[path].nav_order
             else:
                 page = data.get("_page")
                 label = page.title if page else name
@@ -187,7 +195,7 @@ def build_nav_tree(
                     nav_order = page.frontmatter.get("nav_order")
 
             children = dict_to_nodes(data.get("_children", {}), path)
-            folder_fm = folder_pages[path].frontmatter if path in folder_pages else None
+            folder_fm = folder_metas[path].frontmatter if path in folder_metas else None
             resolved = resolve_sort(path, config, folder_fm)
             children = _sort_nav_nodes(children, resolved.sort, resolved.reverse)
 
@@ -195,7 +203,8 @@ def build_nav_tree(
             if is_folder:
                 if path in folder_pages:
                     index_page = folder_pages[path]
-                    index_path = get_url(index_page.slug, clean_urls, base_path)
+                    if not index_page.frontmatter.get("unlisted", False):
+                        index_path = get_url(index_page.slug, clean_urls, base_path)
                 elif config.link_auto_index:
                     index_path = url_path
 
@@ -214,7 +223,7 @@ def build_nav_tree(
         root_resolved = resolve_sort("", config)
         return _sort_nav_nodes(nodes, root_resolved.sort, root_resolved.reverse)
 
-    root_label = resolve_label("", "Home", config.labels, folder_pages)
+    root_label = resolve_label("", "Home", config.labels, folder_metas, folder_pages)
     root_children = dict_to_nodes(tree)
 
     return NavNode(

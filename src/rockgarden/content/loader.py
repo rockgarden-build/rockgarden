@@ -8,8 +8,10 @@ from pathlib import Path
 import frontmatter
 
 from rockgarden.config import DatesConfig
-from rockgarden.content.models import Page
+from rockgarden.content.models import FolderMeta, Page
 from rockgarden.urls import generate_slug
+
+FOLDER_META_FILENAME = "_folder.md"
 
 logger = logging.getLogger(__name__)
 
@@ -152,6 +154,9 @@ def load_content(
         if should_ignore(path, source, ignore_patterns):
             continue
 
+        if path.name == FOLDER_META_FILENAME:
+            continue
+
         page = load_page(path, source, dates_config, url_style, ascii_urls)
         pages.append(page)
 
@@ -178,3 +183,36 @@ def load_content(
                     )
 
     return pages
+
+
+def load_folder_metas(
+    source: Path,
+    ignore_patterns: list[str],
+) -> dict[str, FolderMeta]:
+    """Discover and load all `_folder.md` files from source directory.
+
+    Args:
+        source: The source directory to scan.
+        ignore_patterns: List of glob patterns to ignore.
+
+    Returns:
+        Dict mapping folder path (relative to source, with forward slashes,
+        empty string for the source root) to FolderMeta.
+    """
+    metas: dict[str, FolderMeta] = {}
+
+    for path in source.rglob(FOLDER_META_FILENAME):
+        if should_ignore(path, source, ignore_patterns):
+            continue
+
+        post = frontmatter.load(path)
+        rel_parent = path.parent.relative_to(source)
+        folder_path = "" if rel_parent == Path(".") else rel_parent.as_posix()
+
+        metas[folder_path] = FolderMeta(
+            source_path=path,
+            folder_path=folder_path,
+            frontmatter=dict(post.metadata),
+        )
+
+    return metas

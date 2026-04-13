@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from rockgarden.content.loader import load_content, load_page
+from rockgarden.content.loader import load_content, load_folder_metas, load_page
 
 
 @pytest.fixture
@@ -94,3 +94,55 @@ class TestFolderNoteConflict:
             load_content(source_dir, [])
         assert "index.md" in caplog.text
         assert "folder page" in caplog.text
+
+
+class TestFolderMetaLoading:
+    def test_folder_md_not_loaded_as_page(self, source_dir):
+        """`_folder.md` files should not appear in loaded pages."""
+        _write_page(source_dir, "blog/_folder.md", "---\nnav_order: 1\n---\n")
+        _write_page(source_dir, "blog/post.md", "# Post")
+
+        pages = load_content(source_dir, [])
+        slugs = [p.slug for p in pages]
+        assert "blog/_folder" not in slugs
+        assert "blog/post" in slugs
+
+    def test_folder_md_metadata_loaded(self, source_dir):
+        """`_folder.md` frontmatter is loaded into FolderMeta."""
+        _write_page(
+            source_dir,
+            "blog/_folder.md",
+            "---\nnav_order: 2\nlabel: Blog Posts\nsort: alphabetical\n---\n",
+        )
+        _write_page(source_dir, "blog/post.md", "# Post")
+
+        metas = load_folder_metas(source_dir, [])
+        assert "blog" in metas
+        assert metas["blog"].nav_order == 2
+        assert metas["blog"].label == "Blog Posts"
+        assert metas["blog"].sort == "alphabetical"
+
+    def test_root_folder_meta(self, source_dir):
+        """A `_folder.md` at the source root is keyed by empty string."""
+        _write_page(source_dir, "_folder.md", "---\nlabel: Site\n---\n")
+
+        metas = load_folder_metas(source_dir, [])
+        assert "" in metas
+        assert metas[""].label == "Site"
+
+    def test_nested_folder_meta(self, source_dir):
+        """Folder metas are keyed by forward-slash-joined folder path."""
+        _write_page(source_dir, "a/b/c/_folder.md", "---\nnav_order: 3\n---\n")
+
+        metas = load_folder_metas(source_dir, [])
+        assert "a/b/c" in metas
+        assert metas["a/b/c"].nav_order == 3
+
+    def test_empty_folder_meta(self, source_dir):
+        """`_folder.md` with no frontmatter loads as empty FolderMeta."""
+        _write_page(source_dir, "blog/_folder.md", "just a body, no frontmatter")
+
+        metas = load_folder_metas(source_dir, [])
+        assert "blog" in metas
+        assert metas["blog"].nav_order is None
+        assert metas["blog"].unlisted is False

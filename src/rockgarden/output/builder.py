@@ -25,6 +25,7 @@ from rockgarden.content import (
     get_collection_skip_slugs,
     load_collection_data_files,
     load_content,
+    load_folder_metas,
     partition_collections,
     resolve_model,
     strip_content_title,
@@ -430,6 +431,7 @@ def build_site(
         config.site.url_style,
         config.site.ascii_urls,
     )
+    folder_metas = load_folder_metas(source, config.build.ignore_patterns)
     clean_urls = config.site.clean_urls
     base_path = config.site.base_path or get_base_path(config.site.base_url)
 
@@ -516,7 +518,9 @@ def build_site(
         env_vars=hook_env,
     )
 
-    nav_tree = build_nav_tree(pages, config.nav, clean_urls, base_path)
+    nav_tree = build_nav_tree(
+        pages, config.nav, clean_urls, base_path, folder_metas=folder_metas
+    )
 
     env = create_engine(config, site_root=site_root, base_path=base_path)
     env.globals["collections"] = {
@@ -558,13 +562,17 @@ def build_site(
         "feed_path": config.feed.path,
     }
 
-    show_index_map = {}
+    show_index_map = {
+        folder_path: meta.show_index for folder_path, meta in folder_metas.items()
+    }
+    # Folders whose index.md should render as the page at /folder/ (unless
+    # _folder.md sets show_index=true, in which case an auto-generated listing
+    # replaces the index.md page output).
+    folders_with_index_page: set[str] = set()
     for p in pages:
         parts = p.slug.split("/")
         if parts[-1] == "index":
-            folder_path = "/".join(parts[:-1])
-            show_index = p.frontmatter.get("show_index", False)
-            show_index_map[folder_path] = show_index
+            folders_with_index_page.add("/".join(parts[:-1]))
     # Pre-compute collection nav nodes so they're visible to all templates
     # (including collection page templates themselves).
     from rockgarden.nav.tree import NavNode
@@ -692,7 +700,9 @@ def build_site(
                 page.html, max_level=config.toc.max_depth
             )
 
-        breadcrumbs = build_breadcrumbs(page, pages, config.nav, clean_urls, base_path)
+        breadcrumbs = build_breadcrumbs(
+            page, pages, config.nav, clean_urls, base_path, folder_metas=folder_metas
+        )
 
         # Get backlinks if enabled
         backlinks_tree = None
@@ -705,7 +715,11 @@ def build_site(
             ]
             if backlink_pages:
                 backlinks_tree = build_nav_tree(
-                    backlink_pages, config.nav, clean_urls, base_path
+                    backlink_pages,
+                    config.nav,
+                    clean_urls,
+                    base_path,
+                    folder_metas=folder_metas,
                 )
 
         layout_template = resolve_layout(page.frontmatter, config.theme.default_layout)
@@ -735,14 +749,23 @@ def build_site(
         count += 1
 
     folder_indexes = generate_folder_indexes(
-        pages, config.nav, clean_urls, base_path, config.site.title
+        pages,
+        config.nav,
+        clean_urls,
+        base_path,
+        config.site.title,
+        folder_metas=folder_metas,
     )
     rendered_folder_indexes: list = []
     folder_template = env.get_template("folder_index.html")
 
     for folder in folder_indexes:
         folder_path = folder.slug.rsplit("/", 1)[0] if "/" in folder.slug else ""
-        if folder_path in show_index_map and not show_index_map[folder_path]:
+        # If a real index.md exists and _folder.md doesn't request the auto
+        # listing, the index.md itself provides the page at /folder/.
+        if folder_path in folders_with_index_page and not show_index_map.get(
+            folder_path, False
+        ):
             continue
 
         if folder.custom_content:
@@ -779,7 +802,7 @@ def build_site(
             folder.custom_content = process_callouts(render_markdown(processed))
 
         breadcrumbs = _build_folder_breadcrumbs(
-            folder, pages, config.nav, clean_urls, base_path
+            folder, pages, config.nav, clean_urls, base_path, folder_metas
         )
 
         folder_layout = resolve_layout(folder.frontmatter, config.theme.default_layout)
@@ -934,11 +957,21 @@ def build_site(
     )
 
 
-def _build_folder_breadcrumbs(folder, pages, nav_config, clean_urls=True, base_path=""):
+def _build_folder_breadcrumbs(
+    folder,
+    pages,
+    nav_config,
+    clean_urls=True,
+    base_path="",
+    folder_metas=None,
+):
     """Build breadcrumbs for a folder index page."""
     from rockgarden.nav import Breadcrumb, resolve_label
 
-    folder_pages: dict[str, any] = {}
+    if folder_metas is None:
+        folder_metas = {}
+
+    folder_pages: dict = {}
     for p in pages:
         parts = p.slug.split("/")
         if parts[-1] == "index":
@@ -947,7 +980,9 @@ def _build_folder_breadcrumbs(folder, pages, nav_config, clean_urls=True, base_p
 
     breadcrumbs = []
 
-    root_label = resolve_label("", "Home", nav_config.labels, folder_pages)
+    root_label = resolve_label(
+        "", "Home", nav_config.labels, folder_metas, folder_pages
+    )
     root_path = get_folder_url("", clean_urls, base_path)
     breadcrumbs.append(Breadcrumb(label=root_label, path=root_path))
 
@@ -962,7 +997,7 @@ def _build_folder_breadcrumbs(folder, pages, nav_config, clean_urls=True, base_p
         current_parts.append(part)
         path = "/".join(current_parts)
 
-        label = resolve_label(path, part, nav_config.labels, folder_pages)
+        label = resolve_label(path, part, nav_config.labels, folder_metas, folder_pages)
         folder_url = get_folder_url(path, clean_urls, base_path)
         breadcrumbs.append(Breadcrumb(label=label, path=folder_url))
 

@@ -20,7 +20,11 @@ def resolve_sort(
 ) -> ResolvedSort:
     """Resolve effective sort config for a folder.
 
-    Priority: frontmatter > config overrides > global defaults.
+    Priority: `_folder.md` metadata > config overrides > global defaults.
+
+    `folder_frontmatter` is a flat dict of folder-level metadata (typically
+    the frontmatter from a `_folder.md` file). It may contain `sort` and/or
+    `sort_reverse` to override config for this folder.
     """
     sort = nav_config.sort
     reverse = nav_config.reverse

@@ -44,6 +44,23 @@ All styles strip the `.md` extension and preserve directory structure. Per-page 
 url_style = "preserve-case"
 ```
 
+### Folder URLs
+
+A folder renders at `/folder/` when it contains either:
+
+- `index.md` — the canonical form
+- a folder-note: a file matching the folder name, e.g. `attend/attend.md` (Obsidian folder-note convention). The slug is rewritten internally to `attend/index`.
+
+Both forms produce the same URL (`/attend/`) and are interchangeable. When both `index.md` and a folder-note coexist, `index.md` wins and a warning is logged.
+
+To place a page literally at `/folder/folder/` (bypassing the folder-note rewrite), set an explicit `slug` in the page's frontmatter:
+
+```yaml
+---
+slug: attend/attend
+---
+```
+
 ## `[build]`
 
 | Field             | Type           | Default                                                          | Description                                                                |
@@ -88,7 +105,7 @@ Theme-specific display and rendering options. These are supported by the default
 
 ### Per-folder sort overrides
 
-Override `sort` and `reverse` for specific folders via config or frontmatter.
+Override `sort` and `reverse` for specific folders via config or per-folder metadata file.
 
 **In `rockgarden.toml`:**
 
@@ -98,7 +115,7 @@ sort = "date"
 reverse = true
 ```
 
-**In a folder's `index.md` frontmatter** (takes priority over config):
+**In a folder's `_folder.md` frontmatter** (takes priority over config):
 
 ```yaml
 ---
@@ -107,9 +124,26 @@ sort_reverse: true
 ---
 ```
 
-Priority: frontmatter > `[nav.overrides.<path>]` > global `[nav]` defaults.
+Priority: `_folder.md` > `[nav.overrides.<path>]` > global `[nav]` defaults.
 
 The `"date"` sort strategy orders by file modified time and is only available on folder index pages. In the nav sidebar, `"date"` falls back to `"files-first"`.
+
+## Folder Metadata (`_folder.md`)
+
+An optional `_folder.md` file inside any content folder holds folder-level metadata. Only the frontmatter is consumed — any body content is ignored. The file is not published as a page and is not indexed for wiki-link resolution.
+
+Supported fields:
+
+| Field          | Type   | Description                                                               |
+| -------------- | ------ | ------------------------------------------------------------------------- |
+| `nav_order`    | `int`  | Pin the folder's position in its parent nav (lower = higher)              |
+| `label`        | `str`  | Override the folder's display label in nav and breadcrumbs                |
+| `sort`         | `str`  | Child sort strategy (`alphabetical`, `files-first`, `folders-first`, `date`) |
+| `sort_reverse` | `bool` | Reverse the child sort order                                              |
+| `unlisted`     | `bool` | Hide the folder (and its descendants) from navigation entirely            |
+| `show_index`   | `bool` | Render the auto-generated folder listing at `/folder/` instead of the folder's `index.md` page. If an `index.md` also exists, its body is used as prose above the auto-listing. |
+
+`_folder.md` is strictly optional — folders work without one, using defaults.
 
 ## `[feed]`
 
@@ -205,8 +239,7 @@ Per-page options set in YAML frontmatter:
 | `aliases`     | `str` or `list` | Alternative names for wikilink resolution                                 |
 | `author`      | `str`           | Page author (used in Atom feed, overrides site-level feed author)         |
 | `subtitle`    | `str`           | Subtitle shown below the page title, in folder indexes, and tag indexes   |
-| `show_index`  | `bool`          | For `index.md` files: render page content + auto-generated folder listing |
-| `unlisted`    | `bool`          | Hide page from sidebar navigation and folder indexes (still accessible by URL) |
+| `unlisted`    | `bool`          | Hide page from sidebar navigation and folder indexes (still accessible by URL). On an `index.md` / folder-note, the page still renders at `/folder/` but no nav entry links to it; the folder itself remains visible. To hide an entire folder, set `unlisted: true` in a `_folder.md`. |
 
 ## CLI Overrides
 

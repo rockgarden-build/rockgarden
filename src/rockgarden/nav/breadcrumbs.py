@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from rockgarden.config import NavConfig
-from rockgarden.content import Page
+from rockgarden.content import FolderMeta, Page
 from rockgarden.nav.labels import resolve_label
 from rockgarden.urls import get_folder_url, get_url
 
@@ -24,20 +24,25 @@ def build_breadcrumbs(
     config: NavConfig | None = None,
     clean_urls: bool = True,
     base_path: str = "",
+    folder_metas: dict[str, FolderMeta] | None = None,
 ) -> list[Breadcrumb]:
     """Build breadcrumb trail for a page.
 
     Args:
         page: The current page
-        pages: All pages (for looking up folder index titles)
+        pages: All pages (used to derive folder-index title fallback)
         config: Navigation config (for label overrides)
         clean_urls: If True, use /path/ instead of /path/index.html
+        folder_metas: Optional dict of folder-path → FolderMeta for label
+            resolution.
 
     Returns:
         List of Breadcrumb objects from root to current page
     """
     if config is None:
         config = NavConfig()
+    if folder_metas is None:
+        folder_metas = {}
 
     folder_pages: dict[str, Page] = {}
     for p in pages:
@@ -58,7 +63,7 @@ def build_breadcrumbs(
 
     breadcrumbs: list[Breadcrumb] = []
 
-    root_label = resolve_label("", "Home", config.labels, folder_pages)
+    root_label = resolve_label("", "Home", config.labels, folder_metas, folder_pages)
     root_path = get_folder_url("", clean_urls, base_path)
     breadcrumbs.append(Breadcrumb(label=root_label, path=root_path))
 
@@ -73,7 +78,9 @@ def build_breadcrumbs(
         folder_path = "/".join(current_path_parts)
 
         original_name = original_folder_names.get(folder_path, part)
-        label = resolve_label(folder_path, original_name, config.labels, folder_pages)
+        label = resolve_label(
+            folder_path, original_name, config.labels, folder_metas, folder_pages
+        )
         folder_url = get_folder_url(folder_path, clean_urls, base_path)
         breadcrumbs.append(Breadcrumb(label=label, path=folder_url))
 
