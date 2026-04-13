@@ -206,6 +206,7 @@ Per-page options set in YAML frontmatter:
 | `author`      | `str`           | Page author (used in Atom feed, overrides site-level feed author)         |
 | `subtitle`    | `str`           | Subtitle shown below the page title, in folder indexes, and tag indexes   |
 | `show_index`  | `bool`          | For `index.md` files: render page content + auto-generated folder listing |
+| `unlisted`    | `bool`          | Hide page from sidebar navigation and folder indexes (still accessible by URL) |
 
 ## CLI Overrides
 

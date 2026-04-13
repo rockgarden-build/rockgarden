@@ -124,7 +124,9 @@ def build_nav_tree(
     tree: dict[str, dict] = {}
 
     for page in pages:
-        if _should_hide(page.slug, config.hide):
+        if _should_hide(page.slug, config.hide) or page.frontmatter.get(
+            "unlisted", False
+        ):
             continue
 
         parts = page.slug.split("/")
@@ -136,7 +138,10 @@ def build_nav_tree(
             current_path_parts.append(part)
             folder_path = "/".join(current_path_parts)
 
-            if _should_hide(folder_path, config.hide):
+            folder_page = folder_pages.get(folder_path)
+            if _should_hide(folder_path, config.hide) or (
+                folder_page and folder_page.frontmatter.get("unlisted", False)
+            ):
                 break
 
             if part not in current:
@@ -148,8 +153,7 @@ def build_nav_tree(
                     "_original_name": original_name,
                 }
             current = current[part]["_children"]
-
-        if not _should_hide(page.slug, config.hide):
+        else:
             page_name = parts[-1]
             if page_name != "index":
                 current[page_name] = {

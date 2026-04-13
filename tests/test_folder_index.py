@@ -269,3 +269,52 @@ class TestFolderNoteFolderIndex:
         assert "City of Fairshore" not in child_titles
         assert "The Salty Dog" in child_titles
         assert "Market Square" in child_titles
+
+
+class TestUnlistedFolderIndex:
+    """Test that unlisted pages are excluded from folder index children."""
+
+    def test_unlisted_page_hidden_from_folder_children(self):
+        pages = [
+            make_page("docs/visible", "Visible"),
+            make_page("docs/secret", "Secret", unlisted=True),
+        ]
+        indexes = generate_folder_indexes(pages)
+        docs = next(fi for fi in indexes if fi.slug == "docs/index")
+        child_titles = [c.title for c in docs.children]
+        assert "Visible" in child_titles
+        assert "Secret" not in child_titles
+
+    def test_unlisted_folder_hidden_from_parent_index(self):
+        """Folder with unlisted index page not shown in parent's children."""
+        pages = [
+            make_page("docs/public", "Public"),
+            Page(
+                source_path=Path("/vault/docs/secret/index.md"),
+                slug="docs/secret/index",
+                frontmatter={"title": "Secret Folder", "unlisted": True},
+                content="",
+            ),
+            make_page("docs/secret/inner", "Inner Page"),
+        ]
+        indexes = generate_folder_indexes(pages)
+        docs = next(fi for fi in indexes if fi.slug == "docs/index")
+        child_titles = [c.title for c in docs.children]
+        assert "Public" in child_titles
+        assert "Secret Folder" not in child_titles
+        assert "secret" not in [c.title.lower() for c in docs.children]
+
+    def test_unlisted_folder_not_in_generated_indexes(self):
+        """Folder with unlisted index should not get a generated folder index."""
+        pages = [
+            Page(
+                source_path=Path("/vault/secret/index.md"),
+                slug="secret/index",
+                frontmatter={"title": "Secret", "unlisted": True},
+                content="",
+            ),
+            make_page("secret/inner", "Inner"),
+        ]
+        indexes = generate_folder_indexes(pages)
+        index_slugs = [fi.slug for fi in indexes]
+        assert "secret/index" not in index_slugs
