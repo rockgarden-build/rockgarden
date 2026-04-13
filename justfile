@@ -46,3 +46,8 @@ css:
 # Watch and recompile Tailwind CSS
 css-watch:
     npm run watch:css
+
+# Build distribution artifacts and publish to PyPI
+publish:
+    uv build --clear
+    uv publish
