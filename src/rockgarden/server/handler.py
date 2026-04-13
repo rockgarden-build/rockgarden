@@ -5,6 +5,13 @@ import threading
 from importlib.resources import files
 from pathlib import Path
 
+# Interval for SSE heartbeat comments. Browsers cap concurrent HTTP/1.1
+# connections per origin (~6), and an SSE connection holds one slot. If stale
+# connections aren't detected promptly, rapid navigation can queue requests
+# behind them for tens of seconds. Heartbeats surface a broken pipe on write,
+# so stale clients are dropped quickly.
+SSE_HEARTBEAT_SECONDS = 10.0
+
 _RELOAD_JS = files("rockgarden.server").joinpath("_live_reload.js").read_text("utf-8")
 _RELOAD_SCRIPT = f"\n<script>{_RELOAD_JS}</script>\n"
 _RELOAD_SCRIPT_BYTES = _RELOAD_SCRIPT.encode("utf-8")
@@ -142,15 +149,24 @@ def make_dev_handler(
             self.end_headers()
 
             sse_clients.add(self)
+            # Short socket timeout so read(1) returns periodically, letting us
+            # send heartbeat comments. A failed heartbeat write means the
+            # client is gone and this connection can release its slot.
+            self.connection.settimeout(SSE_HEARTBEAT_SECONDS)
             try:
-                # Keep connection open until client disconnects
                 while True:
-                    # Block on read — will raise when client disconnects
-                    data = self.rfile.read(1)
-                    if not data:
+                    try:
+                        data = self.rfile.read(1)
+                        if not data:
+                            break
+                    except TimeoutError:
+                        try:
+                            self.wfile.write(b": keepalive\n\n")
+                            self.wfile.flush()
+                        except Exception:
+                            break
+                    except Exception:
                         break
-            except Exception:
-                pass
             finally:
                 sse_clients.remove(self)
 
