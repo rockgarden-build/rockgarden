@@ -5,6 +5,7 @@ import json
 from rockgarden.output.manifest import (
     BuildManifest,
     PageManifestEntry,
+    compute_folder_meta_hash,
     hash_directory,
     hash_file,
 )
@@ -160,3 +161,31 @@ class TestBuildManifest:
             page_count=3,
         )
         assert not m.needs_full_rebuild("c", "t", "m", str(out), 3)
+
+
+class TestComputeFolderMetaHash:
+    def test_includes_folder_md_content(self, tmp_path):
+        (tmp_path / "blog").mkdir()
+        (tmp_path / "blog" / "_folder.md").write_text("---\nnav_order: 1\n---\n")
+        h1 = compute_folder_meta_hash(tmp_path, [])
+
+        (tmp_path / "blog" / "_folder.md").write_text("---\nnav_order: 2\n---\n")
+        h2 = compute_folder_meta_hash(tmp_path, [])
+        assert h1 != h2
+
+    def test_skips_ignored_directories(self, tmp_path):
+        (tmp_path / "blog").mkdir()
+        (tmp_path / "blog" / "_folder.md").write_text("---\nnav_order: 1\n---\n")
+        (tmp_path / ".obsidian").mkdir()
+        (tmp_path / ".obsidian" / "_folder.md").write_text("---\nnav_order: 1\n---\n")
+
+        h1 = compute_folder_meta_hash(tmp_path, [".obsidian"])
+
+        # Changing an ignored _folder.md must not affect the hash.
+        (tmp_path / ".obsidian" / "_folder.md").write_text("---\nnav_order: 99\n---\n")
+        h2 = compute_folder_meta_hash(tmp_path, [".obsidian"])
+        assert h1 == h2
+
+    def test_empty_source(self, tmp_path):
+        h = compute_folder_meta_hash(tmp_path, [])
+        assert isinstance(h, str) and len(h) == 64

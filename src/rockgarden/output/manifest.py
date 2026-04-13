@@ -161,18 +161,26 @@ def compute_macro_hash(site_root: Path) -> str:
     return hash_directory(site_root / "_macros")
 
 
-def compute_folder_meta_hash(source: Path) -> str:
+def compute_folder_meta_hash(source: Path, ignore_patterns: list[str]) -> str:
     """Hash all `_folder.md` files under the source directory.
 
     Any change to folder metadata must invalidate all pages on incremental
     builds because folder metadata (nav order, labels, unlisting) is
     rendered into every page's nav.
+
+    Respects `ignore_patterns` so that `_folder.md` files inside ignored
+    directories (which `load_folder_metas` also skips) don't cause spurious
+    full rebuilds.
     """
+    from rockgarden.content.loader import should_ignore
+
     h = hashlib.sha256()
     if not source.exists():
         return h.hexdigest()
     for file_path in sorted(source.rglob("_folder.md")):
         if not file_path.is_file():
+            continue
+        if should_ignore(file_path, source, ignore_patterns):
             continue
         rel = str(file_path.relative_to(source))
         h.update(rel.encode())

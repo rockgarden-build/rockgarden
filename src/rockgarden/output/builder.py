@@ -454,7 +454,9 @@ def build_site(
         cur_config_hash = compute_config_hash(config_path)
         cur_template_hash = compute_template_hash(site_root, config.theme.name)
         cur_macro_hash = compute_macro_hash(site_root)
-        cur_folder_meta_hash = compute_folder_meta_hash(source)
+        cur_folder_meta_hash = compute_folder_meta_hash(
+            source, config.build.ignore_patterns
+        )
         output_dir_str = str(output.resolve())
         cur_cdn_flags = f"math={math_cdn},mermaid={mermaid_cdn}"
 
