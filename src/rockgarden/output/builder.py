@@ -59,6 +59,7 @@ from rockgarden.output.manifest import (
     BuildManifest,
     PageManifestEntry,
     compute_config_hash,
+    compute_folder_meta_hash,
     compute_macro_hash,
     compute_template_hash,
     hash_file,
@@ -453,6 +454,7 @@ def build_site(
         cur_config_hash = compute_config_hash(config_path)
         cur_template_hash = compute_template_hash(site_root, config.theme.name)
         cur_macro_hash = compute_macro_hash(site_root)
+        cur_folder_meta_hash = compute_folder_meta_hash(source)
         output_dir_str = str(output.resolve())
         cur_cdn_flags = f"math={math_cdn},mermaid={mermaid_cdn}"
 
@@ -464,6 +466,7 @@ def build_site(
             output_dir_str,
             len(pages),
             cur_cdn_flags,
+            cur_folder_meta_hash,
         ):
             use_incremental = True
         else:
@@ -474,6 +477,7 @@ def build_site(
                 output_dir=output_dir_str,
                 page_count=len(pages),
                 cdn_flags=cur_cdn_flags,
+                folder_meta_hash=cur_folder_meta_hash,
             )
 
     collections = partition_collections(pages, config.collections, source)

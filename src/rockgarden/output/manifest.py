@@ -8,7 +8,7 @@ import json
 from dataclasses import dataclass, field
 from pathlib import Path
 
-MANIFEST_VERSION = 1
+MANIFEST_VERSION = 2
 
 
 @dataclass
@@ -25,6 +25,7 @@ class BuildManifest:
     output_dir: str
     page_count: int
     cdn_flags: str = ""
+    folder_meta_hash: str = ""
     pages: dict[str, PageManifestEntry] = field(default_factory=dict)
 
     @classmethod
@@ -47,6 +48,7 @@ class BuildManifest:
                 output_dir=data["output_dir"],
                 page_count=data["page_count"],
                 cdn_flags=data.get("cdn_flags", ""),
+                folder_meta_hash=data.get("folder_meta_hash", ""),
                 pages=pages,
             )
         except (json.JSONDecodeError, KeyError, TypeError):
@@ -63,6 +65,7 @@ class BuildManifest:
             "output_dir": self.output_dir,
             "page_count": self.page_count,
             "cdn_flags": self.cdn_flags,
+            "folder_meta_hash": self.folder_meta_hash,
             "pages": {
                 slug: {"content_hash": e.content_hash, "output_path": e.output_path}
                 for slug, e in self.pages.items()
@@ -88,6 +91,7 @@ class BuildManifest:
         output_dir: str,
         page_count: int,
         cdn_flags: str = "",
+        folder_meta_hash: str = "",
     ) -> bool:
         """Check if a full rebuild is needed due to global changes."""
         if self.config_hash != config_hash:
@@ -101,6 +105,8 @@ class BuildManifest:
         if self.page_count != page_count:
             return True
         if self.cdn_flags != cdn_flags:
+            return True
+        if self.folder_meta_hash != folder_meta_hash:
             return True
         if not Path(output_dir).exists():
             return True
@@ -153,3 +159,22 @@ def compute_template_hash(site_root: Path, theme_name: str) -> str:
 def compute_macro_hash(site_root: Path) -> str:
     """Hash all _macros/ files."""
     return hash_directory(site_root / "_macros")
+
+
+def compute_folder_meta_hash(source: Path) -> str:
+    """Hash all `_folder.md` files under the source directory.
+
+    Any change to folder metadata must invalidate all pages on incremental
+    builds because folder metadata (nav order, labels, unlisting) is
+    rendered into every page's nav.
+    """
+    h = hashlib.sha256()
+    if not source.exists():
+        return h.hexdigest()
+    for file_path in sorted(source.rglob("_folder.md")):
+        if not file_path.is_file():
+            continue
+        rel = str(file_path.relative_to(source))
+        h.update(rel.encode())
+        h.update(file_path.read_bytes())
+    return h.hexdigest()
