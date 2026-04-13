@@ -1,6 +1,6 @@
 [project]
 name = "rockgarden"
-version = "0.7.3"
+version = "0.7.4"
 description = "Static site generator for Markdown content with Obsidian support"
 readme = "README.md"
 authors = [
@@ -81,7 +81,7 @@ filterwarnings = ["ignore::DeprecationWarning:frontmatter"]
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "0.7.3"
+version = "0.7.4"
 version_files = [
     "pyproject.toml:^version",
     "src/rockgarden/__init__.py:^__version__",
