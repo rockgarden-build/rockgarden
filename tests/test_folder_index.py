@@ -3,7 +3,7 @@
 from pathlib import Path
 
 from rockgarden.config import FolderSortOverride, NavConfig
-from rockgarden.content import Page
+from rockgarden.content import FolderMeta, Page
 from rockgarden.nav.folder_index import (
     find_folders,
     generate_folder_indexes,
@@ -21,6 +21,14 @@ def make_page(
         slug=slug,
         frontmatter=frontmatter_dict,
         content=content,
+    )
+
+
+def make_meta(folder_path: str, **fields) -> FolderMeta:
+    return FolderMeta(
+        source_path=Path(f"/vault/{folder_path}/_folder.md"),
+        folder_path=folder_path,
+        frontmatter=dict(fields),
     )
 
 
@@ -209,24 +217,21 @@ class TestFolderIndexPerFolderOverride:
         docs_titles = [c.title for c in docs.children]
         assert docs_titles == ["One", "Two"]
 
-    def test_frontmatter_override_wins(self):
+    def test_folder_meta_sort_override_wins(self):
         pages = [
-            Page(
-                source_path=Path("/vault/blog/index.md"),
-                slug="blog/index",
-                frontmatter={"sort": "alphabetical", "sort_reverse": True},
-                content="",
-            ),
             make_page("blog/alpha", "Alpha"),
             make_page("blog/beta", "Beta"),
             make_page("blog/gamma", "Gamma"),
         ]
+        metas = {
+            "blog": make_meta("blog", sort="alphabetical", sort_reverse=True),
+        }
         config = NavConfig(
             sort="alphabetical",
             reverse=False,
             overrides={"blog": FolderSortOverride(reverse=False)},
         )
-        indexes = generate_folder_indexes(pages, config)
+        indexes = generate_folder_indexes(pages, config, folder_metas=metas)
         blog = next(fi for fi in indexes if fi.slug == "blog/index")
         titles = [c.title for c in blog.children]
         assert titles == ["Gamma", "Beta", "Alpha"]
@@ -285,36 +290,39 @@ class TestUnlistedFolderIndex:
         assert "Visible" in child_titles
         assert "Secret" not in child_titles
 
-    def test_unlisted_folder_hidden_from_parent_index(self):
-        """Folder with unlisted index page not shown in parent's children."""
+    def test_unlisted_folder_meta_hides_from_parent_index(self):
+        """Folder with `_folder.md` unlisted=true not shown in parent's children."""
         pages = [
             make_page("docs/public", "Public"),
-            Page(
-                source_path=Path("/vault/docs/secret/index.md"),
-                slug="docs/secret/index",
-                frontmatter={"title": "Secret Folder", "unlisted": True},
-                content="",
-            ),
+            make_page("docs/secret/index", "Secret Folder"),
             make_page("docs/secret/inner", "Inner Page"),
         ]
-        indexes = generate_folder_indexes(pages)
+        metas = {"docs/secret": make_meta("docs/secret", unlisted=True)}
+        indexes = generate_folder_indexes(pages, folder_metas=metas)
         docs = next(fi for fi in indexes if fi.slug == "docs/index")
         child_titles = [c.title for c in docs.children]
         assert "Public" in child_titles
         assert "Secret Folder" not in child_titles
         assert "secret" not in [c.title.lower() for c in docs.children]
 
-    def test_unlisted_folder_not_in_generated_indexes(self):
-        """Folder with unlisted index should not get a generated folder index."""
+    def test_unlisted_folder_meta_not_in_generated_indexes(self):
+        """Folder with `_folder.md` unlisted=true should not get a generated index."""
         pages = [
-            Page(
-                source_path=Path("/vault/secret/index.md"),
-                slug="secret/index",
-                frontmatter={"title": "Secret", "unlisted": True},
-                content="",
-            ),
+            make_page("secret/index", "Secret"),
             make_page("secret/inner", "Inner"),
         ]
-        indexes = generate_folder_indexes(pages)
+        metas = {"secret": make_meta("secret", unlisted=True)}
+        indexes = generate_folder_indexes(pages, folder_metas=metas)
         index_slugs = [fi.slug for fi in indexes]
         assert "secret/index" not in index_slugs
+
+
+class TestFolderMetaWithoutDescendants:
+    """`_folder.md` alone should not materialize an empty folder index."""
+
+    def test_folder_meta_with_no_pages_not_emitted(self):
+        pages = [make_page("about", "About")]
+        metas = {"empty": make_meta("empty", label="Empty")}
+        indexes = generate_folder_indexes(pages, folder_metas=metas)
+        index_slugs = [fi.slug for fi in indexes]
+        assert "empty/index" not in index_slugs

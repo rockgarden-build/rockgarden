@@ -76,21 +76,39 @@ title: Page Title     # Used in nav and <title>
 slug: custom-slug     # Override generated URL slug
 nav_order: 1          # Pin position in nav (lower = first)
 tags: [doc, guide]    # Shown in folder listings
-show_index: true      # For index.md: add folder listing
+unlisted: true        # Hide from nav (URL still works)
 ---
 ```
 
+`unlisted: true` on an `index.md` or folder-note keeps the page at `/folder/` reachable by URL but removes the nav link to it; the folder itself stays in nav with its children.
+
+### Folder Metadata (`_folder.md`)
+
+Per-folder options live in an optional `_folder.md` file inside the folder. Frontmatter only — body is ignored. The file is not published as a page.
+
+```yaml
+---
+nav_order: 2           # Pin folder in parent nav
+label: My Folder       # Folder display label override
+sort: alphabetical     # Child sort strategy
+sort_reverse: false
+unlisted: true         # Hide folder (and descendants) from nav
+show_index: true       # Use auto-listing at /folder/ even if index.md exists
+---
+```
+
+See [[Navigation]] for full details.
+
 ### Folder Index Pages
 
-The `show_index` option controls how `index.md` files are rendered:
+A folder is served at `/folder/` when it contains any of:
 
-| Scenario | Result |
-|----------|--------|
-| No `index.md` in folder | Auto-generated folder listing |
-| `index.md` exists (default) | Renders as normal page |
-| `index.md` with `show_index: true` | Page content + folder listing |
-
-This lets you write custom landing pages for folders while still optionally including the file listing.
+| Scenario | Result at `/folder/` |
+|----------|----------------------|
+| Nothing | Auto-generated folder listing |
+| `index.md` | `index.md` renders as a normal page |
+| Folder-note (`folder/folder.md`) | Equivalent to `index.md` — same URL |
+| `_folder.md` with `show_index: true` and `index.md` | Auto-listing with `index.md` body as prose prefix |
 
 ## URL Slugs
 
@@ -116,7 +134,7 @@ slug: quickstart
 ---
 ```
 
-This produces `/quickstart/` instead of `/getting-started/`.
+This produces `/quickstart/` instead of `/getting-started/`. Use this as the escape hatch to place a page literally at `/folder/folder/` (bypassing the folder-note rewrite).
 
 ## CLI Overrides
 

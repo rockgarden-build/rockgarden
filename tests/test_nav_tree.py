@@ -3,7 +3,7 @@
 from pathlib import Path
 
 from rockgarden.config import FolderSortOverride, NavConfig, NavLinkConfig
-from rockgarden.content import Page
+from rockgarden.content import FolderMeta, Page
 from rockgarden.nav import build_nav_tree
 from rockgarden.nav.tree import convert_nav_links, inject_nav_links
 
@@ -22,6 +22,15 @@ def make_page(
         slug=slug,
         frontmatter=frontmatter,
         content="",
+    )
+
+
+def make_meta(folder_path: str, **fields) -> FolderMeta:
+    """Helper to construct a FolderMeta with the given frontmatter fields."""
+    return FolderMeta(
+        source_path=Path(f"/vault/{folder_path}/_folder.md"),
+        folder_path=folder_path,
+        frontmatter=dict(fields),
     )
 
 
@@ -143,7 +152,7 @@ class TestNavConfigLabels:
         assert characters.label == "Cast"
 
     def test_label_from_index_frontmatter(self):
-        """Folder label comes from index.md frontmatter title."""
+        """Folder label falls back to index.md title."""
         pages = [
             make_page("characters/index", "The Characters"),
             make_page("characters/alice", "Alice"),
@@ -152,6 +161,18 @@ class TestNavConfigLabels:
 
         characters = tree.children[0]
         assert characters.label == "The Characters"
+
+    def test_label_from_folder_meta_overrides_index_title(self):
+        """`_folder.md` label overrides the index.md title."""
+        pages = [
+            make_page("characters/index", "The Characters"),
+            make_page("characters/alice", "Alice"),
+        ]
+        metas = {"characters": make_meta("characters", label="Cast")}
+        tree = build_nav_tree(pages, folder_metas=metas)
+
+        characters = tree.children[0]
+        assert characters.label == "Cast"
 
     def test_config_label_overrides_frontmatter(self):
         """Config label takes precedence over frontmatter."""
@@ -223,15 +244,16 @@ class TestNavOrder:
         assert tree.children[1].label == "Getting Started"
         assert tree.children[2].label == "About"
 
-    def test_nav_order_folder_from_index(self):
-        """Folder nav_order comes from its index.md frontmatter."""
+    def test_nav_order_folder_from_meta(self):
+        """Folder nav_order comes from `_folder.md`."""
         pages = [
-            make_page("guides/index", "Guides", nav_order=1),
+            make_page("guides/index", "Guides"),
             make_page("guides/quick-start", "Quick Start"),
             make_page("reference/index", "Reference"),
             make_page("reference/api", "API"),
         ]
-        tree = build_nav_tree(pages)
+        metas = {"guides": make_meta("guides", label="Guides", nav_order=1)}
+        tree = build_nav_tree(pages, folder_metas=metas)
 
         assert tree.children[0].label == "Guides"
         assert tree.children[0].nav_order == 1
@@ -443,25 +465,19 @@ class TestNavPerFolderOverride:
         labels = [c.label for c in blog_node.children]
         assert labels == ["gamma", "beta", "alpha"]
 
-    def test_frontmatter_override_wins(self):
-        """Frontmatter sort/sort_reverse should override config."""
+    def test_folder_meta_override_wins(self):
+        """`_folder.md` sort/sort_reverse should override config."""
         pages = [
-            Page(
-                source_path=Path("/vault/blog/index.md"),
-                slug="blog/index",
-                frontmatter={
-                    "title": "Blog",
-                    "sort": "alphabetical",
-                    "sort_reverse": True,
-                },
-                content="",
-            ),
+            make_page("blog/index", "Blog"),
             make_page("blog/alpha"),
             make_page("blog/beta"),
             make_page("blog/gamma"),
         ]
+        metas = {
+            "blog": make_meta("blog", sort="alphabetical", sort_reverse=True),
+        }
         config = NavConfig(sort="alphabetical", reverse=False)
-        tree = build_nav_tree(pages, config)
+        tree = build_nav_tree(pages, config, folder_metas=metas)
         blog_node = [c for c in tree.children if c.name == "blog"][0]
         labels = [c.label for c in blog_node.children]
         assert labels == ["gamma", "beta", "alpha"]
@@ -573,25 +589,54 @@ class TestUnlistedPages:
         labels = [c.label for c in tree.children]
         assert "Page" in labels
 
-    def test_unlisted_folder_hidden_from_nav(self):
-        """Folder with unlisted index page should not appear in nav."""
+    def test_unlisted_folder_meta_hides_folder(self):
+        """Folder with unlisted=true in `_folder.md` should not appear in nav."""
         pages = [
-            Page(
-                source_path=Path("/vault/secret/index.md"),
-                slug="secret/index",
-                frontmatter={"title": "Secret", "unlisted": True},
-                content="",
-            ),
-            Page(
-                source_path=Path("/vault/secret/details.md"),
-                slug="secret/details",
-                frontmatter={"title": "Details"},
-                content="",
-            ),
+            make_page("secret/index", "Secret"),
+            make_page("secret/details", "Details"),
             make_page("public", "Public"),
         ]
-        tree = build_nav_tree(pages)
+        metas = {"secret": make_meta("secret", unlisted=True)}
+        tree = build_nav_tree(pages, folder_metas=metas)
         labels = [c.label for c in tree.children]
         assert "Public" in labels
         assert "secret" not in [c.label.lower() for c in tree.children]
         assert "Details" not in labels
+
+    def test_unlisted_index_page_renders_but_folder_visible(self):
+        """Unlisted on index.md: folder still visible, but no nav link to it."""
+        pages = [
+            Page(
+                source_path=Path("/vault/about/index.md"),
+                slug="about/index",
+                frontmatter={"title": "About", "unlisted": True},
+                content="",
+            ),
+            make_page("about/team", "Team"),
+        ]
+        tree = build_nav_tree(pages)
+        about = [c for c in tree.children if c.name == "about"]
+        assert len(about) == 1
+        # Folder present with children, but index_path is None because the
+        # index page itself is unlisted.
+        assert about[0].is_folder
+        assert about[0].index_path is None
+        assert "Team" in [c.label for c in about[0].children]
+
+    def test_unlisted_folder_note_equivalent_to_unlisted_index(self):
+        """Folder-note (attend/attend.md) with unlisted behaves like index.md."""
+        pages = [
+            Page(
+                source_path=Path("/vault/attend/attend.md"),
+                slug="attend/index",
+                frontmatter={"title": "Attend", "unlisted": True},
+                content="",
+            ),
+            make_page("attend/venue", "Venue"),
+        ]
+        tree = build_nav_tree(pages)
+        attend = [c for c in tree.children if c.name == "attend"]
+        assert len(attend) == 1
+        assert attend[0].is_folder
+        assert attend[0].index_path is None
+        assert "Venue" in [c.label for c in attend[0].children]

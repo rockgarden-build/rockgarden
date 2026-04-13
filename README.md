@@ -40,7 +40,7 @@ rockgarden serve     # preview locally
 
 **Navigation & discovery:**
 
-- Auto-generated sidebar, breadcrumbs, folder index pages
+- Auto-generated sidebar, breadcrumbs, folder index pages (with optional `_folder.md` for per-folder nav metadata)
 - Per-page table of contents
 - Backlinks
 - Client-side full-text search

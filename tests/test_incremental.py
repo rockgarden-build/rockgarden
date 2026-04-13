@@ -64,6 +64,24 @@ class TestIncrementalBuilds:
         html = (output / "about" / "index.html").read_text()
         assert "Updated content" in html
 
+    def test_folder_meta_change_triggers_full_rebuild(self, tmp_path):
+        source = tmp_path / "content"
+        source.mkdir()
+        (source / "blog").mkdir()
+        _write_page(source, "blog/post-one")
+        _write_page(source, "blog/post-two")
+        output = tmp_path / "output"
+
+        # Initial build with an unlisted blog folder.
+        (source / "blog" / "_folder.md").write_text("---\nunlisted: true\n---\n")
+        _build(source, output)
+
+        # Flip the folder to visible; all pages must re-render because folder
+        # metadata affects every page's nav.
+        (source / "blog" / "_folder.md").write_text("---\nnav_order: 1\n---\n")
+        result = _build(source, output)
+        assert result.skipped_count == 0
+
     def test_config_change_triggers_full_rebuild(self, tmp_path):
         source = tmp_path / "content"
         source.mkdir()

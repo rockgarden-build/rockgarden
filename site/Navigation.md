@@ -38,8 +38,9 @@ sort = "alphabetical"   # mixed files and folders
 Folder display names resolve in order:
 
 1. Config `labels` override
-2. Folder's `index.md` frontmatter title
-3. Folder name (titlecased)
+2. `label` field in the folder's `_folder.md`
+3. Folder's `index.md` / folder-note title
+4. Folder name (titlecased)
 
 ```toml
 [nav]
@@ -65,7 +66,7 @@ Each page shows a breadcrumb trail from root to current location.
 
 Folders without an `index.md` automatically get a generated index page listing their contents.
 
-If you create `folder/index.md`, it renders as a normal page:
+If you create `folder/index.md`, it renders as a normal page at `/folder/`:
 
 ```yaml
 ---
@@ -75,15 +76,35 @@ title: My Folder
 This is a custom landing page for the folder.
 ```
 
-To show both your content and the folder listing, add `show_index: true`:
+Obsidian's folder-note convention also works: a file matching the folder name (`folder/folder.md`) renders at the same URL (`/folder/`). Both forms are equivalent.
+
+### Folder Metadata (`_folder.md`)
+
+Per-folder options live in an optional `_folder.md` file inside the folder. The file is frontmatter-only — any body is ignored — and is never published as a page.
 
 ```yaml
 ---
-title: My Folder
-show_index: true
+nav_order: 2
+label: "My Folder"
+sort: alphabetical
+sort_reverse: false
 ---
-
-Custom intro text above the listing.
 ```
+
+Supported fields:
+
+- `nav_order` — pin the folder's position in its parent nav
+- `label` — override the folder's display label
+- `sort` / `sort_reverse` — child sort strategy (per-folder override of config)
+- `unlisted` — hide the folder (and all its descendants) from nav
+- `show_index` — render the auto-generated listing at `/folder/` instead of the `index.md` page (if both exist, the `index.md` body appears as prose above the listing)
+
+### Unlisted Behavior
+
+`unlisted: true` on a regular page hides it from nav and folder listings (URL still works).
+
+`unlisted: true` on an `index.md` or folder-note: the page still renders at `/folder/`, but no nav entry links to it. The folder itself remains in nav with its children. Use this for section overview pages that you want reachable via direct URL but not linked from the menu.
+
+To hide an entire folder, set `unlisted: true` in the folder's `_folder.md`.
 
 See [Examples](/examples/) for a live example with custom content.

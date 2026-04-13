@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 
 from rockgarden.config import NavConfig
-from rockgarden.content import Page
+from rockgarden.content import FolderMeta, Page
 from rockgarden.nav.labels import resolve_label
 from rockgarden.nav.sort import resolve_sort
 from rockgarden.urls import get_folder_url, get_url
@@ -59,6 +59,7 @@ def generate_folder_indexes(
     clean_urls: bool = True,
     base_path: str = "",
     site_title: str = "",
+    folder_metas: dict[str, FolderMeta] | None = None,
 ) -> list[FolderIndex]:
     """Generate folder index data for all folders.
 
@@ -67,12 +68,16 @@ def generate_folder_indexes(
         config: Navigation config for hide patterns and labels
         clean_urls: If True, use /path/ instead of /path/index.html
         site_title: Site title used as the root index title fallback
+        folder_metas: Optional dict of folder-path → FolderMeta (from
+            `_folder.md` files). Controls folder unlisting and label.
 
     Returns:
         List of FolderIndex objects for folders that need generated indexes
     """
     if config is None:
         config = NavConfig()
+    if folder_metas is None:
+        folder_metas = {}
 
     folders = find_folders(pages)
 
@@ -88,12 +93,12 @@ def generate_folder_indexes(
     for folder_path in sorted(folders):
         if _should_hide(folder_path, config.hide):
             continue
-        index_page = existing_indexes.get(folder_path)
-        if index_page and index_page.frontmatter.get("unlisted", False):
+        folder_meta = folder_metas.get(folder_path)
+        if folder_meta and folder_meta.unlisted:
             continue
 
         children = _get_folder_children(
-            folder_path, pages, config, clean_urls, base_path
+            folder_path, pages, config, clean_urls, base_path, folder_metas
         )
 
         if folder_path in existing_indexes:
@@ -103,7 +108,9 @@ def generate_folder_indexes(
             frontmatter = index_page.frontmatter
         else:
             folder_name = folder_path.split("/")[-1]
-            title = resolve_label(folder_path, folder_name, config.labels)
+            title = resolve_label(
+                folder_path, folder_name, config.labels, folder_metas, existing_indexes
+            )
             if not title and not folder_path:
                 title = site_title or "Home"
             custom_content = None
@@ -180,8 +187,12 @@ def _get_folder_children(
     config: NavConfig,
     clean_urls: bool = True,
     base_path: str = "",
+    folder_metas: dict[str, FolderMeta] | None = None,
 ) -> list[FolderChild]:
     """Get direct children of a folder."""
+    if folder_metas is None:
+        folder_metas = {}
+
     children: list[FolderChild] = []
     seen_subfolders: set[str] = set()
 
@@ -234,20 +245,22 @@ def _get_folder_children(
             if subfolder_path not in seen_subfolders:
                 if _should_hide(subfolder_path, config.hide):
                     continue
-                subfolder_index = folder_index_pages.get(subfolder_path)
-                if subfolder_index and subfolder_index.frontmatter.get(
-                    "unlisted", False
-                ):
+                subfolder_meta = folder_metas.get(subfolder_path)
+                if subfolder_meta and subfolder_meta.unlisted:
                     continue
 
                 seen_subfolders.add(subfolder_path)
-                label = resolve_label(subfolder_path, subfolder, config.labels)
+                label = resolve_label(
+                    subfolder_path,
+                    subfolder,
+                    config.labels,
+                    folder_metas,
+                    folder_index_pages,
+                )
 
                 nav_order = None
-                if subfolder_path in folder_index_pages:
-                    nav_order = folder_index_pages[subfolder_path].frontmatter.get(
-                        "nav_order"
-                    )
+                if subfolder_path in folder_metas:
+                    nav_order = folder_metas[subfolder_path].nav_order
 
                 children.append(
                     FolderChild(
@@ -260,9 +273,7 @@ def _get_folder_children(
                 )
 
     folder_fm = (
-        folder_index_pages[folder_path].frontmatter
-        if folder_path in folder_index_pages
-        else None
+        folder_metas[folder_path].frontmatter if folder_path in folder_metas else None
     )
     resolved = resolve_sort(folder_path, config, folder_fm)
     return _sort_folder_children(children, resolved.sort, resolved.reverse)
