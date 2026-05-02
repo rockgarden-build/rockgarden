@@ -169,6 +169,11 @@ def make_dev_handler(
                         break
             finally:
                 sse_clients.remove(self)
+                # Don't let BaseHTTPRequestHandler.handle() loop back into
+                # handle_one_request() on a socket that still has the SSE
+                # heartbeat timeout — readline would raise OSError("cannot
+                # read from timed out object"), which the stdlib doesn't catch.
+                self.close_connection = True
 
         def _serve_html_with_injection(self, fs_path: Path) -> None:
             body = fs_path.read_bytes()
