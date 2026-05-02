@@ -9,7 +9,7 @@ from rockgarden.content.collection import Collection
 from rockgarden.content.models import Page
 from rockgarden.nav.folder_index import FolderIndex
 from rockgarden.output.html_to_md import html_to_markdown
-from rockgarden.urls import get_url
+from rockgarden.urls import get_host_url, get_url
 
 
 @dataclass
@@ -58,6 +58,10 @@ def _group_content(
     """
     sections: list[_Section] = []
 
+    # Use the host portion of base_url so concatenation with base_path doesn't
+    # double up when the user encoded the path in base_url itself.
+    host_url = get_host_url(base_url)
+
     collected_slugs: set[str] = set()
     for col in collections.values():
         entries = [e for e in col.entries if isinstance(e, Page)]
@@ -65,7 +69,7 @@ def _group_content(
             continue
         items = []
         for entry in sorted(entries, key=lambda p: p.title.lower()):
-            url = base_url + get_url(entry.slug, clean_urls, base_path)
+            url = host_url + get_url(entry.slug, clean_urls, base_path)
             items.append(_SectionItem(entry.title, url, _get_item_html(entry)))
             collected_slugs.add(entry.slug)
         sections.append(_Section(col.name, items))
@@ -93,7 +97,7 @@ def _group_content(
         sorted_items = sorted(dir_groups[dir_name], key=lambda p: p.title.lower())
         items = []
         for item in sorted_items:
-            url = base_url + get_url(item.slug, clean_urls, base_path)
+            url = host_url + get_url(item.slug, clean_urls, base_path)
             items.append(_SectionItem(item.title, url, _get_item_html(item)))
         sections.append(_Section(dir_name, items))
 
@@ -101,7 +105,7 @@ def _group_content(
         sorted_items = sorted(root_items, key=lambda p: p.title.lower())
         items = []
         for item in sorted_items:
-            url = base_url + get_url(item.slug, clean_urls, base_path)
+            url = host_url + get_url(item.slug, clean_urls, base_path)
             items.append(_SectionItem(item.title, url, _get_item_html(item)))
         sections.append(_Section("Pages", items))
 

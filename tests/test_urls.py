@@ -8,6 +8,7 @@ from rockgarden.urls import (
     generate_slug,
     get_base_path,
     get_folder_url,
+    get_host_url,
     get_output_path,
     get_url,
 )
@@ -260,6 +261,31 @@ class TestBasePath:
         """base_path defaults to empty string."""
         site = SiteConfig()
         assert site.base_path == ""
+
+
+class TestHostUrl:
+    """Tests for get_host_url, used to avoid double-path bugs in absolute URLs."""
+
+    def test_strips_path_component(self):
+        assert get_host_url("https://example.com/docs") == "https://example.com"
+
+    def test_strips_trailing_slash_with_path(self):
+        assert get_host_url("https://example.com/docs/") == "https://example.com"
+
+    def test_no_path_unchanged(self):
+        assert get_host_url("https://example.com") == "https://example.com"
+
+    def test_trailing_slash_only(self):
+        assert get_host_url("https://example.com/") == "https://example.com"
+
+    def test_empty_returns_empty(self):
+        assert get_host_url("") == ""
+
+    def test_preserves_port(self):
+        assert get_host_url("http://localhost:8000/site") == "http://localhost:8000"
+
+    def test_preserves_scheme(self):
+        assert get_host_url("http://example.com/docs") == "http://example.com"
 
     def test_base_path_in_build_output(self, tmp_path):
         """base_path is applied to asset and navigation URLs in built HTML."""

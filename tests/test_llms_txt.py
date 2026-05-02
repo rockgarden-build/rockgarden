@@ -109,6 +109,17 @@ class TestBuildLlmsTxt:
         )
         assert "https://example.com/docs/about/" in result
 
+    def test_path_in_base_url_not_doubled(self):
+        # When the path is encoded in base_url and base_path is derived to
+        # match (as builder.py does via get_base_path), the result must not
+        # double up the path component.
+        pages = [self._make_page("about", "About")]
+        result = build_llms_txt(
+            pages, [], {}, "https://example.com/docs", "My Site", base_path="/docs"
+        )
+        assert "https://example.com/docs/about/" in result
+        assert "https://example.com/docs/docs/" not in result
+
     def test_alphabetical_ordering(self):
         pages = [
             self._make_page("zebra", "Zebra"),

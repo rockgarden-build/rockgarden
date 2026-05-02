@@ -186,6 +186,26 @@ class TestBuildAtomFeed:
         self_link = [el for el in links if el.get("rel") == "self"][0]
         assert self_link.get("href") == "https://example.com/docs/feed.xml"
 
+    def test_path_in_base_url_not_doubled(self):
+        # When the path is encoded in base_url and base_path is derived to
+        # match (as builder.py does via get_base_path), neither the entry
+        # link, the feed self link, the alternate link, nor the feed id
+        # should double up the path component.
+        pages = [self._make_page("about")]
+        result = build_atom_feed(
+            pages, "Site", "", "https://example.com/docs", base_path="/docs"
+        )
+        root = fromstring(result)
+        entry = root.find(_ns("entry"))
+        assert entry.find(_ns("link")).get("href") == "https://example.com/docs/about/"
+        links = root.findall(_ns("link"))
+        hrefs = {el.get("rel", "alternate"): el.get("href") for el in links}
+        assert hrefs["alternate"] == "https://example.com/docs/"
+        assert hrefs["self"] == "https://example.com/docs/feed.xml"
+        assert root.find(_ns("id")).text == "https://example.com/docs/"
+        # Belt and suspenders: ensure no doubled paths anywhere in the feed.
+        assert "/docs/docs/" not in result
+
     def test_non_clean_urls(self):
         pages = [self._make_page("about")]
         result = build_atom_feed(
