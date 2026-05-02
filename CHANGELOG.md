@@ -1,3 +1,9 @@
+## v0.7.7 (2026-05-02)
+
+### Minor / Bug Fixes
+
+- fix base_url support (#116)
+
 ## v0.7.6 (2026-05-02)
 
 ### Minor / Bug Fixes
