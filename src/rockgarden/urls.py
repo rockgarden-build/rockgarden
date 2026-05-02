@@ -50,6 +50,27 @@ def get_base_path(base_url: str) -> str:
     return path
 
 
+def get_host_url(base_url: str) -> str:
+    """Return the scheme + host portion of base_url, with no path.
+
+    Use this when constructing absolute URLs by combining ``host + base_path
+    + slug_path``: it avoids the double-path bug that occurs when ``base_url``
+    already contains the path prefix and ``base_path`` is then concatenated
+    again.
+
+    Examples:
+        "https://example.com/docs/" → "https://example.com"
+        "https://example.com" → "https://example.com"
+        "" → ""
+    """
+    if not base_url:
+        return ""
+    parsed = urlparse(base_url)
+    if not parsed.scheme or not parsed.netloc:
+        return base_url
+    return f"{parsed.scheme}://{parsed.netloc}"
+
+
 def generate_slug(
     relative_path: str, style: str = "slug", ascii_urls: bool = False
 ) -> str:

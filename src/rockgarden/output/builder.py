@@ -73,7 +73,7 @@ from rockgarden.render import (
     render_page,
     resolve_layout,
 )
-from rockgarden.urls import get_base_path, get_folder_url, get_output_path
+from rockgarden.urls import get_base_path, get_folder_url, get_host_url, get_output_path
 
 
 @dataclass
@@ -547,6 +547,7 @@ def build_site(
         "description": config.site.description,
         "og_image": config.site.og_image,
         "base_url": config.site.base_url,
+        "host_url": get_host_url(config.site.base_url),
         "base_path": base_path,
         "clean_urls": config.site.clean_urls,
         "tag_index": config.theme.tag_index,
@@ -903,10 +904,9 @@ def build_site(
 
     # Generate llms.txt if base_url is configured and llms_txt enabled
     if config.site.base_url and config.llms_txt.enabled:
+        host_url = get_host_url(config.site.base_url)
         full_url = (
-            f"{config.site.base_url}{base_path}/llms-full.txt"
-            if config.llms_txt.full
-            else ""
+            f"{host_url}{base_path}/llms-full.txt" if config.llms_txt.full else ""
         )
         llms_txt_content = build_llms_txt(
             pages,

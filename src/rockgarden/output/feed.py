@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 from xml.etree.ElementTree import Element, SubElement, tostring
 
 from rockgarden.content.models import Page
-from rockgarden.urls import get_url
+from rockgarden.urls import get_host_url, get_url
 
 ATOM_NS = "http://www.w3.org/2005/Atom"
 
@@ -84,16 +84,20 @@ def build_atom_feed(
         subtitle_el = SubElement(feed, "subtitle")
         subtitle_el.text = site_description
 
-    SubElement(feed, "link", href=base_url + base_path + "/")
+    # Use the host portion of base_url so concatenation with base_path doesn't
+    # double up when the user encoded the path in base_url itself.
+    host_url = get_host_url(base_url)
+
+    SubElement(feed, "link", href=host_url + base_path + "/")
     SubElement(
         feed,
         "link",
         rel="self",
-        href=base_url + base_path + feed_path,
+        href=host_url + base_path + feed_path,
     )
 
     id_el = SubElement(feed, "id")
-    id_el.text = base_url + base_path + "/"
+    id_el.text = host_url + base_path + "/"
 
     # Feed updated time is the most recent entry date, or now if no entries have dates
     most_recent = None
@@ -117,7 +121,7 @@ def build_atom_feed(
         entry_title = SubElement(entry_el, "title")
         entry_title.text = page.title
 
-        page_url = base_url + get_url(page.slug, clean_urls, base_path)
+        page_url = host_url + get_url(page.slug, clean_urls, base_path)
         SubElement(entry_el, "link", href=page_url)
 
         entry_id = SubElement(entry_el, "id")
