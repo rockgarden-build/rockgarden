@@ -1,3 +1,10 @@
+## v0.7.6 (2026-05-02)
+
+### Minor / Bug Fixes
+
+- fix dev server timeout (#114)
+- reduce dev server timeouts (#110)
+
 ## v0.7.5 (2026-04-13)
 
 ### Minor / Bug Fixes
