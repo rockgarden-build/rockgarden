@@ -350,6 +350,56 @@ class TestHostUrl:
         assert "/preview/_assets/rockgarden.css" in html
         assert "/production/_assets/" not in html
 
+    def test_canonical_and_og_url_explicit_base_path(self, tmp_path):
+        source = tmp_path / "source"
+        source.mkdir()
+        (source / "about.md").write_text("# About\nHi")
+
+        output = tmp_path / "output"
+        config = Config(
+            site=SiteConfig(base_url="https://example.com", base_path="/2026")
+        )
+
+        build_site(config, source, output)
+        html = (output / "about" / "index.html").read_text()
+
+        expected = "https://example.com/2026/about/"
+        assert f'<link rel="canonical" href="{expected}">' in html
+        assert f'<meta property="og:url" content="{expected}">' in html
+
+    def test_canonical_and_og_url_path_in_base_url(self, tmp_path):
+        # When the path is encoded in base_url and base_path is derived to
+        # match, neither tag should double up the path.
+        source = tmp_path / "source"
+        source.mkdir()
+        (source / "about.md").write_text("# About\nHi")
+
+        output = tmp_path / "output"
+        config = Config(site=SiteConfig(base_url="https://example.com/docs"))
+
+        build_site(config, source, output)
+        html = (output / "about" / "index.html").read_text()
+
+        expected = "https://example.com/docs/about/"
+        assert f'<link rel="canonical" href="{expected}">' in html
+        assert f'<meta property="og:url" content="{expected}">' in html
+        assert "/docs/docs/" not in html
+
+    def test_canonical_and_og_url_no_base_url(self, tmp_path):
+        # Without base_url there is no canonical absolute URL to emit.
+        source = tmp_path / "source"
+        source.mkdir()
+        (source / "about.md").write_text("# About\nHi")
+
+        output = tmp_path / "output"
+        config = Config()
+
+        build_site(config, source, output)
+        html = (output / "about" / "index.html").read_text()
+
+        assert 'rel="canonical"' not in html
+        assert 'property="og:url"' not in html
+
     def test_base_path_rejects_single_quote(self):
         with pytest.raises(ValueError, match="invalid URL path characters"):
             SiteConfig(base_path="/my's-blog")
