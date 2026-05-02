@@ -865,7 +865,11 @@ def build_site(
     # Generate sitemap if base_url is configured
     if config.site.base_url:
         sitemap_xml = build_sitemap(
-            pages, rendered_folder_indexes, config.site.base_url, clean_urls
+            pages,
+            rendered_folder_indexes,
+            config.site.base_url,
+            clean_urls,
+            base_path,
         )
         (output / "sitemap.xml").write_text(sitemap_xml)
 

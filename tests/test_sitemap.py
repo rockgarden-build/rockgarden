@@ -56,3 +56,14 @@ class TestBuildSitemap:
         pages = [self._make_page("page")]
         result = build_sitemap(pages, [], "https://example.com", clean_urls=False)
         assert "https://example.com/page.html" in result
+
+    def test_base_path_applied_to_pages(self):
+        pages = [self._make_page("about")]
+        result = build_sitemap(pages, [], "https://example.com", base_path="/2026")
+        assert "https://example.com/2026/about/" in result
+        assert "<loc>https://example.com/about/</loc>" not in result
+
+    def test_base_path_applied_to_folder_indexes(self):
+        folders = [FolderIndex(slug="docs/index", title="Docs", children=[])]
+        result = build_sitemap([], folders, "https://example.com", base_path="/2026")
+        assert "https://example.com/2026/docs/" in result

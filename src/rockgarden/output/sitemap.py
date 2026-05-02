@@ -12,6 +12,7 @@ def build_sitemap(
     folder_indexes: list[FolderIndex],
     base_url: str,
     clean_urls: bool = True,
+    base_path: str = "",
 ) -> str:
     """Generate an XML sitemap string.
 
@@ -20,6 +21,7 @@ def build_sitemap(
         folder_indexes: All folder index pages.
         base_url: Site base URL (e.g., "https://example.com").
         clean_urls: Whether clean URLs are enabled.
+        base_path: Optional path prefix (e.g., "/docs").
 
     Returns:
         XML sitemap string.
@@ -30,7 +32,7 @@ def build_sitemap(
     for page in pages:
         url_el = SubElement(urlset, "url")
         loc = SubElement(url_el, "loc")
-        loc.text = base_url + get_url(page.slug, clean_urls)
+        loc.text = base_url + get_url(page.slug, clean_urls, base_path)
         if page.modified:
             lastmod = SubElement(url_el, "lastmod")
             lastmod.text = page.modified.strftime("%Y-%m-%d")
@@ -38,7 +40,7 @@ def build_sitemap(
     for folder in folder_indexes:
         url_el = SubElement(urlset, "url")
         loc = SubElement(url_el, "loc")
-        loc.text = base_url + get_url(folder.slug, clean_urls)
+        loc.text = base_url + get_url(folder.slug, clean_urls, base_path)
 
     xml_bytes = tostring(urlset, encoding="unicode", xml_declaration=False)
     return '<?xml version="1.0" encoding="UTF-8"?>\n' + xml_bytes + "\n"
