@@ -5,9 +5,9 @@
     "watch:css": "npx @tailwindcss/cli -i static-src/input.css -o src/rockgarden/static/rockgarden.css --watch"
   },
   "devDependencies": {
-    "@tailwindcss/cli": "^4.2.4",
-    "@tailwindcss/typography": "^0.5.16",
-    "daisyui": "^5.5.19",
+    "@tailwindcss/cli": "^4.3.3",
+    "@tailwindcss/typography": "^0.5.20",
+    "daisyui": "^5.7.28",
     "tailwindcss": "^4.2.4"
   }
 }
