@@ -1,3 +1,9 @@
+## v0.7.8 (2026-09-09)
+
+### Minor / Bug Fixes
+
+- add canonical URL tag to default theme pages (#118)
+
 ## v0.7.7 (2026-05-02)
 
 ### Minor / Bug Fixes
