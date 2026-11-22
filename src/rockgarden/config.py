@@ -113,10 +113,11 @@ NavLinkConfig.model_rebuild()
 
 
 class FolderSortOverride(BaseModel):
-    """Per-folder sort override."""
+    """Per-folder nav override."""
 
     sort: str | None = None
     reverse: bool | None = None
+    show_subtitles: bool | None = None
 
 
 class NavConfig(BaseModel):
@@ -126,6 +127,7 @@ class NavConfig(BaseModel):
     labels: dict[str, str] = Field(default_factory=dict)
     sort: str = "files-first"
     reverse: bool = False
+    show_subtitles: bool = True
     link_auto_index: bool = False
     links: list[NavLinkConfig] = Field(default_factory=list)
     links_position: str = "after"

@@ -98,14 +98,15 @@ Theme-specific display and rendering options. These are supported by the default
 | `labels`          | `dict`      | `{}`            | Custom labels for paths (e.g. `{"/api" = "API Reference"}`)         |
 | `sort`            | `str`       | `"files-first"` | Sort order: `"files-first"`, `"folders-first"`, `"alphabetical"`, or `"date"` (folder index only) |
 | `reverse`         | `bool`      | `false`         | Reverse sort order of unpinned items (pinned items keep their `nav_order`) |
+| `show_subtitles`  | `bool`      | `true`          | Show page `subtitle` frontmatter under nav labels                   |
 | `link_auto_index` | `bool`      | `false`         | Make folders with `index.md` clickable links in nav                 |
 | `links`           | `list`      | `[]`            | Custom navigation links. Each entry has `label`, `url`, and optional `children` (same structure, nested) |
 | `links_position`  | `str`       | `"after"`       | Where to place custom links relative to directory nav: `"before"` or `"after"` |
-| `overrides`       | `dict`      | `{}`            | Per-folder sort overrides (see below)                               |
+| `overrides`       | `dict`      | `{}`            | Per-folder overrides (see below)                                    |
 
-### Per-folder sort overrides
+### Per-folder overrides
 
-Override `sort` and `reverse` for specific folders via config or per-folder metadata file.
+Override `sort`, `reverse`, and `show_subtitles` for specific folders via config or per-folder metadata file. A folder's setting applies to all its descendants unless a deeper folder sets its own.
 
 **In `rockgarden.toml`:**
 
@@ -113,6 +114,7 @@ Override `sort` and `reverse` for specific folders via config or per-folder meta
 [nav.overrides.blog]
 sort = "date"
 reverse = true
+show_subtitles = false
 ```
 
 **In a folder's `_folder.md` frontmatter** (takes priority over config):
@@ -121,10 +123,11 @@ reverse = true
 ---
 sort: date
 sort_reverse: true
+show_subtitles: false
 ---
 ```
 
-Priority: `_folder.md` > `[nav.overrides.<path>]` > global `[nav]` defaults.
+Priority: the deepest folder with a setting wins. Within one folder, `_folder.md` > `[nav.overrides.<path>]`. Global `[nav]` values are the fallback.
 
 The `"date"` sort strategy orders by file modified time and is only available on folder index pages. In the nav sidebar, `"date"` falls back to `"files-first"`.
 
@@ -138,8 +141,10 @@ Supported fields:
 | -------------- | ------ | ------------------------------------------------------------------------- |
 | `nav_order`    | `int`  | Pin the folder's position in its parent nav (lower = higher)              |
 | `label`        | `str`  | Override the folder's display label in nav and breadcrumbs                |
-| `sort`         | `str`  | Child sort strategy (`alphabetical`, `files-first`, `folders-first`, `date`) |
-| `sort_reverse` | `bool` | Reverse the child sort order                                              |
+| `subtitle`     | `str`  | Subtitle shown under the folder's nav label (overrides the folder's `index.md` subtitle) |
+| `sort`         | `str`  | Sort strategy for this folder's contents (`alphabetical`, `files-first`, `folders-first`, `date`) |
+| `sort_reverse` | `bool` | Reverse the sort order for this folder's contents                        |
+| `show_subtitles` | `bool` | Show subtitles in nav for this folder's contents                         |
 | `unlisted`     | `bool` | Hide the folder (and its descendants) from navigation entirely            |
 | `show_index`   | `bool` | Render the auto-generated folder listing at `/folder/` instead of the folder's `index.md` page. If an `index.md` also exists, its body is used as prose above the auto-listing. |
 
@@ -238,7 +243,7 @@ Per-page options set in YAML frontmatter:
 | `layout`      | `str`           | Layout template name (e.g. `"talk"` → `layouts/talk.html`)                |
 | `aliases`     | `str` or `list` | Alternative names for wikilink resolution                                 |
 | `author`      | `str`           | Page author (used in Atom feed, overrides site-level feed author)         |
-| `subtitle`    | `str`           | Subtitle shown below the page title, in folder indexes, and tag indexes   |
+| `subtitle`    | `str`           | Subtitle shown below the page title, in nav, folder indexes, tag indexes, and search results |
 | `unlisted`    | `bool`          | Hide page from sidebar navigation and folder indexes (still accessible by URL). On an `index.md` / folder-note, the page still renders at `/folder/` but no nav entry links to it; the folder itself remains visible. To hide an entire folder, set `unlisted: true` in a `_folder.md`. |
 
 ## CLI Overrides

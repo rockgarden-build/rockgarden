@@ -372,6 +372,7 @@ def build_collection_pages(
             generated.append(
                 {
                     "title": fields.get("title", fields.get("name", slug)),
+                    "subtitle": str(fields.get("subtitle") or ""),
                     "url": f"{base_path}{url}",
                     "slug": slug,
                     "collection": col.name,
@@ -593,12 +594,16 @@ def build_site(
             slug = url.strip("/")
             fields = entry_fields(entry)
             title = fields.get("title", fields.get("name", slug))
+            subtitle = (
+                (fields.get("subtitle") or "") if config.nav.show_subtitles else ""
+            )
             children.append(
                 NavNode(
                     name=slug.rsplit("/", 1)[-1],
                     path=f"{base_path}{url}",
                     label=title,
                     is_folder=False,
+                    subtitle=str(subtitle),
                 )
             )
         if not children:
@@ -841,6 +846,8 @@ def build_site(
                 "title": entry["title"],
                 "url": entry["url"],
             }
+            if entry.get("subtitle"):
+                search_entry["subtitle"] = entry["subtitle"]
             if config.search.include_content and entry.get("rendered_html"):
                 search_entry["content"] = strip_html(entry["rendered_html"])
             search_index.append(search_entry)

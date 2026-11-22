@@ -59,6 +59,8 @@ def build_search_index(
             "title": page.title,
             "url": get_url(page.slug, clean_urls, base_path),
         }
+        if page.subtitle:
+            entry["subtitle"] = page.subtitle
 
         # Add tags if present
         tags = page.frontmatter.get("tags", [])
