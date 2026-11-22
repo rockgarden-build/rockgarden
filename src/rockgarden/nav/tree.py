@@ -8,7 +8,7 @@ from fnmatch import fnmatch
 from rockgarden.config import NavConfig, NavLinkConfig
 from rockgarden.content import FolderMeta, Page
 from rockgarden.nav.labels import resolve_label
-from rockgarden.nav.sort import resolve_sort
+from rockgarden.nav.sort import resolve_show_subtitles, resolve_sort
 from rockgarden.urls import get_folder_url, get_url
 
 
@@ -21,6 +21,7 @@ class NavNode:
     label: str
     is_folder: bool
     children: list[NavNode] = field(default_factory=list)
+    subtitle: str = ""
     nav_order: int | None = None
     index_path: str | None = None
     is_external: bool = False
@@ -171,6 +172,7 @@ def build_nav_tree(
 
     def dict_to_nodes(d: dict, parent_path: str = "") -> list[NavNode]:
         nodes = []
+        show_subtitles = resolve_show_subtitles(parent_path, config, folder_metas)
         for name, data in d.items():
             if name.startswith("_"):
                 continue
@@ -178,6 +180,7 @@ def build_nav_tree(
             path = data.get("_path", "")
             is_folder = data.get("_is_folder", False)
             nav_order = None
+            subtitle = ""
 
             if is_folder:
                 original_name = data.get("_original_name", name)
@@ -187,16 +190,19 @@ def build_nav_tree(
                 url_path = get_folder_url(path, clean_urls, base_path)
                 if path in folder_metas:
                     nav_order = folder_metas[path].nav_order
+                    subtitle = folder_metas[path].subtitle or ""
+                if not subtitle and path in folder_pages:
+                    subtitle = folder_pages[path].subtitle
             else:
                 page = data.get("_page")
                 label = page.title if page else name
                 url_path = get_url(path, clean_urls, base_path)
                 if page:
                     nav_order = page.frontmatter.get("nav_order")
+                    subtitle = page.subtitle
 
             children = dict_to_nodes(data.get("_children", {}), path)
-            folder_fm = folder_metas[path].frontmatter if path in folder_metas else None
-            resolved = resolve_sort(path, config, folder_fm)
+            resolved = resolve_sort(path, config, folder_metas)
             children = _sort_nav_nodes(children, resolved.sort, resolved.reverse)
 
             index_path = None
@@ -217,10 +223,11 @@ def build_nav_tree(
                     children=children,
                     nav_order=nav_order,
                     index_path=index_path,
+                    subtitle=subtitle if show_subtitles else "",
                 )
             )
 
-        root_resolved = resolve_sort("", config)
+        root_resolved = resolve_sort("", config, folder_metas)
         return _sort_nav_nodes(nodes, root_resolved.sort, root_resolved.reverse)
 
     root_label = resolve_label("", "Home", config.labels, folder_metas, folder_pages)

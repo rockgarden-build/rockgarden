@@ -24,6 +24,11 @@ class Page:
             return title
         return self.source_path.stem.replace("_", " ")
 
+    @property
+    def subtitle(self) -> str:
+        """Get page subtitle from frontmatter, or empty string."""
+        return str(self.frontmatter.get("subtitle") or "")
+
 
 @dataclass
 class FolderMeta:
@@ -45,6 +50,10 @@ class FolderMeta:
     @property
     def label(self) -> str | None:
         return self.frontmatter.get("label")
+
+    @property
+    def subtitle(self) -> str | None:
+        return self.frontmatter.get("subtitle")
 
     @property
     def sort(self) -> str | None:

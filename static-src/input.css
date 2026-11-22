@@ -30,6 +30,14 @@
     text-decoration: underline;
 }
 
+.nav-tree a:hover:has(.nav-label) {
+    text-decoration: none;
+}
+
+.nav-tree a:hover .nav-label > :first-child {
+    text-decoration: underline;
+}
+
 /* Callout base styles */
 .callout {
     border-left: 4px solid;

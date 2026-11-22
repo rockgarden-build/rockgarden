@@ -230,7 +230,7 @@ def _get_folder_children(
             children.append(
                 FolderChild(
                     title=page.title,
-                    subtitle=page.frontmatter.get("subtitle", ""),
+                    subtitle=page.subtitle,
                     path=get_url(page.slug, clean_urls, base_path),
                     is_folder=False,
                     modified=modified,
@@ -272,8 +272,5 @@ def _get_folder_children(
                     )
                 )
 
-    folder_fm = (
-        folder_metas[folder_path].frontmatter if folder_path in folder_metas else None
-    )
-    resolved = resolve_sort(folder_path, config, folder_fm)
+    resolved = resolve_sort(folder_path, config, folder_metas)
     return _sort_folder_children(children, resolved.sort, resolved.reverse)

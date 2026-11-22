@@ -191,6 +191,7 @@
                         {% endif %}
                         this.ref('url');
                         this.field('title', { boost: 10 });
+                        this.field('subtitle', { boost: 5 });
                         this.field('tags', { boost: 5 });
                         this.field('content');
 
@@ -198,6 +199,7 @@
                             this.add({
                                 url: doc.url,
                                 title: doc.title,
+                                subtitle: doc.subtitle || '',
                                 tags: doc.tags ? doc.tags.join(' ') : '',
                                 content: doc.content || ''
                             });
@@ -290,6 +292,12 @@
                     const titleText = document.createElement('div');
                     titleText.className = 'text-lg font-semibold group-hover:text-primary transition-colors';
                     titleText.textContent = doc.title;
+                    if (doc.subtitle) {
+                        const subtitleText = document.createElement('div');
+                        subtitleText.className = 'text-sm font-normal text-base-content/60';
+                        subtitleText.textContent = doc.subtitle;
+                        titleText.appendChild(subtitleText);
+                    }
                     titleLink.appendChild(titleText);
 
                     resultCard.appendChild(titleLink);

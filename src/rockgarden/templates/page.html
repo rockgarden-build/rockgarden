@@ -10,8 +10,8 @@
     {% block before_heading %}{% endblock %}
     {% block heading %}<h1>{{ page.title }}</h1>{% endblock %}
     {% block subtitle %}
-    {% if page.frontmatter.get('subtitle') %}
-    <p class="not-prose text-3xl font-semibold italic text-base-content/60 -mt-4 mb-6">{{ page.frontmatter.get('subtitle') }}</p>
+    {% if page.subtitle %}
+    <p class="not-prose text-3xl font-semibold italic text-base-content/60 -mt-4 mb-6">{{ page.subtitle }}</p>
     {% endif %}
     {% endblock %}
     {% block after_heading %}
