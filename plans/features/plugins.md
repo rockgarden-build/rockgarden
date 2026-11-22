@@ -1,6 +1,6 @@
 # Plugins
 
-## Status: Future
+## Status: Design before 1.0, implement after
 
 ## Concept
 

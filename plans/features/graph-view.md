@@ -1,6 +1,6 @@
 # Graph View
 
-## Status: Future
+## Status: Planned (Phase 1)
 
 Interactive graph visualization of page links and backlinks. Would display the relationship graph between pages, similar to Obsidian's graph view.
 

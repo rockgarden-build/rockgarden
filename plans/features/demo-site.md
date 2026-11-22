@@ -1,10 +1,10 @@
 # Demo Site
 
-## Status: Planned
+## Status: Planned (Phase 2)
 
 ## Goal
 
-Flesh out `site/` as a comprehensive feature showcase and deploy to Cloudflare Pages. Separate from the docs site.
+Flesh out `site/` as a comprehensive feature showcase and deploy to Cloudflare Pages. Separate from the docs site. Showcases both the default theme and the alternate theme (see `alternate-theme.md`).
 
 ## Pre-work
 

@@ -10,8 +10,4 @@
 
 ## Feature gaps
 
-- **Add brand icon library support**: Lucide intentionally excludes brand/logo icons. Need a second icon library for social/brand icons. The resolver's `LIBRARY_ALIASES` and multi-library dispatch are already wired up — implementation is mostly adding a new loader. Candidates: Simple Icons, Font Awesome, Iconify.
-
-## Content
-
-- **Flesh out example site and publish as demo**: The existing small example site isn't built or published anywhere. Expand it to cover most features and publish as a standalone demo site.
+- **Add brand icon library support** (roadmap Phase 1, needed for social links): Lucide intentionally excludes brand/logo icons. Need a second icon library for social/brand icons. The resolver's `LIBRARY_ALIASES` and multi-library dispatch are already wired up — implementation is mostly adding a new loader. Candidates: Simple Icons, Font Awesome, Iconify.
