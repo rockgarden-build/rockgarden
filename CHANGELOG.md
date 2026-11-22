@@ -1,3 +1,9 @@
+## v0.8.0 (2026-11-22)
+
+### Features
+
+- add support for subtitle rendering (#151)
+
 ## v0.7.8 (2026-09-09)
 
 ### Minor / Bug Fixes
