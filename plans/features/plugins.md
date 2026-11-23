@@ -28,11 +28,11 @@ Scenarios for checking the design's extension points.
 
 ### A tool's own file format rendered as pages
 
-Example: an Obsidian VTT plugin stores scenes as JSON files (`.atlasmap`) with a background image, tokens, fog, and pins linking to notes, some marked hidden. A plugin renders each scene as a page and as an embed in notes. Needs:
+Hypothetical: a plugin for something like [Atlas VTT](https://github.com/atlas-vtt/atlas-vtt), an Obsidian virtual tabletop that stores scenes as JSON files with a background image, tokens, fog, and pins linking to notes, some marked hidden. The plugin renders each scene as a page and as an embed in notes. Not a commitment to support Atlas. Needs:
 
 - Content loader for a non-markdown file extension
 - Adding generated pages to the content store, with their own template and URL
-- Embed handler for a file type (`![[Scene.atlasmap]]`)
+- Embed handler for a file type
 - Read access to the content store and link resolution (pin targets to URLs, dropped pages)
 - Asset registration (images referenced by the file)
 - Plugin static assets (client-side JS/CSS)
