@@ -22,9 +22,28 @@ Plugins handle functionality that's too opinionated for the core (e.g., OG image
 - Hooks are a primitive: usable standalone via config, or provided by plugins.
 - Installation by convention (copy/clone into project) or via CLI from a git URL or local directory.
 
+## Fit-Test Use Cases
+
+Scenarios for checking the design's extension points.
+
+### A tool's own file format rendered as pages
+
+Example: an Obsidian VTT plugin stores scenes as JSON files (`.atlasmap`) with a background image, tokens, fog, and pins linking to notes, some marked hidden. A plugin renders each scene as a page and as an embed in notes. Needs:
+
+- Content loader for a non-markdown file extension
+- Adding generated pages to the content store, with their own template and URL
+- Embed handler for a file type (`![[Scene.atlasmap]]`)
+- Read access to the content store and link resolution (pin targets to URLs, dropped pages)
+- Asset registration (images referenced by the file)
+- Plugin static assets (client-side JS/CSS)
+- Reading the active audience profile (see `ideas.md`) to filter hidden objects
+
+Build hooks alone can't cover this: they can write source files but can't see the store or link resolution.
+
 ## Open Questions
 
 - Plugin discovery and loading mechanism (entry points, convention-based, or config-declared)
 - Dependency resolution between plugins and themes
 - Plugin configuration (own section in `rockgarden.toml` or separate config)
 - How plugin-provided templates integrate with the ChoiceLoader resolution order
+- Which of the extension points from the fit-test use cases join the registration list, and which internal APIs (content store, link resolution, assets) they expose for the 1.0 contract

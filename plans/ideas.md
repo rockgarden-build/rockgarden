@@ -8,6 +8,8 @@ Future ideas and research notes. Post-1.0 unless moved into `roadmap.md`.
 - **Configurable markdown preset** (commonmark, gfm-like, custom plugins)
 - **Build-time mermaid rendering** — render mermaid diagrams to SVG at build time instead of client-side JS (via mermaid CLI `mmdc`)
 
+- **Audience profiles**: build one vault for different audiences (e.g. GM vs players, internal vs public). A build-time profile drops pages by frontmatter or folder, strips audience-restricted blocks inside pages, and renders links to dropped pages as broken without leaking titles. Needs design before roadmap: syntax for restricted blocks, how profiles are declared and selected, interaction with search index, nav, backlinks, and tags.
+
 ## UI & Navigation
 
 - **Reading time** — estimated reading time per page (word count / ~230 WPM)
